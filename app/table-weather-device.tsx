@@ -10,26 +10,26 @@ import {
 import { webUser } from '../lib/webusers-model';
 import { User } from '../lib/users-schema';
 import { Device } from '../lib/devices-schema';
-
-export default function DevicesTable({ devices }: { devices: Device[] }) {
+import { weatherAccount } from '../lib/weather_accounts';
+export default function DevicesTable({ devices }: { devices: weatherAccount[] }) {
   return (
     <Table>
       <TableHead>
         <TableRow>
-          <TableHeaderCell>Name</TableHeaderCell>
-          <TableHeaderCell>Miner Key</TableHeaderCell>
-          <TableHeaderCell>Is registered ?</TableHeaderCell>
+          <TableHeaderCell>Api Key</TableHeaderCell>
+          <TableHeaderCell>Devices</TableHeaderCell>
+          <TableHeaderCell>Idk</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {devices.map((device) => (
           <TableRow key={device.id}>
-            <TableCell>{device.name}</TableCell>
+            <TableCell>{device.api_key}</TableCell>
             <TableCell>
-              <Text>{device.miner_key}</Text>
+              <Text>{device.devices.length}</Text>
             </TableCell>
             <TableCell>
-              <Text>{device.is_registered ? 'Yes' : 'No'}</Text>
+              <Text>{device.user_id.toString()}</Text>
             </TableCell>
           </TableRow>
         ))}

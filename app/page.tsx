@@ -1,38 +1,27 @@
 import { Card, Title, Text } from '@tremor/react';
 import Search from './search';
 import UsersTable from './table';
-import WebUserModel, { rawWebUser, webUser } from '../lib/webusers-model';
-import { getSession } from 'next-auth/react';
-import { getServerSession } from 'next-auth/next';
-import { connect } from '../lib/connect';
-import UserModel from '../lib/users-schema';
-import { MySession, authOptions } from '../pages/api/auth/[...nextauth]';
 
-export default async function IndexPage({
+import UserModel from '../lib/users-schema';
+import { connect } from '../lib/connect';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../pages/api/auth/[...nextauth]';
+import { checkSession } from './sessionCheck';
+
+
+const IndexPage = async function ({
   searchParams,
 }: {
   searchParams: { q: string };
 }) {
-
+  const session = await getServerSession(authOptions);
+  const isForbidden = await checkSession(session);
+  if (isForbidden) {
+    return isForbidden;
+  }
   const search = searchParams.q ?? '';
-
-  const session: MySession | null = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    return (
-      <main className="p-4 md:p-10 mx-auto max-w-7xl">
-        <Title>Please login in order to access the admin panel</Title>
-      </main>
-    );
-  } 
-  await connect();
-  if (!session.user.admin) {
-    return (
-      <main className="p-4 md:p-10 mx-auto max-w-7xl">
-        <Title>This panel is only accessible to admin users.</Title>
-      </main>
-    );
-  } else {
     console.log("search", search);
+    await connect();
     const users = await UserModel.find({ "name.full": { $regex: search } });
     return (
       <main className="p-4 md:p-10 mx-auto max-w-7xl">
@@ -46,5 +35,7 @@ export default async function IndexPage({
         </Card>
       </main>
     );
-  }
+  
 }
+
+export default IndexPage

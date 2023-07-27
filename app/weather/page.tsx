@@ -4,8 +4,9 @@ import { MySession, authOptions } from '../../pages/api/auth/[...nextauth]';
 import { connect } from '../../lib/connect';
 import DeviceModel from '../../lib/devices-schema';
 import Search from '../search';
-import DevicesTable from '../table-device';
+import WeatherDevicesTable from '../table-weather-device';
 import { checkSession } from '../sessionCheck';
+import { WeatherAccountModel } from '../../lib/weather_accounts';
 
 
 export default async function DevicesPage({
@@ -22,13 +23,13 @@ export default async function DevicesPage({
     return isForbidden;
   }
   console.log("search", search);
-  const devices = await DeviceModel.find({ "name": { $regex: search } });
+  const devices = await WeatherAccountModel.find({ "api_key": { $regex: search } });
   return (
     <main className="p-4 md:p-10 mx-auto max-w-7xl">
-      <Title>Devices</Title>
+      <Title>Weather Devices</Title>
       <Search />
       <Card className="mt-6">
-        <DevicesTable devices={devices} />
+        <WeatherDevicesTable devices={devices} />
       </Card>
     </main>
   );

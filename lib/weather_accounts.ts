@@ -31,7 +31,7 @@ export interface weatherAccount extends mongoose.Document {
             },
             name: string,
         }
-    }
+    }[]
 }
 
 export const WeatherAccountModel = mongoose.model<weatherAccount>('weather_accounts', weatherAccountsSchema);
