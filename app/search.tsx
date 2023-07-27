@@ -2,12 +2,19 @@
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { usePathname, useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 export default function Search({ disabled }: { disabled?: boolean }) {
   const { replace } = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+  const [searchTerm, setSearchTerm] = useState('');
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch(searchTerm);
+    }, 500); //wait for 0.5 second before handling search
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
 
   function handleSearch(term: string) {
     const params = new URLSearchParams(window.location.search);
@@ -45,7 +52,7 @@ export default function Search({ disabled }: { disabled?: boolean }) {
           className="h-10 block w-full rounded-md border border-gray-200 pl-9 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           placeholder="Search by name..."
           spellCheck={false}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 

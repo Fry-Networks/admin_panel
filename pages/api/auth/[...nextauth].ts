@@ -4,9 +4,12 @@ import GithubProvider from 'next-auth/providers/github';
 import { MongoDBAdapter } from "@auth/mongodb-adapter"
 import clientPromise from "../../../lib/mongoclient"
 import { Adapter } from 'next-auth/adapters';
+import { Session } from 'next-auth';
+
 export const authOptions: NextAuthOptions = {
   jwt: {
     secret: process.env.NEXTAUTH_SECRET as string,
+   
   },
   adapter: MongoDBAdapter(clientPromise, {
       collections: {
@@ -16,12 +19,13 @@ export const authOptions: NextAuthOptions = {
         VerificationTokens: 'webverificationtokens',
       },
       
-      databaseName: 'webauth',
+      databaseName: 'main',
   }) as Adapter,
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_SECRET as string,
+      
     }),
   ],
   session: {
@@ -29,7 +33,6 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async session({ session, token, user }) {
-      console.log(session, token, user)
       session.user = user;
       return session;
     }
@@ -37,3 +40,15 @@ export const authOptions: NextAuthOptions = {
 };
 
 export default NextAuth(authOptions);
+
+
+export interface MySession extends Session {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    image: string;
+    emailVerified: string | null;
+    admin: boolean;
+  }
+}

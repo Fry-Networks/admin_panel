@@ -12,6 +12,13 @@ export interface webUser extends mongoose.Document {
     email: string;
     admin: boolean;
 }
+
+export interface rawWebUser {
+    name: string;
+    username: string;
+    email: string;
+    admin: boolean;
+}
 const WebUserModel = (mongoose.models.webusers || mongoose.model<webUser>('webusers', webUsersSchema)) as mongoose.Model<webUser>;
 
 

@@ -9,26 +9,27 @@ import {
 } from '@tremor/react';
 import { webUser } from '../lib/webusers-model';
 import { User } from '../lib/users-schema';
+import { Device } from '../lib/devices-schema';
 
-export default async function UsersTable({ users }: { users: User[] }) {
+export default async function DevicesTable({ devices }: { devices: Device[] }) {
   return (
     <Table>
       <TableHead>
         <TableRow>
           <TableHeaderCell>Name</TableHeaderCell>
-          <TableHeaderCell>Address</TableHeaderCell>
-          <TableHeaderCell>Email</TableHeaderCell>
+          <TableHeaderCell>Miner Key</TableHeaderCell>
+          <TableHeaderCell>Is registered ?</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
-        {users.map((user) => (
-          <TableRow key={user.id}>
-            <TableCell>{user.name.full}</TableCell>
+        {devices.map((device) => (
+          <TableRow key={device.id}>
+            <TableCell>{device.name}</TableCell>
             <TableCell>
-              <Text>{user.address}</Text>
+              <Text>{device.miner_key}</Text>
             </TableCell>
             <TableCell>
-              <Text>{user.email}</Text>
+              <Text>{device.is_registered ? 'Yes' : 'No'}</Text>
             </TableCell>
           </TableRow>
         ))}
