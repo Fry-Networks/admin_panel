@@ -9,7 +9,7 @@ export default function Search({ disabled }: { disabled?: boolean }) {
   const { replace } = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(window.location.search ? new URLSearchParams(window.location.search).get('q') ?? "" : "");
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       handleSearch(searchTerm);
@@ -24,11 +24,10 @@ export default function Search({ disabled }: { disabled?: boolean }) {
     } else {
       params.delete('q');
     }
-    //TODO: fix search
+    
     startTransition(() => {
-      if (lastParams.size && !params.size && !window.location.search.length) replace(`${pathname}`);
-      else if (!params.size && window.location.search.length >= 1) replace(`${pathname + window.location.search}`);
-      else replace(`${pathname}?${params.toString()}`);
+     
+      replace(`${pathname}?${params.toString()}`);
       lastParams = params;
     });
   }
@@ -57,6 +56,7 @@ export default function Search({ disabled }: { disabled?: boolean }) {
           placeholder="Search by name..."
           spellCheck={false}
           onChange={(e) => { setSearchTerm(e.target.value) }}
+          value={searchTerm}
         />
       </div>
 

@@ -11,6 +11,38 @@ import { webUser } from '../lib/webusers-model';
 import { User } from '../lib/users-schema';
 
 export default function UsersTable({ users }: { users: User[] }) {
+  const sorted = users.sort((a, b) => {
+    // Check if both have full names
+    if (a.name?.full && b.name?.full) {
+        // If both have full names, then check the address
+        if (a.address && !b.address) {
+            return -1;
+        } else if (!a.address && b.address) {
+            return 1;
+        } else {
+            return 0;
+        }
+    } 
+    // If one has a full name and the other doesn't, give priority to the one with a full name
+    else if (a.name?.full && !b.name?.full) {
+        return -1;
+    } else if (!a.name?.full && b.name?.full) {
+        return 1;
+    } 
+    // If neither have a full name, then check the address
+    else {
+        if (a.address && !b.address) {
+            return -1;
+        } else if (!a.address && b.address) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+});
+
+
+
   return (
     <Table>
       <TableHead>
@@ -21,7 +53,7 @@ export default function UsersTable({ users }: { users: User[] }) {
         </TableRow>
       </TableHead>
       <TableBody>
-        {users.map((user) => (
+        {sorted.map((user) => (
           <TableRow key={user.id}>
             <TableCell>{user.name?.full ?? ""}</TableCell>
             <TableCell>

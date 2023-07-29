@@ -1,11 +1,13 @@
 
-import { Card, Metric, Text, Title, BarList, Flex, Grid, MultiSelect, MultiSelectItem } from '@tremor/react';
+import { Card, Metric, Text, Title, BarList, Flex, Grid, MultiSelect, MultiSelectItem, TabPanel, TabPanels, TabGroup, TabList, Tab } from '@tremor/react';
 import Search from '../app/search';
 import clientPromise from '../lib/mongoclient';
 import { useState } from 'react';
 import { User } from '../lib/users-schema';
 import UsersTable from '../app/table';
 import { getSession } from 'next-auth/react';
+import UserForm from './components/form-user';
+import RemoveUserForm from './components/remove-user';
 
 
 export default function UsersPage({ users, searchParams }: { users: User[], searchParams: { q: string } }) {
@@ -27,18 +29,36 @@ export default function UsersPage({ users, searchParams }: { users: User[], sear
   return (
     <main className="p-4 md:p-10 mx-auto max-w-7xl">
       <Title>Users</Title>
-      <Flex alignItems='end' flexDirection='row' className='mt-6'>
-        <Search />
-      </Flex>
-      <div style={{ marginTop: '20px' }}>
-        <Text >
-          {filtered.length} users matching your search
-        </Text>
-      </div>
+      <TabGroup>
+        <TabList className="mt-8">
+          <Tab >List</Tab>
+          <Tab >Add User</Tab>
+          <Tab >Remove User</Tab>
 
-      <Card className="mt-6">
-        <UsersTable users={filtered} />
-      </Card>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <Flex alignItems='end' flexDirection='row' className='mt-6'>
+              <Search />
+            </Flex>
+            <div style={{ marginTop: '20px' }}>
+              <Text >
+                {filtered.length} users matching your search
+              </Text>
+            </div>
+
+            <Card className="mt-6">
+              <UsersTable users={filtered} />
+            </Card>
+          </TabPanel>
+          <TabPanel>
+           <UserForm />
+          </TabPanel>
+          <TabPanel>
+            <RemoveUserForm users={users}/>
+          </TabPanel>
+        </TabPanels>
+      </TabGroup>
     </main>
   );
 

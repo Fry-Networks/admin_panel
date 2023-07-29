@@ -1,6 +1,6 @@
 
 
-export async function addDevice({ email, device_type }: { email: string, device_type: string }): Promise<void> {
+export async function addDevice({ email, device_type }: { email: string, device_type: string }): Promise<boolean> {
     let device_name = "";
 
     switch (device_type) {
@@ -30,6 +30,39 @@ export async function addDevice({ email, device_type }: { email: string, device_
         },
         body: JSON.stringify({ email, device_name, device_type })
     });
-    console.log(res.status);
+    return res.ok;
 
 };
+
+export async function addUser(data: { email: string, address: string, first_name: string, last_name: string }): Promise<boolean> {
+    const res = await fetch('/api/add-user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    return res.ok;
+}
+
+export async function removeUser(user_id: string): Promise<boolean> {
+    const res = await fetch('/api/remove-user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ user_id })
+    });
+    return res.ok;
+}
+
+export async function removeDevice(device_id: string): Promise<boolean> {
+    const res = await fetch('/api/remove-device', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ device_id })
+    });
+    return res.ok;
+}

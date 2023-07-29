@@ -10,6 +10,7 @@ import '../app/css/devices.css';
 import DeviceForm from './components/form-device';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@tremor/react";
 import { User } from '../lib/users-schema';
+import RemoveDeviceForm from './components/remove-device';
 
 export default function DevicesPage({ devices, users, searchParams }: { devices: Device[],users: User[], searchParams: { q: string } }) {
   const searchTerm = searchParams.q || "";
@@ -35,6 +36,7 @@ export default function DevicesPage({ devices, users, searchParams }: { devices:
         <TabList className="mt-8">
           <Tab >List</Tab>
           <Tab >Add Device</Tab>
+          <Tab >Remove Device</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -57,6 +59,9 @@ export default function DevicesPage({ devices, users, searchParams }: { devices:
           </TabPanel>
           <TabPanel>
             <DeviceForm users={users}/>
+          </TabPanel>
+          <TabPanel>
+            <RemoveDeviceForm devices={devices}/>
           </TabPanel>
         </TabPanels>
       </TabGroup>
