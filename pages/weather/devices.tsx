@@ -4,6 +4,7 @@ import Search from '../../app/search';
 import clientPromise from '../../lib/mongoclient';
 import { weatherAccount } from '../../lib/weather_accounts';
 import WeatherDevicesTable from '../../app/table-weather-device';
+import { getSession } from 'next-auth/react';
 
 
 export default function WeatherDevicesPage({ accounts, searchParams }: { accounts: weatherAccount[], searchParams: { q: string } }) {
@@ -42,6 +43,13 @@ export default function WeatherDevicesPage({ accounts, searchParams }: { account
 }
 
 export async function getServerSideProps(context: any) {
+  const session = await getSession(context);
+  if (!session || !session.user?.admin) {
+    return {
+      props: { error: 'Unauthorized access' },
+    };
+  }
+  
   try {
     const client = await clientPromise;
     const db = client.db("main");

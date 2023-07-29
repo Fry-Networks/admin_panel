@@ -5,6 +5,7 @@ import clientPromise from '../lib/mongoclient';
 import { useState } from 'react';
 import { User } from '../lib/users-schema';
 import UsersTable from '../app/table';
+import { getSession } from 'next-auth/react';
 
 
 export default function UsersPage({ users, searchParams }: { users: User[], searchParams: { q: string } }) {
@@ -44,6 +45,12 @@ export default function UsersPage({ users, searchParams }: { users: User[], sear
 }
 
 export async function getServerSideProps(context: any) {
+  const session = await getSession(context);
+  if (!session || !session.user?.admin) {
+    return {
+      props: { error: 'Unauthorized access' },
+    };
+  }
   try {
     const client = await clientPromise;
     const db = client.db("main");

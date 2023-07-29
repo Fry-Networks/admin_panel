@@ -17,7 +17,9 @@ export default function MyApp({ Component, pageProps }: MyAppProps) {
   return (
     <SessionProvider session={pageProps.session}>
       <Navbar />
+      <div id="main">
       <ProtectedComponent Component={Component} pageProps={pageProps} />
+      </div>
     </SessionProvider>
   );
 }
