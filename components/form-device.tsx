@@ -1,8 +1,8 @@
 import { Button, SearchSelect, SearchSelectItem, Text } from "@tremor/react";
 import { getSession } from "next-auth/react";
 import { useState } from "react";
-import clientPromise from "../../lib/mongoclient";
-import { User } from "../../lib/users-schema";
+import clientPromise from "../lib/mongoclient";
+import { User } from "../lib/users-schema";
 import { addDevice } from "./server-util";
 export default function DeviceForm({ users }: { users: User[] }) {
     const [deviceType, setDeviceType] = useState("");

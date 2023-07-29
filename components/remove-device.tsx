@@ -1,11 +1,12 @@
 import { Button, SearchSelect, SearchSelectItem, Text } from "@tremor/react";
 import { getSession } from "next-auth/react";
 import { useState } from "react";
-import clientPromise from "../../lib/mongoclient";
-import { User } from "../../lib/users-schema";
-import { addDevice, removeUser } from "./server-util";
-export default function RemoveUserForm({ users }: { users: User[] }) {
-    const [selectedUser, setSelectedUser] = useState("");
+import clientPromise from "../lib/mongoclient";
+import { User } from "../lib/users-schema";
+import { removeDevice } from "./server-util";
+import { Device } from "../lib/devices-schema";
+export default function RemoveDeviceForm({ devices }: { devices: Device[] }) {
+    const [selectedDevice, setSelectedDevice] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState("");
     return (
@@ -13,16 +14,16 @@ export default function RemoveUserForm({ users }: { users: User[] }) {
             <Text className="mb-4">Select a user and hit the button to remove it</Text>
       
         
-                <SearchSelect className=" mb-4" placeholder="Select a user" onValueChange={(value) => setSelectedUser(value)} value={selectedUser}>
-                    {users.map((user, index) => (
-                        <SearchSelectItem key={index} value={user._id}>
-                             {user.name?.full ? `${user.name?.full} (${user.email})` : user.email}
+                <SearchSelect className=" mb-4" placeholder="Select a user" onValueChange={(value) => setSelectedDevice(value)} value={selectedDevice}>
+                    {devices.map((device, index) => (
+                        <SearchSelectItem key={index} value={device._id}>
+                             {device.miner_key ? `${device.miner_key} (${device.name})` : device.name}
                              </SearchSelectItem>
                     ))}
                 </SearchSelect>
        
 
-            {selectedUser ? (
+            {selectedDevice ? (
                  <Button
                  className=""
                  style={{
@@ -32,7 +33,7 @@ export default function RemoveUserForm({ users }: { users: User[] }) {
                  loadingText="Sending to server..."
                  onClick={async () => {
                     setIsLoading(true);
-                    const res = await removeUser(selectedUser);
+                    const res = await removeDevice(selectedDevice);
                     if(res) {
                         setStatus("Success");
                     } else {

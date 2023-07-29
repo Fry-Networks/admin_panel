@@ -6,8 +6,8 @@ import { useState } from 'react';
 import { User } from '../lib/users-schema';
 import UsersTable from '../app/table';
 import { getSession } from 'next-auth/react';
-import UserForm from './components/form-user';
-import RemoveUserForm from './components/remove-user';
+import UserForm from '../components/form-user';
+import RemoveUserForm from '../components/remove-user';
 
 
 export default function UsersPage({ users, searchParams }: { users: User[], searchParams: { q: string } }) {

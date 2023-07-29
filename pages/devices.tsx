@@ -7,10 +7,10 @@ import { Device } from '../lib/devices-schema';
 import { getSession } from 'next-auth/react';
 import { CSSTransition } from 'react-transition-group';
 import '../app/css/devices.css';
-import DeviceForm from './components/form-device';
+import DeviceForm from '../components/form-device';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@tremor/react";
 import { User } from '../lib/users-schema';
-import RemoveDeviceForm from './components/remove-device';
+import RemoveDeviceForm from '../components/remove-device';
 
 export default function DevicesPage({ devices, users, searchParams }: { devices: Device[],users: User[], searchParams: { q: string } }) {
   const searchTerm = searchParams.q || "";
