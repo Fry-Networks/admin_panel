@@ -1,0 +1,63 @@
+
+import { Card, Metric, Text, Title, BarList, Flex, Grid, MultiSelect, MultiSelectItem } from '@tremor/react';
+import Search from '../app/search';
+import clientPromise from '../lib/mongoclient';
+import { useState } from 'react';
+import { User } from '../lib/users-schema';
+import UsersTable from '../app/table';
+
+
+export default function UsersPage({ users, searchParams }: { users: User[], searchParams: { q: string } }) {
+  const searchTerm = searchParams.q || "";
+
+
+  const filtered = (searchTerm.length > 0) ? users.filter((user) => {
+    const contains = (original: string) => {
+      if (!searchTerm) return true;
+      return original.toLowerCase().includes(searchTerm.toLowerCase());
+    }
+    return contains(user.name?.full ?? "") || contains(user.address) || contains(user.email) || contains(user._id.toString());
+
+  }) : users;
+  //(VPN|OGPS|IGPS|IDB|ODB)
+
+
+
+  return (
+    <main className="p-4 md:p-10 mx-auto max-w-7xl">
+      <Title>Users</Title>
+      <Flex alignItems='end' flexDirection='row' className='mt-6'>
+        <Search />
+      </Flex>
+      <div style={{ marginTop: '20px' }}>
+        <Text >
+          {filtered.length} users matching your search
+        </Text>
+      </div>
+
+      <Card className="mt-6">
+        <UsersTable users={filtered} />
+      </Card>
+    </main>
+  );
+
+}
+
+export async function getServerSideProps(context: any) {
+  try {
+    const client = await clientPromise;
+    const db = client.db("main");
+
+    const users = await db
+      .collection("users")
+      .find({})
+      .toArray();
+    const searchParams = context.query;
+
+    return {
+      props: { users: JSON.parse(JSON.stringify(users)), searchParams },
+    };
+  } catch (e) {
+    console.error(e);
+  }
+}

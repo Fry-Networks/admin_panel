@@ -7,29 +7,33 @@ import {
   TableCell,
   Text
 } from '@tremor/react';
+import Link from 'next/link';
 import { webUser } from '../lib/webusers-model';
 import { User } from '../lib/users-schema';
 import { Device } from '../lib/devices-schema';
-import { weatherAccount } from '../lib/weather_accounts';
-export default function DevicesTable({ devices }: { devices: weatherAccount[] }) {
+import { deviceData, weatherAccount } from '../lib/weather_accounts';
+import { WeatherData } from '../lib/weather-schema';
+export default function WeatherDevicesTable({ devices }: { devices: deviceData[] }) {
   return (
     <Table>
       <TableHead>
         <TableRow>
-          <TableHeaderCell>Api Key</TableHeaderCell>
-          <TableHeaderCell>Devices</TableHeaderCell>
-          <TableHeaderCell>Idk</TableHeaderCell>
+          <TableHeaderCell>Name</TableHeaderCell>
+          <TableHeaderCell>MAC Addr</TableHeaderCell>
+          <TableHeaderCell>Coords</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
-        {devices.map((device) => (
-          <TableRow key={device.id}>
-            <TableCell>{device.api_key}</TableCell>
+        {devices?.map((device) => (
+          <TableRow key={device.deviceMAC}>
+            <TableCell>{device.infos.name}</TableCell>
             <TableCell>
-              <Text>{device.devices.length}</Text>
+              <Text>{device.deviceMAC}</Text>
             </TableCell>
             <TableCell>
-              <Text>{device.user_id.toString()}</Text>
+
+              <Text>{device.infos.coords.lat}, {device.infos.coords.lon}</Text>
+
             </TableCell>
           </TableRow>
         ))}

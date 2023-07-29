@@ -4,6 +4,7 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 
+let lastParams: URLSearchParams = new URLSearchParams()
 export default function Search({ disabled }: { disabled?: boolean }) {
   const { replace } = useRouter();
   const pathname = usePathname();
@@ -23,9 +24,12 @@ export default function Search({ disabled }: { disabled?: boolean }) {
     } else {
       params.delete('q');
     }
-
+    //TODO: fix search
     startTransition(() => {
-      replace(`${pathname}?${params.toString()}`);
+      if (lastParams.size && !params.size && !window.location.search.length) replace(`${pathname}`);
+      else if (!params.size && window.location.search.length >= 1) replace(`${pathname + window.location.search}`);
+      else replace(`${pathname}?${params.toString()}`);
+      lastParams = params;
     });
   }
 
@@ -52,7 +56,7 @@ export default function Search({ disabled }: { disabled?: boolean }) {
           className="h-10 block w-full rounded-md border border-gray-200 pl-9 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           placeholder="Search by name..."
           spellCheck={false}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => { setSearchTerm(e.target.value) }}
         />
       </div>
 

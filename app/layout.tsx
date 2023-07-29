@@ -1,29 +1,23 @@
 import './globals.css';
 import { Analytics } from '@vercel/analytics/react';
-import Nav from './nav';
 
 import { Suspense } from 'react';
 
-export const metadata = {
-  title: 'Fry Admin Panel',
-  description:
-    'An admin dashboard to manage users and their registrations.'
-};
 
-
-export default async function RootLayout({
-  children
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+
+export default function RootLayout({ children }: RootLayoutProps) {
+  // If a user is logged in, render the requested page
   return (
     <html lang="en" className="h-full bg-gray-50">
       <body className="h-full">
-        <Suspense>
-          <Nav />
-        </Suspense>
-        {children}
-        <Analytics />
+          <Suspense fallback={<div>Loading...</div>}>
+          </Suspense>
+          {children}
+          <Analytics />
       </body>
     </html>
   );

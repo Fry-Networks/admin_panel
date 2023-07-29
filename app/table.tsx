@@ -23,7 +23,7 @@ export default function UsersTable({ users }: { users: User[] }) {
       <TableBody>
         {users.map((user) => (
           <TableRow key={user.id}>
-            <TableCell>{user.name.full}</TableCell>
+            <TableCell>{user.name?.full ?? ""}</TableCell>
             <TableCell>
               <Text>{user.address}</Text>
             </TableCell>

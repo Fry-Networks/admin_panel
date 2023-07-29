@@ -1,3 +1,5 @@
+'use server'
+import DeviceModel, { Device } from './devices-schema';
 import UserModel, { User } from './users-schema';
 
 export async function getMongoUser({ address, email }: { address?: string, email?: string }): Promise<User> {
@@ -31,4 +33,8 @@ export async function getMongoUser({ address, email }: { address?: string, email
         }
     }
     throw new Error("Both email and address are missing");
+}
+
+export async function getDevices(): Promise<Device[]> {
+    return (await DeviceModel.find({}));
 }

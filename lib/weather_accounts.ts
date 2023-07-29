@@ -34,4 +34,15 @@ export interface weatherAccount extends mongoose.Document {
     }[]
 }
 
-export const WeatherAccountModel = mongoose.model<weatherAccount>('weather_accounts', weatherAccountsSchema);
+export interface deviceData {
+    deviceMAC: string,
+    infos: {
+        coords: {
+            lat: number,
+            lon: number
+        },
+        name: string,
+    }
+}
+
+export const WeatherAccountModel = mongoose.models.weather_accounts || mongoose.model<weatherAccount>('weather_accounts', weatherAccountsSchema) as mongoose.Model<weatherAccount>;

@@ -8,8 +8,9 @@ import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 
 const navigation = [
-  { name: 'Dashboard', href: '/' },
-  { name: 'Weather Devices', href: '/weather' },
+  { name: 'Users', href: '/users' },
+  { name: 'Weather Accounts', href: '/weather/accounts' },
+  { name: 'Weather Devices', href: '/weather/devices' },
   { name: 'Devices', href: '/devices' },
 ];
 
@@ -17,8 +18,13 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function Navbar({ user }: { user: any }) {
+import { useSession } from 'next-auth/react';
+
+export default function Navbar() {
+  const { data: session, status } = useSession();
+  const isLoading = status === 'loading';
   const pathname = usePathname();
+  if (isLoading) return <div>Loading...</div>; // Or some loading spinner
 
   return (
     <Disclosure as="nav" className="bg-white shadow-sm">
@@ -75,10 +81,10 @@ export default function Navbar({ user }: { user: any }) {
                       <span className="sr-only">Open user menu</span>
                       <Image
                         className="h-8 w-8 rounded-full"
-                        src={user?.image || 'https://avatar.vercel.sh/leerob'}
+                        src={session?.user?.image || 'https://avatar.vercel.sh/leerob'}
                         height={32}
                         width={32}
-                        alt={`${user?.name || 'placeholder'} avatar`}
+                        alt={`${session?.user?.name || 'placeholder'} avatar`}
                       />
                     </Menu.Button>
                   </div>
@@ -92,7 +98,7 @@ export default function Navbar({ user }: { user: any }) {
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {user ? (
+                      {session?.user ? (
                         <Menu.Item>
                           {({ active }) => (
                             <button
@@ -158,24 +164,24 @@ export default function Navbar({ user }: { user: any }) {
               ))}
             </div>
             <div className="border-t border-gray-200 pt-4 pb-3">
-              {user ? (
+              {session?.user ? (
                 <>
                   <div className="flex items-center px-4">
                     <div className="flex-shrink-0">
                       <Image
                         className="h-8 w-8 rounded-full"
-                        src={user.image}
+                        src={session?.user.image || 'https://avatar.vercel.sh/leerob'}
                         height={32}
                         width={32}
-                        alt={`${user.name} avatar`}
+                        alt={`${session?.user.name} avatar`}
                       />
                     </div>
                     <div className="ml-3">
                       <div className="text-base font-medium text-gray-800">
-                        {user.name}
+                        {session?.user.name}
                       </div>
                       <div className="text-sm font-medium text-gray-500">
-                        {user.email}
+                        {session?.user.email}
                       </div>
                     </div>
                   </div>
