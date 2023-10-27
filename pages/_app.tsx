@@ -18,31 +18,38 @@ export default function MyApp({ Component, pageProps }: MyAppProps) {
     <SessionProvider session={pageProps.session}>
       <Navbar />
       <div id="main">
-      <ProtectedComponent Component={Component} pageProps={pageProps} />
+        <ProtectedComponent Component={Component} pageProps={pageProps} />
       </div>
     </SessionProvider>
   );
 }
 
-const ProtectedComponent: React.FC<ProtectedComponentProps> = ({ Component, pageProps }) => {
+const ProtectedComponent: React.FC<ProtectedComponentProps> = ({
+  Component,
+  pageProps
+}) => {
   const { data: session, status } = useSession();
   const isLoading = status === 'loading';
   const showInfo = (text: string) => {
     return (
-      <p style={{
-        margin: '50px'
-      }}>{text}</p>
-    )
-  }
+      <p
+        style={{
+          margin: '50px'
+        }}
+      >
+        {text}
+      </p>
+    );
+  };
 
-  if (isLoading) return showInfo("Loading...");
+  if (isLoading) return showInfo('Loading...');
 
   if (!session) {
-    return showInfo("User is not logged in!"); // Here you should handle the case when the user is not logged in
+    return showInfo('User is not logged in!'); // Here you should handle the case when the user is not logged in
   }
 
-  if(!session.user?.admin) {
-    return showInfo("User is not an admin!");
+  if (!session.user?.admin) {
+    return showInfo('User is not an admin!');
   }
 
   return <Component {...pageProps} />;
