@@ -58,7 +58,7 @@ const [filteredDevices, setFilteredDevices] = useState<deviceData[]>([]);
       </div>
 
       <Card className="mt-6">
-        <WeatherDevicesTable devices={filteredDevices} />
+        <WeatherDevicesTable devicesData={filteredDevices} />
       </Card>
     </main>
   );

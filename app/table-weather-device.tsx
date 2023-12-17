@@ -15,13 +15,19 @@ import { Device } from '../lib/devices-schema';
 import { deviceData, weatherAccount } from '../lib/weather_accounts';
 import { WeatherData } from '../lib/weather-schema';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 export default function WeatherDevicesTable({
-  devices
+  devicesData
 }: {
-  devices: deviceData[];
+  devicesData: deviceData[];
 }) {
   const router = useRouter();
-  console.log(devices, 'devices');
+  const [ devices, setDevices] = useState<deviceData[]>([]);
+
+  useEffect(() => {
+    setDevices(devicesData);
+  }, [devicesData]); 
+  
   return (
     <Table>
       <TableHead>
