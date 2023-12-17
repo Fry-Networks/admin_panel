@@ -11,9 +11,11 @@ import {
 } from '@tremor/react';
 import Search from '../../../app/search';
 import clientPromise from '../../../lib/mongoclient';
-import { weatherAccount } from '../../../lib/weather_accounts';
+import { deviceData, weatherAccount } from '../../../lib/weather_accounts';
 import WeatherDevicesTable from '../../../app/table-weather-device';
 import { getSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { Device } from '../../../lib/devices-schema';
 
 export default function WeatherDevicesPage({
   accounts,
@@ -22,22 +24,26 @@ export default function WeatherDevicesPage({
   accounts: weatherAccount[];
   searchParams: { q: string };
 }) {
-  const searchTerm = searchParams.q || '';
-  const devices = accounts.map((account) => account.devices).flat();
+  const [allDevices, setAllDevices] = useState<deviceData[]>([]);
+const [filteredDevices, setFilteredDevices] = useState<deviceData[]>([]);
 
-  const filtered =
-    searchTerm.length > 0
-      ? devices.filter((device) => {
-          const contains = (original: string) => {
-            if (!searchTerm) return true;
-            return original.toLowerCase().includes(searchTerm.toLowerCase());
-          };
-          return (
-            contains(device.deviceMAC ?? '') ||
-            contains(device.infos.name.toString())
-          );
+  const searchTerm = searchParams.q || '';
+
+  useEffect(() => {
+    const devices = accounts.map(account => account.devices).flat();
+    setAllDevices(devices);
+  }, [accounts]);
+
+    useEffect(() => {
+    const filtered = searchTerm.length > 0
+      ? allDevices.filter(device => {
+          const contains = (original: string) => searchTerm && original.toLowerCase().includes(searchTerm.toLowerCase());
+          return contains(device.deviceMAC ?? '') || contains(device.infos.name.toString());
         })
-      : devices;
+      : allDevices;
+
+    setFilteredDevices(filtered);
+  }, [searchTerm, allDevices]);
   //(VPN|OGPS|IGPS|IDB|ODB)
 
   return (
@@ -47,11 +53,11 @@ export default function WeatherDevicesPage({
         <Search />
       </Flex>
       <div style={{ marginTop: '20px' }}>
-        <Text>{filtered.length} devices matching your search</Text>
+        <Text>{filteredDevices.length} devices matching your search</Text>
       </div>
 
       <Card className="mt-6">
-        <WeatherDevicesTable devices={filtered} />
+        <WeatherDevicesTable devices={filteredDevices} />
       </Card>
     </main>
   );
