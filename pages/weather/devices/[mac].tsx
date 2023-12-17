@@ -50,7 +50,7 @@ export default function WeatherDataPage({
         <Search />
       </Flex> */}
       <div style={{ marginTop: '20px' }}>
-        <Text>{weathers?.length} data matching your device mac Address</Text>
+        <Text>{weathers?.length} data matching your device MAC address</Text>
       </div>
 
       <Card className="mt-6">

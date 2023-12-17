@@ -21,7 +21,7 @@ export default function WeatherDevicesTable({
   devices: deviceData[];
 }) {
   const router = useRouter();
-
+  console.log(devices, 'devices');
   return (
     <Table>
       <TableHead>

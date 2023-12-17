@@ -43,6 +43,7 @@ const [filteredDevices, setFilteredDevices] = useState<deviceData[]>([]);
       : allDevices;
 
     setFilteredDevices(filtered);
+    console.log(filtered, 'filtered');
   }, [searchTerm, allDevices]);
   //(VPN|OGPS|IGPS|IDB|ODB)
 
