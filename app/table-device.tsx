@@ -12,9 +12,8 @@ import { User } from '../lib/users-schema';
 import { Device } from '../lib/devices-schema';
 
 export default function DevicesTable({ devices }: { devices: Device[] }) {
-  function formatDate(date: Date) {
-    console.log(date, 'date');
-    console.log(typeof date)
+  function formatDate(dateStr: string) {
+    const date = new Date(dateStr);
     let day = date.getDate().toString().padStart(2, '0');
     let month = (date.getMonth() + 1).toString().padStart(2, '0'); // January is 0
     let year = date.getFullYear();

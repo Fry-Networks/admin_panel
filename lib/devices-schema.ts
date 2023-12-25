@@ -14,7 +14,7 @@ export interface Device extends mongoose.Document {
     name: string,
     is_registered: boolean,
     registered_at: Date,
-    created_at: Date,
+    created_at: string,
 }
 
 const DeviceModel = (mongoose.models.device || mongoose.model<Device>('device', devicesSchema)) as mongoose.Model<Device>;
