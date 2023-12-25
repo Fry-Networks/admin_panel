@@ -39,7 +39,7 @@ export default function DevicesPage({
   useEffect(() => {
     // Update the URL with the new page
     router.push(`?page=${page}&pageSize=${pageSize}`, undefined);
-  }, [page, pageSize, router]);
+  }, [page, pageSize]);
   const totalPages = Math.ceil(totalDevices / pageSize);
 
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
