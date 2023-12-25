@@ -28,23 +28,26 @@ export default function WeatherDevicesPage({
   const [filteredDevices, setFilteredDevices] = useState<deviceData[]>([]);
 
   const searchTerm = searchParams.q || '';
-
+/*
   useEffect(() => {
     const devices = accounts.map(account => account.devices).flat();
     setAllDevices(devices);
   }, [accounts]);
+  */
 
   useEffect(() => {
+    const devices = accounts.map(account => account.devices).flat();
+  
     const filtered = searchTerm.length > 0
-      ? allDevices.filter(device => {
+      ? devices.filter(device => {
         const contains = (original: string) => searchTerm && original.toLowerCase().includes(searchTerm.toLowerCase());
         return contains(device.deviceMAC ?? '') || contains(device.infos.name.toString());
       })
-      : allDevices;
-
+      : devices;
+  
+    setAllDevices(devices);
     setFilteredDevices(filtered);
-    console.log(filteredDevices, 'filtered');
-  }, [searchTerm, allDevices]);
+  }, [accounts, searchTerm]);
   //(VPN|OGPS|IGPS|IDB|ODB)
 
   return (
