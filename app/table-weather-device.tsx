@@ -36,7 +36,7 @@ export default function WeatherDevicesTable({
         </TableRow>
       </TableHead>
       <TableBody>
-        {devicesData?.map((device) => (
+        {devices?.map((device) => (
           <TableRow key={device.deviceMAC}>
             <TableCell>{device.infos.name}</TableCell>
             <TableCell>
