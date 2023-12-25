@@ -3,6 +3,7 @@ export const weatherAccountsSchema = new mongoose.Schema({
     user_id: mongoose.Schema.Types.ObjectId,
     timestamp: Date,
     api_key: String,
+    api_type: String,
     devices: {
         type: [{
             deviceMAC: String,
@@ -22,6 +23,7 @@ export interface weatherAccount extends mongoose.Document {
     user_id: mongoose.Schema.Types.ObjectId | string,
     timestamp: Date,
     api_key: string,
+    api_type: string;
     devices: {
         deviceMAC: string,
         infos: {
@@ -42,7 +44,8 @@ export interface deviceData {
             lon: number
         },
         name: string,
-    }
+    },
+    type: string
 }
 
 export const WeatherAccountModel = mongoose.models.weather_accounts || mongoose.model<weatherAccount>('weather_accounts', weatherAccountsSchema) as mongoose.Model<weatherAccount>;

@@ -23,6 +23,7 @@ export default function WeatherDevicesTable({
       <TableHead>
         <TableRow>
           <TableHeaderCell>Name</TableHeaderCell>
+          <TableHeaderCell>Type</TableHeaderCell>
           <TableHeaderCell>MAC Addr</TableHeaderCell>
           <TableHeaderCell>Coords</TableHeaderCell>
         </TableRow>
@@ -31,6 +32,9 @@ export default function WeatherDevicesTable({
         {devicesData?.map((device) => (
           <TableRow key={device.deviceMAC}>
             <TableCell>{device.infos.name}</TableCell>
+            <TableCell>
+              <Text>{device.type}</Text>
+            </TableCell>
             <TableCell>
               <Text>{device.deviceMAC}</Text>
             </TableCell>

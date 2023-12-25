@@ -27,15 +27,22 @@ export default function WeatherDevicesPage({
 
   const searchTerm = searchParams.q || '';
 
-    const devices = accounts.map(account => account.devices).flat();
-  
-    const filtered = searchTerm.length > 0
-      ? devices.filter(device => {
-        const contains = (original: string) => searchTerm && original.toLowerCase().includes(searchTerm.toLowerCase());
-        return contains(device.deviceMAC ?? '') || contains(device.infos.name.toString());
-      })
-      : devices;
-  
+  const devices = accounts.map(account => {
+    return account.devices.map(device => {
+      return {
+        ...device,
+        type: account.api_type ?? 'Unknown',
+      }
+    })
+  }).flat();
+
+  const filtered = searchTerm.length > 0
+    ? devices.filter(device => {
+      const contains = (original: string) => searchTerm && original.toLowerCase().includes(searchTerm.toLowerCase());
+      return contains(device.deviceMAC ?? '') || contains(device.infos.name.toString());
+    })
+    : devices;
+
   //(VPN|OGPS|IGPS|IDB|ODB)
 
   return (
