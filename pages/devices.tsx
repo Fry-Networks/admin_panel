@@ -55,7 +55,9 @@ export default function DevicesPage({
     'OGPS',
     'IGPS',
     'IDB',
-    'ODB'
+    'ODB',
+    'registered',
+    'unregistered'
   ]);
   const sortedDevices = useMemo(() => sortDevices([...devices]), [devices, sortOrder]);
 
@@ -68,7 +70,7 @@ export default function DevicesPage({
           if (!searchTerm) return true;
           return original.toLowerCase().includes(searchTerm.toLowerCase());
         };
-        return (selectValue.includes(type) && contains(device.miner_key)) || (selectValue.includes('registered') && device.is_registered )|| (selectValue.includes('unregistered') && !device.is_registered)
+        return ((selectValue.includes(type) && contains(device.miner_key))) && ((selectValue.includes('registered') && device.is_registered )|| (selectValue.includes('unregistered') && !device.is_registered))
       })
       : sortedDevices;
   }, [sortedDevices, selectValue, searchTerm]);
