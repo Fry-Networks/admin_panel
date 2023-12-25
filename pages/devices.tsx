@@ -38,7 +38,7 @@ export default function DevicesPage({
 
   useEffect(() => {
     // Update the URL with the new page
-    router.push(`?page=${page}&pageSize=${pageSize}`, undefined, { shallow: true });
+    router.push(`?page=${page}&pageSize=${pageSize}`, undefined);
   }, [page, pageSize, router]);
   const totalPages = Math.ceil(totalDevices / pageSize);
 
