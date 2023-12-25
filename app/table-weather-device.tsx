@@ -17,15 +17,7 @@ export default function WeatherDevicesTable({
   devicesData: deviceData[];
 }) {
   const router = useRouter();
-  const [ devices, setDevices] = useState<deviceData[]>([]);
- 
 
-  useEffect(() => {
-    console.log(devicesData, 'devices');
-    setDevices(devicesData);
-    
-  }, [devicesData]); 
-  
   return (
     <Table>
       <TableHead>
@@ -36,7 +28,7 @@ export default function WeatherDevicesTable({
         </TableRow>
       </TableHead>
       <TableBody>
-        {devices?.map((device) => (
+        {devicesData?.map((device) => (
           <TableRow key={device.deviceMAC}>
             <TableCell>{device.infos.name}</TableCell>
             <TableCell>

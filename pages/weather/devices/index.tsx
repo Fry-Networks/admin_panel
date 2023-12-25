@@ -24,18 +24,9 @@ export default function WeatherDevicesPage({
   accounts: weatherAccount[];
   searchParams: { q: string };
 }) {
-  const [allDevices, setAllDevices] = useState<deviceData[]>([]);
-  const [filteredDevices, setFilteredDevices] = useState<deviceData[]>([]);
 
   const searchTerm = searchParams.q || '';
-/*
-  useEffect(() => {
-    const devices = accounts.map(account => account.devices).flat();
-    setAllDevices(devices);
-  }, [accounts]);
-  */
 
-  useEffect(() => {
     const devices = accounts.map(account => account.devices).flat();
   
     const filtered = searchTerm.length > 0
@@ -45,9 +36,6 @@ export default function WeatherDevicesPage({
       })
       : devices;
   
-    setAllDevices(devices);
-    setFilteredDevices(filtered);
-  }, [accounts, searchTerm]);
   //(VPN|OGPS|IGPS|IDB|ODB)
 
   return (
@@ -57,11 +45,11 @@ export default function WeatherDevicesPage({
         <Search />
       </Flex>
       <div style={{ marginTop: '20px' }}>
-        <Text>{filteredDevices.length} devices matching your search</Text>
+        <Text>{filtered.length} devices matching your search</Text>
       </div>
 
       <Card className="mt-6">
-        <WeatherDevicesTable devicesData={filteredDevices} />
+        <WeatherDevicesTable devicesData={filtered} />
       </Card>
     </main>
   );
