@@ -68,7 +68,7 @@ export default function DevicesPage({
           if (!searchTerm) return true;
           return original.toLowerCase().includes(searchTerm.toLowerCase());
         };
-        return selectValue.includes(type) && contains(device.miner_key);
+        return (selectValue.includes(type) && contains(device.miner_key)) || (selectValue.includes('registered') && device.is_registered )|| (selectValue.includes('unregistered') && !device.is_registered)
       })
       : sortedDevices;
   }, [sortedDevices, selectValue, searchTerm]);
@@ -98,9 +98,11 @@ export default function DevicesPage({
                 <MultiSelectItem value="IGPS">IGPS</MultiSelectItem>
                 <MultiSelectItem value="IDB">IDB</MultiSelectItem>
                 <MultiSelectItem value="ODB">ODB</MultiSelectItem>
+                <MultiSelectItem value="registered">Registered</MultiSelectItem>
+                <MultiSelectItem value="unregistered">Unregistered</MultiSelectItem>
               </MultiSelect>
             </Flex>
-            <Button onClick={toggleSortOrder}>Toggle Sort Order</Button>
+            <Button className="mt-4" onClick={toggleSortOrder}>Toggle Sort Order</Button>
             <Text className="mt-4">
               {filtered.length} devices matching your search
             </Text>
