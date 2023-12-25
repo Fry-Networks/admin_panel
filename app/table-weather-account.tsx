@@ -18,6 +18,7 @@ export default function WeatherAccountsTable({ accounts }: { accounts: weatherAc
       <TableHead>
         <TableRow>
           <TableHeaderCell>Api Key</TableHeaderCell>
+          <TableHeaderCell>Type</TableHeaderCell>
           <TableHeaderCell>Devices</TableHeaderCell>
           <TableHeaderCell>User ID</TableHeaderCell>
         </TableRow>
@@ -25,6 +26,7 @@ export default function WeatherAccountsTable({ accounts }: { accounts: weatherAc
       <TableBody>
         {accounts.map((account) => (
           <TableRow key={account.id}>
+            <TableCell>{account.api_type}</TableCell>
             <TableCell>{account.api_key}</TableCell>
             <TableCell>
               <Text>{account.devices.length}</Text>
