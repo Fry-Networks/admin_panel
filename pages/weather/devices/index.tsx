@@ -25,7 +25,7 @@ export default function WeatherDevicesPage({
   searchParams: { q: string };
 }) {
   const [allDevices, setAllDevices] = useState<deviceData[]>([]);
-const [filteredDevices, setFilteredDevices] = useState<deviceData[]>([]);
+  const [filteredDevices, setFilteredDevices] = useState<deviceData[]>([]);
 
   const searchTerm = searchParams.q || '';
 
@@ -34,12 +34,12 @@ const [filteredDevices, setFilteredDevices] = useState<deviceData[]>([]);
     setAllDevices(devices);
   }, [accounts]);
 
-    useEffect(() => {
+  useEffect(() => {
     const filtered = searchTerm.length > 0
       ? allDevices.filter(device => {
-          const contains = (original: string) => searchTerm && original.toLowerCase().includes(searchTerm.toLowerCase());
-          return contains(device.deviceMAC ?? '') || contains(device.infos.name.toString());
-        })
+        const contains = (original: string) => searchTerm && original.toLowerCase().includes(searchTerm.toLowerCase());
+        return contains(device.deviceMAC ?? '') || contains(device.infos.name.toString());
+      })
       : allDevices;
 
     setFilteredDevices(filtered);

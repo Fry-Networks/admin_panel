@@ -8,12 +8,7 @@ import {
   Text,
   Button
 } from '@tremor/react';
-import Link from 'next/link';
-import { webUser } from '../lib/webusers-model';
-import { User } from '../lib/users-schema';
-import { Device } from '../lib/devices-schema';
-import { deviceData, weatherAccount } from '../lib/weather_accounts';
-import { WeatherData } from '../lib/weather-schema';
+import { deviceData } from '../lib/weather_accounts';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 export default function WeatherDevicesTable({
@@ -23,9 +18,12 @@ export default function WeatherDevicesTable({
 }) {
   const router = useRouter();
   const [ devices, setDevices] = useState<deviceData[]>([]);
+ 
 
   useEffect(() => {
+    console.log(devicesData, 'devices');
     setDevices(devicesData);
+    
   }, [devicesData]); 
   
   return (
@@ -38,7 +36,7 @@ export default function WeatherDevicesTable({
         </TableRow>
       </TableHead>
       <TableBody>
-        {devices?.map((device) => (
+        {devicesData?.map((device) => (
           <TableRow key={device.deviceMAC}>
             <TableCell>{device.infos.name}</TableCell>
             <TableCell>
