@@ -74,7 +74,21 @@ export async function getServerSideProps(context: any) {
     const client = await clientPromise;
     const db = client.db('main');
 
-    const accounts = await db.collection('weather_accounts').find({}).toArray();
+    const accounts = (await db
+      .collection("weather_accounts")
+      .find({})
+      .toArray()).map((account) => {
+        if(account.token) {
+          account.token = account.token.substring(0, 10) + "..."
+        }
+        if(account.api_key) {
+          account.api_key = account.api_key.substring(0, 10) + "..."
+        }
+        if(account.app_key) {
+          account.app_key = account.app_key.substring(0, 10) + "..."
+        }
+        return account;
+      });
     const searchParams = context.query;
 
     return {
