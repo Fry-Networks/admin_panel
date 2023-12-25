@@ -23,6 +23,7 @@ export interface weatherAccount extends mongoose.Document {
     user_id: mongoose.Schema.Types.ObjectId | string,
     timestamp: Date,
     api_key: string,
+    token: string,
     api_type: string;
     devices: {
         deviceMAC: string,
