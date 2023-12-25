@@ -12,7 +12,7 @@ import {
 import Search from '../app/search';
 import clientPromise from '../lib/mongoclient';
 import DevicesTable from '../app/table-device';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Device } from '../lib/devices-schema';
 import { getSession } from 'next-auth/react';
 import { CSSTransition } from 'react-transition-group';
@@ -33,6 +33,21 @@ export default function DevicesPage({
 }) {
   console.log(devices, users, searchParams, 'search aeeop');
 
+  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
+
+  // Function to toggle sorting order
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
+
+  // Function to sort devices
+  const sortDevices = (devices: Device[]) => {
+    return devices.sort((a, b) => {
+      const dateA = (new Date(a.created_at)).getDate();
+      const dateB = (new Date(b.created_at)).getDate();
+      return sortOrder === 'asc' ? (dateA - dateB) : (dateB - dateA);
+    });
+  };
   const searchTerm = searchParams.q || '';
   const [selectValue, setSelectValue] = useState([
     'VPN',
@@ -41,19 +56,21 @@ export default function DevicesPage({
     'IDB',
     'ODB'
   ]);
-  const [addingDevice, setAddingDevice] = useState(false);
+  const sortedDevices = useMemo(() => sortDevices([...devices]), [devices, sortOrder]);
 
-  const filtered =
-    selectValue.length || searchTerm.length > 0
+
+  const filtered = useMemo(() => {
+    return selectValue.length || searchTerm.length > 0
       ? devices.filter((device) => {
-          const type = device.miner_key.split('-')[0];
-          const contains = (original: string) => {
-            if (!searchTerm) return true;
-            return original.toLowerCase().includes(searchTerm.toLowerCase());
-          };
-          return selectValue.includes(type) && contains(device.miner_key);
-        })
+        const type = device.miner_key.split('-')[0];
+        const contains = (original: string) => {
+          if (!searchTerm) return true;
+          return original.toLowerCase().includes(searchTerm.toLowerCase());
+        };
+        return selectValue.includes(type) && contains(device.miner_key);
+      })
       : devices;
+  }, [devices, selectValue, searchTerm]);
 
   return (
     <main className="p-4 md:p-10 mx-auto max-w-7xl">
@@ -82,6 +99,7 @@ export default function DevicesPage({
                 <MultiSelectItem value="ODB">ODB</MultiSelectItem>
               </MultiSelect>
             </Flex>
+            <Button onClick={toggleSortOrder}>Toggle Sort Order</Button>
             <Text className="mt-4">
               {filtered.length} devices matching your search
             </Text>
