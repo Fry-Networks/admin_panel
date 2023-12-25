@@ -33,15 +33,6 @@ export default function DevicesPage({
   currentPage: number;
   pageSize: number;
 }) {
-  const [page, setPage] = useState(currentPage);
-  const router = useRouter();
-
-  useEffect(() => {
-    // Update the URL with the new page
-    router.push(`?page=${page}&pageSize=${pageSize}`, undefined);
-  }, [page, pageSize]);
-  const totalPages = Math.ceil(totalDevices / pageSize);
-
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
 
   // Function to toggle sorting order
@@ -116,11 +107,6 @@ export default function DevicesPage({
             <Card className="mt-6">
               <DevicesTable devices={filtered} />
             </Card>
-            <div className="pagination-controls">
-              <Button disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</Button>
-              <Text>{page} of {totalPages}</Text>
-              <Button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Next</Button>
-            </div>
           </TabPanel>
           <TabPanel>
             <DeviceForm users={users} />
@@ -136,39 +122,28 @@ export default function DevicesPage({
 
 export async function getServerSideProps(context: any) {
   const session = await getSession(context);
-  if (!session || !session.user.admin) {
+  if (!session || !session.user?.admin) {
     return {
-      props: { error: 'Unauthorized access' }
+      props: { error: 'Unauthorized access' },
     };
   }
-
-
   try {
-
-    const page = parseInt(context.query.page) || 1;
-    const pageSize = parseInt(context.query.pageSize) || 10;
-
-
     const client = await clientPromise;
-    const db = client.db('main');
+    const db = client.db("main");
 
-    const skip = (page - 1) * pageSize;
-    const devices = await db.collection('devices').find({}).skip(skip).limit(pageSize).toArray();
-    const totalDevices = await db.collection('devices').countDocuments();
-
-    const users = await db.collection('users').find({}).toArray();
+    const devices = await db
+      .collection("devices")
+      .find({})
+      .toArray();
+    const users = await db
+      .collection("users")
+      .find({})
+      .toArray();
 
     const searchParams = context.query;
 
     return {
-      props: {
-        devices: JSON.parse(JSON.stringify(devices)),
-        totalDevices,
-        users: JSON.parse(JSON.stringify(users)),
-        searchParams,
-        currentPage: page,
-        pageSize
-      }
+      props: { devices: JSON.parse(JSON.stringify(devices)),users: JSON.parse(JSON.stringify(users)), searchParams },
     };
   } catch (e) {
     console.error(e);
