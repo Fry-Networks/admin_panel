@@ -52,8 +52,8 @@ export default function DevicesPage({
   // Function to sort devices
   const sortDevices = (devices: Device[]) => {
     return devices.sort((a, b) => {
-      const dateA = (new Date(a.created_at)).getDate();
-      const dateB = (new Date(b.created_at)).getDate();
+      const dateA = (new Date(a.created_at)).getTime();
+      const dateB = (new Date(b.created_at)).getTime();
       console.log(dateA, dateB, 'date a and b');
       return sortOrder === 'asc' ? (dateA - dateB) : (dateB - dateA);
     });
