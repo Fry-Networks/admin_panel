@@ -43,7 +43,7 @@ export default function WeatherDevicesPage({
       : allDevices;
 
     setFilteredDevices(filtered);
-    console.log(filtered, 'filtered');
+    console.log(filteredDevices, 'filtered');
   }, [searchTerm, allDevices]);
   //(VPN|OGPS|IGPS|IDB|ODB)
 
