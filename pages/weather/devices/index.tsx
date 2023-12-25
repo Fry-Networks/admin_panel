@@ -79,13 +79,13 @@ export async function getServerSideProps(context: any) {
       .find({})
       .toArray()).map((account) => {
         if(account.token) {
-          account.token = account.token.substring(0, 10) + "..."
+          account.token = account.token.substring(0, 20) + "..."
         }
         if(account.api_key) {
-          account.api_key = account.api_key.substring(0, 10) + "..."
+          account.api_key = account.api_key.substring(0, 20) + "..."
         }
         if(account.app_key) {
-          account.app_key = account.app_key.substring(0, 10) + "..."
+          account.app_key = account.app_key.substring(0, 20) + "..."
         }
         return account;
       });

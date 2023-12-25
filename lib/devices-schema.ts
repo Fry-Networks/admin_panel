@@ -4,7 +4,8 @@ export const devicesSchema = new mongoose.Schema({
     miner_key: String, 
     name: String,
     is_registered: { type: Boolean, default: false },
-    registered_at: Date
+    registered_at: Date,
+    created_at: { type: Date, default: Date.now },
  
 });
 export interface Device extends mongoose.Document {
@@ -13,6 +14,7 @@ export interface Device extends mongoose.Document {
     name: string,
     is_registered: boolean,
     registered_at: Date,
+    created_at: Date,
 }
 
 const DeviceModel = (mongoose.models.device || mongoose.model<Device>('device', devicesSchema)) as mongoose.Model<Device>;
