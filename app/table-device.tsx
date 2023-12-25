@@ -44,7 +44,7 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
               <Text>{device.is_registered ? 'Yes' : 'No'}</Text>
             </TableCell>
             <TableCell>
-              <Text>{formatDate(device.created_at)}</Text>
+              <Text>{device.created_at ? formatDate(device.created_at) : "Unknown"}</Text>
             </TableCell>
           </TableRow>
         ))}
