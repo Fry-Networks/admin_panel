@@ -26,50 +26,57 @@ export default function ProductsTable({ products }: { products: Product[] }) {
   };
   const unverifiedRewardRef = useRef<HTMLInputElement>(null);
   const verifiedRewardRef = useRef<HTMLInputElement>(null);
-  
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  
-    // Ensure editingProduct is not null
-    if (!editingProduct) {
-      console.error('No product selected for editing');
-      return;
-    }
-  
-    try {
-      const unverifiedReward = unverifiedRewardRef.current?.value;
-      const verifiedReward = verifiedRewardRef.current?.value;
 
-      // Ensure the values are retrieved
-      if (unverifiedReward === undefined || verifiedReward === undefined) {
-        console.error('Form elements are missing');
-        return;
-      }
+const handleSubmit = async (e:any) => {
+  e.preventDefault();
 
-      // Update logic here
-      const updateData = {
-        reward: {
-          unverified: unverifiedReward,
-          verified: verifiedReward,
-        },
-      };
-  
-      console.log('Updating product:', editingProduct);
-      const response = await ProductModel.updateOne(
-        { wix_id: editingProduct.wix_id },
-        updateData
-      );
-  
-      console.log('Updated product:', response);
-    } catch (err) {
-      console.error('Error updating product:', err);
-    }
-  
-    // Reset editing product and close modal
-    setEditingProduct(null);
-    closeModal();
+  // Ensure editingProduct is not null
+  if (!editingProduct) {
+    console.error('No product selected for editing');
+    return;
+  }
+
+  const unverifiedReward = unverifiedRewardRef.current?.value;
+  const verifiedReward = verifiedRewardRef.current?.value;
+
+  // Ensure the values are retrieved
+  if (unverifiedReward === undefined || verifiedReward === undefined) {
+    console.error('Form elements are missing');
+    return;
+  }
+
+  const updateData = {
+    productId: editingProduct.wix_id, // Use the appropriate identifier for the product
+    unverifiedReward: unverifiedReward,
+    verifiedReward: verifiedReward,
   };
-  
+
+  try {
+    console.log('Updating product:', editingProduct);
+
+    const response = await fetch('/api/edit-product', { // Replace with your actual API endpoint
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('Updated product:', result);
+  } catch (err) {
+    console.error('Error updating product:', err);
+  }
+
+  // Reset editing product and close modal
+  setEditingProduct(null);
+  closeModal();
+};
+
 
   function formatDate(date: Date) {
     date = new Date(date);
