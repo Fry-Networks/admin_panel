@@ -41,8 +41,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             // Construct an update object
             const updateData: any = {};
-            if (unverifiedReward !== undefined) updateData['reward.unverified'] = unverifiedReward;
-            if (verifiedReward !== undefined) updateData['reward.verified'] = verifiedReward;
+            if (unverifiedReward !== undefined) updateData['reward.unverified'] = +unverifiedReward;
+            if (verifiedReward !== undefined) updateData['reward.verified'] = +verifiedReward;
 
             // Update the product in the database
             await collection.updateOne({ wix_id: productId }, { $set: updateData });
