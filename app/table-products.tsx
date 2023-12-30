@@ -41,10 +41,10 @@ export default function ProductsTable({ products }: { products: Product[] }) {
               <Text>{product.key}</Text>
             </TableCell>
             <TableCell>
-              <Text>{product.rewards.unverified}</Text>
+              <Text>{product.reward.unverified}</Text>
             </TableCell>
             <TableCell>
-              <Text>{product.rewards.verified}</Text>
+              <Text>{product.reward.verified}</Text>
             </TableCell>
             <TableCell>
               <Text>{product.created_at ? formatDate(product.created_at) : "Unknown"}</Text>
