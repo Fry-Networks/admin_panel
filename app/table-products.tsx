@@ -72,7 +72,7 @@ export default function ProductsTable({ products }: { products: Product[] }) {
               <TableCell>
                 <Button
                   variant="secondary"
-                  onClick={() => console.log('edit')}
+                  onClick={() => openEditModal(product)}
                 >
                   Edit
                 </Button>
