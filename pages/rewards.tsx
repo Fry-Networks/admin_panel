@@ -35,10 +35,7 @@ import { Product } from '../lib/products-schema';
         <Title>Wix Products</Title>
         <TabGroup>
           <TabPanels>
-            <TabPanel>
-              <Flex alignItems="end" flexDirection="row" className="mt-6">
-                <Search />
-              </Flex>
+            <TabPanel>  
               <div style={{ marginTop: '20px' }}>
                 <Text>{products.length} products found!</Text>
               </div>
