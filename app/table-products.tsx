@@ -12,7 +12,7 @@ import {
 import Modal from 'react-modal';
 import { webUser } from '../lib/webusers-model';
 import { Product, ProductModel } from '../lib/products-schema';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import ReactModal from 'react-modal';
 
 export default function ProductsTable({ products }: { products: Product[] }) {
@@ -24,6 +24,9 @@ export default function ProductsTable({ products }: { products: Product[] }) {
   const closeModal = () => {
     setEditingProduct(null);
   };
+  const unverifiedRewardRef = useRef<HTMLInputElement>(null);
+  const verifiedRewardRef = useRef<HTMLInputElement>(null);
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
@@ -34,20 +37,20 @@ export default function ProductsTable({ products }: { products: Product[] }) {
     }
   
     try {
-      const form = e.currentTarget;
-      const unverifiedReward = form.elements.namedItem('unverifiedReward') as HTMLInputElement;
-      const verifiedReward = form.elements.namedItem('verifiedReward') as HTMLInputElement;
-  
-      if (!unverifiedReward || !verifiedReward) {
+      const unverifiedReward = unverifiedRewardRef.current?.value;
+      const verifiedReward = verifiedRewardRef.current?.value;
+
+      // Ensure the values are retrieved
+      if (unverifiedReward === undefined || verifiedReward === undefined) {
         console.error('Form elements are missing');
         return;
       }
-  
-      // Update logic
+
+      // Update logic here
       const updateData = {
         reward: {
-          unverified: unverifiedReward.value,
-          verified: verifiedReward.value,
+          unverified: unverifiedReward,
+          verified: verifiedReward,
         },
       };
   
@@ -137,11 +140,11 @@ export default function ProductsTable({ products }: { products: Product[] }) {
         <form onSubmit={handleSubmit}>
           <div>
             <label>Unverified Reward:</label>
-            <NumberInput defaultValue={editingProduct?.reward.unverified} />
+            <NumberInput ref={unverifiedRewardRef} defaultValue={editingProduct?.reward.unverified} />
           </div>
           <div>
             <label>Verified Reward:</label>
-            <NumberInput defaultValue={editingProduct?.reward.verified} />
+            <NumberInput ref={verifiedRewardRef} defaultValue={editingProduct?.reward.verified} />
           </div>
           <div className='mb-4 mt-4'>
             <Button type="submit" className='mr-2' variant="primary">Update</Button>
