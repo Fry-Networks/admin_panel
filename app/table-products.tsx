@@ -10,7 +10,7 @@ import {
 import { webUser } from '../lib/webusers-model';
 import { Product } from '../lib/products-schema';
 
-export default function DevicesTable({ products }: { products: Product[] }) {
+export default function ProductsTable({ products }: { products: Product[] }) {
   function formatDate(date: Date) {
     let day = date.getDate().toString().padStart(2, '0');
     let month = (date.getMonth() + 1).toString().padStart(2, '0'); // January is 0
@@ -20,7 +20,7 @@ export default function DevicesTable({ products }: { products: Product[] }) {
 
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
-
+  console.log(products, 'products');
 
   return (
     <Table>

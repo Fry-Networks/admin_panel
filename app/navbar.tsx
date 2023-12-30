@@ -12,6 +12,7 @@ const navigation = [
   { name: 'Weather Accounts', href: '/weather/accounts' },
   { name: 'Weather Devices', href: '/weather/devices' },
   { name: 'Devices', href: '/devices' },
+  { name: 'Rewards', href: '/rewards' },
 ];
 
 function classNames(...classes: string[]) {
