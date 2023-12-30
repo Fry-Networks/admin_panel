@@ -11,7 +11,7 @@ import {
 } from '@tremor/react';
 import Modal from 'react-modal';
 import { webUser } from '../lib/webusers-model';
-import { Product } from '../lib/products-schema';
+import { Product, ProductModel } from '../lib/products-schema';
 import { useState } from 'react';
 import ReactModal from 'react-modal';
 
@@ -24,10 +24,24 @@ export default function ProductsTable({ products }: { products: Product[] }) {
   const closeModal = () => {
     setEditingProduct(null);
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle the update logic here
     console.log('Updating product:', editingProduct);
+    await ProductModel.updateOne({ wix_id: editingProduct?.wix_id }, {
+      reward: {
+        unverified: (e.target as any).elements[0].value,
+        verified: (e.target as any).elements[1].value
+      }
+    }, (err: any, res: any) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log(res);
+    });
+    console.log('Updated product:', editingProduct);
+    setEditingProduct(null);
     closeModal();
   };
 
@@ -100,15 +114,15 @@ export default function ProductsTable({ products }: { products: Product[] }) {
         <form onSubmit={handleSubmit}>
           <div>
             <label>Unverified Reward:</label>
-            <NumberInput  defaultValue={editingProduct?.reward.unverified} />
+            <NumberInput defaultValue={editingProduct?.reward.unverified} />
           </div>
           <div>
             <label>Verified Reward:</label>
             <NumberInput defaultValue={editingProduct?.reward.verified} />
           </div>
           <div className='mb-4 mt-4'>
-          <Button type="submit" className='mr-2' variant="primary">Update</Button>
-          <Button onClick={closeModal} variant="secondary">Cancel</Button>
+            <Button type="submit" className='mr-2' variant="primary">Update</Button>
+            <Button onClick={closeModal} variant="secondary">Cancel</Button>
           </div>
         </form>
       </Modal>
