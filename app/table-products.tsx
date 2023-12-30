@@ -147,11 +147,11 @@ const handleSubmit = async (e:any) => {
         <form onSubmit={handleSubmit}>
           <div>
             <label>Unverified Reward:</label>
-            <NumberInput ref={unverifiedRewardRef} defaultValue={editingProduct?.reward.unverified} />
+            <NumberInput ref={unverifiedRewardRef} defaultValue={editingProduct?.reward.unverified} step={0.01} />
           </div>
           <div>
             <label>Verified Reward:</label>
-            <NumberInput ref={verifiedRewardRef} defaultValue={editingProduct?.reward.verified} />
+            <NumberInput ref={verifiedRewardRef} defaultValue={editingProduct?.reward.verified} step={0.01} />
           </div>
           <div className='mb-4 mt-4'>
             <Button type="submit" className='mr-2' variant="primary">Update</Button>
