@@ -12,6 +12,7 @@ import { Product } from '../lib/products-schema';
 
 export default function ProductsTable({ products }: { products: Product[] }) {
   function formatDate(date: Date) {
+    date = new Date(date);
     let day = date.getDate().toString().padStart(2, '0');
     let month = (date.getMonth() + 1).toString().padStart(2, '0'); // January is 0
     let year = date.getFullYear();
