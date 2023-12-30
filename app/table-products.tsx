@@ -6,11 +6,14 @@ import {
   TableBody,
   TableCell,
   Text,
-  Button
+  Button,
+  NumberInput,
 } from '@tremor/react';
+import Modal from 'react-modal';
 import { webUser } from '../lib/webusers-model';
 import { Product } from '../lib/products-schema';
 import { useState } from 'react';
+import ReactModal from 'react-modal';
 
 export default function ProductsTable({ products }: { products: Product[] }) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -38,7 +41,6 @@ export default function ProductsTable({ products }: { products: Product[] }) {
 
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
-  console.log(products, 'products');
 
   return (
     <div>
@@ -87,18 +89,46 @@ export default function ProductsTable({ products }: { products: Product[] }) {
           ))}
         </TableBody>
       </Table>
-      {editingProduct && (
-        <div className="modal">
-          <form onSubmit={handleSubmit}>
-            <h2>{editingProduct.name} - {editingProduct.key}</h2>
-            <input type="text" value={editingProduct.reward.unverified} /> 
-            <input type="text" value={editingProduct.reward.verified} />
-            <button type="submit" style={{ backgroundColor: 'green' }}>Submit</button>
-            <button type="button" onClick={closeModal}>Cancel</button>
-          </form>
-        </div>
-      )}
+      <Modal
+        isOpen={!!editingProduct}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Edit Product"
+      >
+        <h2>Edit Product</h2>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Unverified Reward:</label>
+            <NumberInput  defaultValue={editingProduct?.reward.unverified} />
+          </div>
+          <div>
+            <label>Verified Reward:</label>
+            <NumberInput defaultValue={editingProduct?.reward.verified} />
+          </div>
+          <Button type="submit" variant="primary">Update</Button>
+          <Button onClick={closeModal} variant="secondary">Cancel</Button>
+        </form>
+      </Modal>
     </div>
 
   );
 }
+
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: '#f0f0f0', // Example background color
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)'
+  },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
+  }
+};
