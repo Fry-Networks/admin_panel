@@ -92,10 +92,11 @@ export default function ProductsTable({ products }: { products: Product[] }) {
       <Modal
         isOpen={!!editingProduct}
         onRequestClose={closeModal}
+        closeTimeoutMS={500}
         style={customStyles}
         contentLabel="Edit Product"
       >
-        <h2>Edit Product</h2>
+        <h2>Editting {editingProduct?.name} - ({editingProduct?.key})</h2>
         <form onSubmit={handleSubmit}>
           <div>
             <label>Unverified Reward:</label>
@@ -105,8 +106,10 @@ export default function ProductsTable({ products }: { products: Product[] }) {
             <label>Verified Reward:</label>
             <NumberInput defaultValue={editingProduct?.reward.verified} />
           </div>
-          <Button type="submit" variant="primary">Update</Button>
+          <div className='mb-4 mt-4'>
+          <Button type="submit" className='mr-2' variant="primary">Update</Button>
           <Button onClick={closeModal} variant="secondary">Cancel</Button>
+          </div>
         </form>
       </Modal>
     </div>
@@ -123,7 +126,8 @@ const customStyles = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
-    backgroundColor: '#f0f0f0', // Example background color
+    backgroundColor: 'white', // Example background color
+    color: "#6b7280",
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)'
