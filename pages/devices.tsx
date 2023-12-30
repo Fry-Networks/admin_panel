@@ -59,6 +59,7 @@ export default function DevicesPage({
     'registered',
     'unregistered'
   ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const sortedDevices = useMemo(() => sortDevices([...devices]), [devices, sortOrder]);
 
 
