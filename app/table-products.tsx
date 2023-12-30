@@ -24,26 +24,49 @@ export default function ProductsTable({ products }: { products: Product[] }) {
   const closeModal = () => {
     setEditingProduct(null);
   };
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle the update logic here
-    console.log('Updating product:', editingProduct);
-    await ProductModel.updateOne({ wix_id: editingProduct?.wix_id }, {
-      reward: {
-        unverified: (e.target as any).elements[0].value,
-        verified: (e.target as any).elements[1].value
-      }
-    }, (err: any, res: any) => {
-      if (err) {
-        console.error(err);
+  
+    // Ensure editingProduct is not null
+    if (!editingProduct) {
+      console.error('No product selected for editing');
+      return;
+    }
+  
+    try {
+      const form = e.currentTarget;
+      const unverifiedReward = form.elements.namedItem('unverifiedReward') as HTMLInputElement;
+      const verifiedReward = form.elements.namedItem('verifiedReward') as HTMLInputElement;
+  
+      if (!unverifiedReward || !verifiedReward) {
+        console.error('Form elements are missing');
         return;
       }
-      console.log(res);
-    });
-    console.log('Updated product:', editingProduct);
+  
+      // Update logic
+      const updateData = {
+        reward: {
+          unverified: unverifiedReward.value,
+          verified: verifiedReward.value,
+        },
+      };
+  
+      console.log('Updating product:', editingProduct);
+      const response = await ProductModel.updateOne(
+        { wix_id: editingProduct.wix_id },
+        updateData
+      );
+  
+      console.log('Updated product:', response);
+    } catch (err) {
+      console.error('Error updating product:', err);
+    }
+  
+    // Reset editing product and close modal
     setEditingProduct(null);
     closeModal();
   };
+  
 
   function formatDate(date: Date) {
     date = new Date(date);
