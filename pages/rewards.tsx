@@ -25,10 +25,16 @@ import { Product } from '../lib/products-schema';
   
   export default function RewardsPage() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
     useEffect(() => {
-      fetchProducts(); // Fetch products initially
-    }, []);
+      console.log('Initial load:', isInitialLoad);
+      if (isInitialLoad) {
+        console.log('Fetching products...');
+        fetchProducts();
+        setIsInitialLoad(false);
+      }
+    }, [isInitialLoad]);
 
     //(VPN|OGPS|IGPS|IDB|ODB)
     const fetchProducts = async () => {
@@ -43,12 +49,13 @@ import { Product } from '../lib/products-schema';
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        setProducts(data.products);
+        setProducts(data);
+        
       } catch (error) {
         console.error('Failed to fetch products:', error);
       }
     };
-  
+    console.log(products);
     return (
       <main className="p-4 md:p-10 mx-auto max-w-7xl">
         <Title>Wix Products</Title>

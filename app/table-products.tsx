@@ -71,6 +71,7 @@ export default function ProductsTable({ products, updateProducts }: { products: 
 
       const result = await response.json();
       console.log('Updated product:', result);
+      updateProducts(); // Update products table
       setUpdateSuccess(editingProduct.name); // Set success state to true
       setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
     } catch (err) {
@@ -114,7 +115,7 @@ export default function ProductsTable({ products, updateProducts }: { products: 
         </TableHead>
         <TableBody>
           {products.map((product) => (
-            <TableRow key={product.id}>
+            <TableRow key={product.wix_id}>
               <TableCell>{product.name}</TableCell>
               <TableCell>
                 <Text>{product.key}</Text>
