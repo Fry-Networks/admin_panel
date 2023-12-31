@@ -16,19 +16,38 @@ import {
   } from '@tremor/react';
   import Search from '../app/search';
   import clientPromise from '../lib/mongoclient';
-  import { useState } from 'react';
+  import { useEffect, useState } from 'react';
   import ProductsTable from '../app/table-products';
   import { getSession } from 'next-auth/react';
   import UserForm from '../components/form-user';
   import RemoveUserForm from '../components/remove-user';
 import { Product } from '../lib/products-schema';
   
-  export default function UsersPage({
-    products,
-  }: {
-    products: Product[];
-  }) {
+  export default function RewardsPage() {
+    const [products, setProducts] = useState<Product[]>([]);
+
+    useEffect(() => {
+      fetchProducts(); // Fetch products initially
+    }, []);
+
     //(VPN|OGPS|IGPS|IDB|ODB)
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/get-products',{ // Replace with your actual API endpoint
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setProducts(data.products);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      }
+    };
   
     return (
       <main className="p-4 md:p-10 mx-auto max-w-7xl">
@@ -41,7 +60,7 @@ import { Product } from '../lib/products-schema';
               </div>
   
               <Card className="mt-6">
-                <ProductsTable products={products} />
+                <ProductsTable products={products} updateProducts={fetchProducts} />
               </Card>
             </TabPanel>
           </TabPanels>
@@ -49,25 +68,5 @@ import { Product } from '../lib/products-schema';
       </main>
     );
   }
-  
-  export async function getServerSideProps(context: any) {
-    const session = await getSession(context);
-    if (!session || !session.user.admin) {
-      return {
-        props: { error: 'Unauthorized access' }
-      };
-    }
-    try {
-      const client = await clientPromise;
-      const db = client.db('main');
-  
-      const products = await db.collection('products').find({}).toArray();
-  
-      return {
-        props: { products: JSON.parse(JSON.stringify(products)) }
-      };
-    } catch (e) {
-      console.error(e);
-    }
-  }
+
   

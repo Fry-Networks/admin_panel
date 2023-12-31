@@ -17,7 +17,7 @@ import { Product, ProductModel } from '../lib/products-schema';
 import { useRef, useState } from 'react';
 import ReactModal from 'react-modal';
 
-export default function ProductsTable({ products }: { products: Product[] }) {
+export default function ProductsTable({ products, updateProducts }: { products: Product[], updateProducts: Function }) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
 
