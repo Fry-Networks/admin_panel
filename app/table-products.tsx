@@ -19,7 +19,7 @@ import ReactModal from 'react-modal';
 
 export default function ProductsTable({ products }: { products: Product[] }) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [updateSuccess, setUpdateSuccess] = useState(false); // State to track update success
+  const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
 
   const openEditModal = (product: Product) => {
     setEditingProduct(product);
@@ -71,8 +71,8 @@ export default function ProductsTable({ products }: { products: Product[] }) {
 
       const result = await response.json();
       console.log('Updated product:', result);
-      setUpdateSuccess(true); // Set success state to true
-      setTimeout(() => setUpdateSuccess(false), 3000); // Reset success state after 3 seconds
+      setUpdateSuccess(editingProduct.name); // Set success state to true
+      setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
     } catch (err) {
       console.error('Error updating product:', err);
     }
@@ -96,9 +96,9 @@ export default function ProductsTable({ products }: { products: Product[] }) {
 
   return (
     <div>
-      {updateSuccess && (
-        <Callout className="mt-4" title="No critical system data" icon={CheckCircleIcon} color="teal">
-          Product updated successfully!
+      {(updateSuccess != "" )&& (
+        <Callout className="mt-4" title="Success" icon={CheckCircleIcon} color="teal">
+          Successfully updated {updateSuccess} !
         </Callout>
       )}
       <Table>
@@ -147,9 +147,9 @@ export default function ProductsTable({ products }: { products: Product[] }) {
         style={customStyles}
         contentLabel="Edit Product"
       >
-        <h2><strong>Editting</strong> {editingProduct?.name} - ({editingProduct?.key})</h2>
+        <h2 className='mb-4'><strong>Editting</strong> {editingProduct?.name} - ({editingProduct?.key})</h2>
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className='mb-2'>
             <label>Unverified Reward:</label>
             <NumberInput ref={unverifiedRewardRef} defaultValue={editingProduct?.reward.unverified} step={0.01} />
           </div>
