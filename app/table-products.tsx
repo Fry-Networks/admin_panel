@@ -7,8 +7,10 @@ import {
   TableCell,
   Text,
   Button,
+  Callout,
   NumberInput,
 } from '@tremor/react';
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import Modal from 'react-modal';
 import { webUser } from '../lib/webusers-model';
 import { Product, ProductModel } from '../lib/products-schema';
@@ -17,6 +19,7 @@ import ReactModal from 'react-modal';
 
 export default function ProductsTable({ products }: { products: Product[] }) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [updateSuccess, setUpdateSuccess] = useState(false); // State to track update success
 
   const openEditModal = (product: Product) => {
     setEditingProduct(product);
@@ -27,55 +30,57 @@ export default function ProductsTable({ products }: { products: Product[] }) {
   const unverifiedRewardRef = useRef<HTMLInputElement>(null);
   const verifiedRewardRef = useRef<HTMLInputElement>(null);
 
-const handleSubmit = async (e:any) => {
-  e.preventDefault();
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
 
-  // Ensure editingProduct is not null
-  if (!editingProduct) {
-    console.error('No product selected for editing');
-    return;
-  }
-
-  const unverifiedReward = unverifiedRewardRef.current?.value;
-  const verifiedReward = verifiedRewardRef.current?.value;
-
-  // Ensure the values are retrieved
-  if (unverifiedReward === undefined || verifiedReward === undefined) {
-    console.error('Form elements are missing');
-    return;
-  }
-
-  const updateData = {
-    productId: editingProduct.wix_id, // Use the appropriate identifier for the product
-    unverifiedReward: unverifiedReward,
-    verifiedReward: verifiedReward,
-  };
-
-  try {
-    console.log('Updating product:', editingProduct);
-
-    const response = await fetch('/api/edit-product', { // Replace with your actual API endpoint
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updateData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    // Ensure editingProduct is not null
+    if (!editingProduct) {
+      console.error('No product selected for editing');
+      return;
     }
 
-    const result = await response.json();
-    console.log('Updated product:', result);
-  } catch (err) {
-    console.error('Error updating product:', err);
-  }
+    const unverifiedReward = unverifiedRewardRef.current?.value;
+    const verifiedReward = verifiedRewardRef.current?.value;
 
-  // Reset editing product and close modal
-  setEditingProduct(null);
-  closeModal();
-};
+    // Ensure the values are retrieved
+    if (unverifiedReward === undefined || verifiedReward === undefined) {
+      console.error('Form elements are missing');
+      return;
+    }
+
+    const updateData = {
+      productId: editingProduct.wix_id, // Use the appropriate identifier for the product
+      unverifiedReward: unverifiedReward,
+      verifiedReward: verifiedReward,
+    };
+
+    try {
+      console.log('Updating product:', editingProduct);
+
+      const response = await fetch('/api/edit-product', { // Replace with your actual API endpoint
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Updated product:', result);
+      setUpdateSuccess(true); // Set success state to true
+      setTimeout(() => setUpdateSuccess(false), 3000); // Reset success state after 3 seconds
+    } catch (err) {
+      console.error('Error updating product:', err);
+    }
+
+    // Reset editing product and close modal
+    setEditingProduct(null);
+    closeModal();
+  };
 
 
   function formatDate(date: Date) {
@@ -91,6 +96,11 @@ const handleSubmit = async (e:any) => {
 
   return (
     <div>
+      {updateSuccess && (
+        <Callout className="mt-4" title="No critical system data" icon={CheckCircleIcon} color="teal">
+          Product updated successfully!
+        </Callout>
+      )}
       <Table>
         <TableHead>
           <TableRow>
@@ -125,12 +135,6 @@ const handleSubmit = async (e:any) => {
                 >
                   Edit
                 </Button>
-                <Button
-                  variant="secondary"
-                  color='red'
-                >
-                  Delete
-                </Button>
               </TableCell>
             </TableRow>
           ))}
@@ -143,7 +147,7 @@ const handleSubmit = async (e:any) => {
         style={customStyles}
         contentLabel="Edit Product"
       >
-        <h2>Editting {editingProduct?.name} - ({editingProduct?.key})</h2>
+        <h2><strong>Editting</strong> {editingProduct?.name} - ({editingProduct?.key})</h2>
         <form onSubmit={handleSubmit}>
           <div>
             <label>Unverified Reward:</label>
