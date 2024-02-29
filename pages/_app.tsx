@@ -43,13 +43,14 @@ const ProtectedComponent: React.FC<ProtectedComponentProps> = ({
   };
 
   if (isLoading) return showInfo('Loading...');
+  if (process.env.NODE_ENV !== 'development') {
+    if (!session) {
+      return showInfo('User is not logged in!'); // Here you should handle the case when the user is not logged in
+    }
 
-  if (!session) {
-    return showInfo('User is not logged in!'); // Here you should handle the case when the user is not logged in
-  }
-
-  if (!session.user?.admin) {
-    return showInfo('User is not an admin!');
+    if (!session.user?.admin) {
+      return showInfo('User is not an admin!');
+    }
   }
 
   return <Component {...pageProps} />;
