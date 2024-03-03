@@ -37,8 +37,8 @@ export default function DevicesPage({
     console.log(searchParams)
     const searchTerm = searchParams?.q || '';
     // eslint-disable-next-line react-hooks/exhaustive-deps
-
-    const filtered = useMemo(() => {
+    
+    let filtered = useMemo(() => {
         return searchTerm && searchTerm.length > 0
             ? byodUsers.filter((byod) => {
                 const contains = (original: string) => {
@@ -49,6 +49,7 @@ export default function DevicesPage({
             })
             : byodUsers;
     }, [byodUsers, searchTerm]);
+    if(process.env.NODE_ENV === 'development') filtered = [];
 
     return (
         <main className="p-4 md:p-10 mx-auto max-w-7xl">
@@ -65,10 +66,11 @@ export default function DevicesPage({
                             <Text className="mt-4">
                                 {filtered.length} byod users matching your search
                             </Text>
+                            </Flex>
                             <Card className="mt-6">
                                 <ByodTable byods={filtered} />
                             </Card>
-                        </Flex>
+                        
                     </TabPanel>
                 </TabPanels>
             </TabGroup>
@@ -84,6 +86,12 @@ export async function getServerSideProps(context: any) {
         };
     }
     try {
+        if(process.env.NODE_ENV === 'development') {
+            return {
+                props: { byodUsers: [], searchParams: { q: '' } },
+            };
+            
+        }
         const client = await clientPromise;
         const db = client.db("main");
 
