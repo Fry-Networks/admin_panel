@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getServerSession(req, res, authOptions);
 
     // Check if user is authenticated and is an admin
-    if (!session || !session.user.admin) {
+    if (!session || !session.user.admin || !session.user.owner) {
         res.status(401).json({ message: "Unauthorized" });
         return;
     }
@@ -26,11 +26,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === 'PUT') {
         const data: ProductData = req.body;
-        const { productId, unverifiedReward, verifiedReward, password } = data;
-        if(password !== process.env.ADMIN_PASSWORD) {
-            res.status(401).json({ message: "Unauthorized" });
-            return;
-        }
+        const { productId, unverifiedReward, verifiedReward } = data;
+        
+        
         console.log("Updating product", productId);
 
         const existingProduct = await collection.findOne({

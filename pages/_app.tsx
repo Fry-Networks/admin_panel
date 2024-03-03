@@ -4,6 +4,7 @@ import '../app/globals.css';
 import { useSession, SessionProvider } from 'next-auth/react';
 
 import Navbar from '../app/navbar';
+import { useRouter } from 'next/router';
 interface MyAppProps extends AppProps {
   Component: NextPage;
 }
@@ -30,6 +31,7 @@ const ProtectedComponent: React.FC<ProtectedComponentProps> = ({
 }) => {
   const { data: session, status } = useSession();
   const isLoading = status === 'loading';
+  const router = useRouter();
   const showInfo = (text: string) => {
     return (
       <p
@@ -51,6 +53,10 @@ const ProtectedComponent: React.FC<ProtectedComponentProps> = ({
     if (!session.user?.admin) {
       return showInfo('User is not an admin!');
     }
+    if (router.pathname === '/rewards' && !session.user?.owner) {
+      return showInfo('Sorry guys, only owners can access this page!');
+    }
+    //if the user is at /rewards and is not an owner, return a message
   }
 
   return <Component {...pageProps} />;

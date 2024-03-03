@@ -30,7 +30,6 @@ export default function ProductsTable({ products, updateProducts }: { products: 
   };
   const unverifiedRewardRef = useRef<HTMLInputElement>(null);
   const verifiedRewardRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -43,7 +42,6 @@ export default function ProductsTable({ products, updateProducts }: { products: 
 
     const unverifiedReward = unverifiedRewardRef.current?.value;
     const verifiedReward = verifiedRewardRef.current?.value;
-    const password = passwordRef.current?.value;
 
     // Ensure the values are retrieved
     if (unverifiedReward === undefined || verifiedReward === undefined) {
@@ -54,8 +52,7 @@ export default function ProductsTable({ products, updateProducts }: { products: 
     const updateData = {
       productId: editingProduct.wix_id, // Use the appropriate identifier for the product
       unverifiedReward: unverifiedReward,
-      verifiedReward: verifiedReward,
-      password:   password
+      verifiedReward: verifiedReward
     };
 
     try {
@@ -167,10 +164,6 @@ export default function ProductsTable({ products, updateProducts }: { products: 
           <div>
             <label>Verified Reward:</label>
             <NumberInput ref={verifiedRewardRef} defaultValue={editingProduct?.reward.verified} step={0.01} />
-          </div>
-          <div>
-            <label>Password:</label>
-            <TextInput ref={passwordRef} type="password" />
           </div>
           <div className='mb-4 mt-4'>
             <Button type="submit" className='mr-2' variant="primary">Update</Button>
