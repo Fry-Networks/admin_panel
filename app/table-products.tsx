@@ -10,6 +10,7 @@ import {
   Callout,
   NumberInput,
   TextInput,
+  Flex,
 } from '@tremor/react';
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import Modal from 'react-modal';
@@ -20,6 +21,7 @@ import ReactModal from 'react-modal';
 
 export default function ProductsTable({ products, updateProducts }: { products: Product[], updateProducts: Function }) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [globalMultiplier, setGlobalMultiplier] = useState(1);
   const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
 
   const openEditModal = (product: Product) => {
@@ -30,7 +32,7 @@ export default function ProductsTable({ products, updateProducts }: { products: 
   };
   const unverifiedRewardRef = useRef<HTMLInputElement>(null);
   const verifiedRewardRef = useRef<HTMLInputElement>(null);
-
+  const globalMultiplierRef = useRef<HTMLInputElement>(null);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
@@ -85,6 +87,29 @@ export default function ProductsTable({ products, updateProducts }: { products: 
     closeModal();
   };
 
+  const updateMultiplier = async () => {
+    try {
+      const response = await fetch('/api/update-multiplier', { // Replace with your actual API endpoint
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ multiplier: globalMultiplier }),
+      });
+
+      if (!response.ok) {
+        setUpdateSuccess("error"); // Reset success state
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Updated multiplier:', result);
+      setUpdateSuccess("multiplier"); // Set success state to true
+      setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
+    } catch (err) {
+      console.error('Error updating multiplier:', err);
+    }
+  }
 
   function formatDate(date: Date) {
     date = new Date(date);
@@ -99,16 +124,23 @@ export default function ProductsTable({ products, updateProducts }: { products: 
 
   return (
     <div>
-      {(updateSuccess != "" && updateSuccess != "error")&& (
+      {(updateSuccess != "" && updateSuccess != "error") && (
         <Callout className="mt-4" title="Success" icon={CheckCircleIcon} color="teal">
           Successfully updated {updateSuccess} !
         </Callout>
       )}
-      {(updateSuccess == "error" )&& (  
+      {(updateSuccess == "error") && (
         <Callout className="mt-4" title="Error" icon={CheckCircleIcon} color="red">
           Error updating product!
         </Callout>
       )}
+      <Flex flexDirection='row' className="mt-6">
+        <NumberInput ref={globalMultiplierRef} defaultValue={globalMultiplier} step={0.01} onChange={(e) => setGlobalMultiplier(+e.target.value)} />
+        <Button className="ml-4" onClick={() => {
+          updateMultiplier();
+        }}>Update multiplier</Button>
+        
+      </Flex>
       <Table>
         <TableHead>
           <TableRow>

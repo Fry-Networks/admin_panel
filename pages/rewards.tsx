@@ -12,11 +12,12 @@ import {
     TabPanels,
     TabGroup,
     TabList,
-    Tab
+    Tab,
+    NumberInput
   } from '@tremor/react';
   import Search from '../app/search';
   import clientPromise from '../lib/mongoclient';
-  import { useEffect, useState } from 'react';
+  import { useEffect, useRef, useState } from 'react';
   import ProductsTable from '../app/table-products';
   import { getSession } from 'next-auth/react';
   import UserForm from '../components/form-user';
@@ -26,7 +27,6 @@ import { Product } from '../lib/products-schema';
   export default function RewardsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
-
     useEffect(() => {
       console.log('Initial load:', isInitialLoad);
       if (isInitialLoad) {
@@ -62,10 +62,13 @@ import { Product } from '../lib/products-schema';
         <TabGroup>
           <TabPanels>
             <TabPanel>  
+              <Flex flexDirection='row' className="mt-6">
               <div style={{ marginTop: '20px' }}>
                 <Text>{products.length} products found!</Text>
               </div>
-  
+        
+              </Flex>
+      
               <Card className="mt-6">
                 <ProductsTable products={products} updateProducts={fetchProducts} />
               </Card>
