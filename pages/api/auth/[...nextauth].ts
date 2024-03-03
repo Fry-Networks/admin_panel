@@ -51,5 +51,6 @@ export interface MySession extends Session {
     image: string;
     emailVerified: string | null;
     admin: boolean;
+    owner: boolean;
   }
 }
