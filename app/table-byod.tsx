@@ -28,13 +28,21 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
           <TableRow key={byod.id}>
             <TableCell>{byod.email}</TableCell>
             <TableCell>
-              <Text>{byod.licenses.map(license => license + '\n')}</Text>
+              {byod.licenses.map((license, index) => (
+                // Directly using <div> here
+                <div key={index}>
+                  {license}
+                </div>
+              ))}
             </TableCell>
             <TableCell>
-              <Text>{`Algo: ${byod.algo ? "Yes" : "No"} | Fry: ${byod.fry ? "Yes" : "No"}`}</Text>
+              {/* Assuming Text component doesn't need a component prop here */}
+              <div>{`Algo: ${byod.algo ? "Yes" : "No"} | Fry: ${byod.fry ? "Yes" : "No"}`}</div>
             </TableCell>
           </TableRow>
         ))}
+
+
       </TableBody>
     </Table>
   );
