@@ -8,6 +8,7 @@ interface ProductData {
     productId: string;
     unverifiedReward?: string;
     verifiedReward?: string;
+    password: string
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -25,8 +26,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === 'PUT') {
         const data: ProductData = req.body;
-        const { productId, unverifiedReward, verifiedReward } = data;
-
+        const { productId, unverifiedReward, verifiedReward, password } = data;
+        if(password !== process.env.ADMIN_PASSWORD) {
+            res.status(401).json({ message: "Unauthorized" });
+            return;
+        }
         console.log("Updating product", productId);
 
         const existingProduct = await collection.findOne({
