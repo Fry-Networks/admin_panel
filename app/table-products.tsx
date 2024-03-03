@@ -9,6 +9,7 @@ import {
   Button,
   Callout,
   NumberInput,
+  TextInput,
 } from '@tremor/react';
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import Modal from 'react-modal';
@@ -69,6 +70,7 @@ export default function ProductsTable({ products, updateProducts }: { products: 
       });
 
       if (!response.ok) {
+        setUpdateSuccess("error"); // Reset success state
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
@@ -100,9 +102,14 @@ export default function ProductsTable({ products, updateProducts }: { products: 
 
   return (
     <div>
-      {(updateSuccess != "" )&& (
+      {(updateSuccess != "" && updateSuccess != "error")&& (
         <Callout className="mt-4" title="Success" icon={CheckCircleIcon} color="teal">
           Successfully updated {updateSuccess} !
+        </Callout>
+      )}
+      {(updateSuccess == "error" )&& (  
+        <Callout className="mt-4" title="Error" icon={CheckCircleIcon} color="red">
+          Error updating product!
         </Callout>
       )}
       <Table>
@@ -163,7 +170,7 @@ export default function ProductsTable({ products, updateProducts }: { products: 
           </div>
           <div>
             <label>Password:</label>
-            <input ref={passwordRef} type="password" />
+            <TextInput ref={passwordRef} type="password" />
           </div>
           <div className='mb-4 mt-4'>
             <Button type="submit" className='mr-2' variant="primary">Update</Button>
