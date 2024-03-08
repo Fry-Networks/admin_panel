@@ -18,7 +18,7 @@ import { useState } from 'react';
 
 export default function ByodTable({ byods }: { byods: ByodUser[] }) {
   const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
-  const setUsed = async (license: {license: string, used: boolean}, email: string) => {
+  const setUsed = async (license: { license: string, used: boolean }, email: string) => {
     try {
       const response = await fetch('/api/edit-license-use', { // Replace with your actual API endpoint
         method: 'PUT',
@@ -37,6 +37,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
       console.log('Updated license use:', result);
       setUpdateSuccess("license"); // Set success state to true
       setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
+      return result.used;
     } catch (err) {
       console.error('Error updating license use:', err);
     }
@@ -69,13 +70,17 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
               <TableCell>
                 {byod.licenses.map((license_data, index) => {
 
-                  const color = license_data.used ? "red" : "green";
+                  let color: "red" | "green" = license_data.used ? "red" : "green"
                   // Directly using <div> here
                   return (<div key={index}>
                     {license_data.license}
                     <Button
                       color={color}
-                      onClick={() => setUsed(license_data, byod.email)}>
+                      onClick={() => {
+                        setUsed(license_data, byod.email).then((used) => {
+                          color = used ? "red" : "green";
+                        });
+                      }}>
                       Mark as used
                     </Button>
                   </div>

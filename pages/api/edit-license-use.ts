@@ -33,9 +33,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
         try {
-            await collection.updateOne({ email: data.email }, { $set: { "licenses.$[elem].used": data.license.used } }, { arrayFilters: [{ "elem.license": data.license.license }] });
+            await collection.updateOne({ email: data.email }, { $set: { "licenses.$[elem].used": !data.license.used } }, { arrayFilters: [{ "elem.license": data.license.license }] });
 
-            res.status(200).json({ message: "Product updated successfully" });
+            res.status(200).json({ message: "Product updated successfully", used: !data.license.used });
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Error updating product" });
