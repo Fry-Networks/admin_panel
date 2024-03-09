@@ -7,7 +7,9 @@ import {
   TableCell,
   Text,
   Button,
-  Callout
+  Callout,
+  TextInput,
+  Flex
 } from '@tremor/react';
 import { webUser } from '../lib/webusers-model';
 import { User } from '../lib/users-schema';
@@ -42,8 +44,40 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
       console.error('Error updating license use:', err);
     }
   }
+  const createLicense = async (license: string, email: string) => {
+    try {
+      const response = await fetch('/api/add-license', { // Replace with your actual API endpoint
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ license, email }),
+      });
+
+      if (!response.ok) {
+        setUpdateSuccess("error"); // Reset success state
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Added license:', result);
+      setUpdateSuccess("license"); // Set success state to true
+      setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
+    } catch (err) {
+      console.error('Error adding license:', err);
+    }
+  }
   return (
+
+
     <div>
+      <Flex flexDirection='row' justifyContent='evenly' alignItems='center' style={{ marginBottom: "2px" }}>
+      <TextInput placeholder="License" style={{ marginTop: "2px" }} />
+      <TextInput placeholder="Email" style={{ marginTop: "2px" }} />
+      <Button onClick={() => {
+        createLicense("license", "email");
+      }}>Add license</Button>
+      </Flex>
       {(updateSuccess != "" && updateSuccess != "error") && (
         <Callout className="mt-4" title="Success" icon={CheckCircleIcon} color="teal">
           Successfully updated {updateSuccess} !
@@ -51,10 +85,11 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
       )}
       {(updateSuccess == "error") && (
         <Callout className="mt-4" title="Error" icon={CheckCircleIcon} color="red">
-          Error updating product!
+          Error updating license!
         </Callout>
       )}
       <Table>
+      
 
         <TableHead>
           <TableRow>
