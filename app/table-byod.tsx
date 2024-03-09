@@ -20,6 +20,8 @@ import { useState } from 'react';
 
 export default function ByodTable({ byods }: { byods: ByodUser[] }) {
   const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
+  const [license, setLicense] = useState("");
+  const [email, setEmail] = useState("");
   const setUsed = async (license: { license: string, used: boolean }, email: string) => {
     try {
       const response = await fetch('/api/edit-license-use', { // Replace with your actual API endpoint
@@ -72,10 +74,10 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
 
     <div>
       <Flex flexDirection='row' justifyContent='evenly' alignItems='center' style={{ marginBottom: "2px" }}>
-      <TextInput placeholder="License" style={{ marginTop: "2px" }} />
-      <TextInput placeholder="Email" style={{ marginTop: "2px" }} />
+      <TextInput placeholder="License" style={{ marginTop: "2px" }} onValueChange={(value) => setLicense(value)} />
+      <TextInput placeholder="Email" style={{ marginTop: "2px" }} onValueChange={(value) => setEmail(value)} />
       <Button onClick={() => {
-        createLicense("license", "email");
+        createLicense(license, email);
       }}>Add license</Button>
       </Flex>
       {(updateSuccess != "" && updateSuccess != "error") && (
