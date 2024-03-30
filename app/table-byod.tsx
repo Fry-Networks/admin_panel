@@ -18,6 +18,9 @@ import { Device } from '../lib/devices-schema';
 import { ByodUser } from '../lib/byod-schema';
 import { useState } from 'react';
 
+
+// Your byte sequenc
+
 export default function ByodTable({ byods }: { byods: ByodUser[] }) {
   const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
   const [license, setLicense] = useState("");

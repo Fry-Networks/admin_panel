@@ -17,7 +17,7 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import { ByodUser } from '../lib/byod-schema';
 import ByodTable from '../app/table-byod';
 import Search from '../app/search';
-
+import { encode as base32Encode } from 'base32-encoding';
 export default function DevicesPage({
     byodUsers, currentPage, pageSize, searchParams
 }: {
@@ -37,7 +37,7 @@ export default function DevicesPage({
     console.log(searchParams)
     const searchTerm = searchParams?.q || '';
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    
+
     let filtered = useMemo(() => {
         return searchTerm && searchTerm.length > 0
             ? byodUsers.filter((byod) => {
@@ -49,7 +49,7 @@ export default function DevicesPage({
             })
             : byodUsers;
     }, [byodUsers, searchTerm]);
-    if(process.env.NODE_ENV === 'development') filtered = [];
+    if (process.env.NODE_ENV === 'development') filtered = [];
 
     return (
         <main className="p-4 md:p-10 mx-auto max-w-7xl">
@@ -66,11 +66,11 @@ export default function DevicesPage({
                             <Text className="mt-4">
                                 {filtered.length} byod users matching your search
                             </Text>
-                            </Flex>
-                            <Card className="mt-6">
-                                <ByodTable byods={filtered} />
-                            </Card>
-                        
+                        </Flex>
+                        <Card className="mt-6">
+                            <ByodTable byods={filtered} />
+                        </Card>
+
                     </TabPanel>
                 </TabPanels>
             </TabGroup>
@@ -86,11 +86,11 @@ export async function getServerSideProps(context: any) {
         };
     }
     try {
-        if(process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === 'development') {
             return {
                 props: { byodUsers: [], searchParams: { q: '' } },
             };
-            
+
         }
         const client = await clientPromise;
         const db = client.db("main");
@@ -99,7 +99,13 @@ export async function getServerSideProps(context: any) {
             .collection("byods")
             .find({ licenses: { $exists: true, $not: { $size: 0 } } })
             .toArray();
+        byods.map((byod) => {
+            const bytes = new Uint8Array(byod.address);
 
+            // Encode to base32
+            const address = base32Encode(bytes);
+            byod.address = address;
+        });
         const searchParams = context.query;
 
         return {
