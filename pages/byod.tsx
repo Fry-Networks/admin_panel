@@ -45,7 +45,7 @@ export default function DevicesPage({
                     if (!searchTerm) return true;
                     return original.toLowerCase().includes(searchTerm.toLowerCase());
                 };
-                return contains(byod.email) || byod.licenses.some((license) => contains(license.license));
+                return contains(byod.email) || byod.licenses.some((license) => contains(license.license)) || contains(byod.address);
             })
             : byodUsers;
     }, [byodUsers, searchTerm]);

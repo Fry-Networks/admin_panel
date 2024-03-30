@@ -9,7 +9,8 @@ import {
   Button,
   Callout,
   TextInput,
-  Flex
+  Flex,
+  Tab
 } from '@tremor/react';
 import { webUser } from '../lib/webusers-model';
 import { User } from '../lib/users-schema';
@@ -99,6 +100,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
         <TableHead>
           <TableRow>
             <TableHeaderCell>Email</TableHeaderCell>
+            <TableHeaderCell>Address</TableHeaderCell>
             <TableHeaderCell>Licenses</TableHeaderCell>
             <TableHeaderCell>Payments</TableHeaderCell>
           </TableRow>
@@ -107,6 +109,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
           {byods.map((byod) => (
             <TableRow key={byod.id}>
               <TableCell>{byod.email}</TableCell>
+              <TableCell>{byod.address ?? "None"}</TableCell>
               <TableCell>
                 {byod.licenses.map((license_data, index) => {
 
