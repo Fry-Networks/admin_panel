@@ -10,7 +10,8 @@ import {
   Callout,
   TextInput,
   Flex,
-  Tab
+  Tab,
+  FlexDirection
 } from '@tremor/react';
 import { webUser } from '../lib/webusers-model';
 import { User } from '../lib/users-schema';
@@ -108,8 +109,12 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
         <TableBody>
           {byods.map((byod) => (
             <TableRow key={byod.id}>
-              <TableCell>{byod.email}</TableCell>
-              <TableCell>{byod.address ?? "None"}</TableCell>
+              <TableCell>
+                <Flex flexDirection='col'>
+                {byod.email}
+                {byod.address ?? "None"}
+                </Flex>
+                </TableCell>
               <TableCell>
                 {byod.licenses.map((license_data, index) => {
 
