@@ -17,7 +17,7 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import { ByodUser } from '../lib/byod-schema';
 import ByodTable from '../app/table-byod';
 import Search from '../app/search';
-import { encode as base32Encode } from 'base32-encoding';
+import { base32 } from '@scure/base';
 export default function DevicesPage({
     byodUsers, currentPage, pageSize, searchParams
 }: {
@@ -104,7 +104,7 @@ export async function getServerSideProps(context: any) {
             const bytes = new Uint8Array(numberArray);
 
             // Encode to base32
-            const address = base32Encode(bytes);
+            const address = base32.encode(bytes).split('=')[0];
             byod.address = address;
         });
         const searchParams = context.query;
