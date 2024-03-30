@@ -21,8 +21,6 @@
     "@vercel/analytics": "^1.0.1",
     "autoprefixer": "^10.4.14",
     "axios": "^1.4.0",
-    "base32": "^0.0.7",
-    "base32-encoding": "^1.0.0",
     "dotenv": "^16.3.1",
     "engine.io-client": "^6.5.1",
     "eslint": "8.46.0",
