@@ -88,7 +88,7 @@ export async function getServerSideProps(context: any) {
     try {
         if (process.env.NODE_ENV === 'development') {
             return {
-                props: { byodUsers: [], searchParams: { q: '' } },
+                props: { byodUsers: [{email: "simon", address: "simon", licenses: []}], searchParams: { q: '' } },
             };
 
         }

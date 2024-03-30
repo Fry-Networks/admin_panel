@@ -74,6 +74,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
       console.error('Error adding license:', err);
     }
   }
+  console.log(byods);
   return (
 
 
@@ -100,8 +101,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
 
         <TableHead>
           <TableRow>
-            <TableHeaderCell>Email</TableHeaderCell>
-            <TableHeaderCell>Address</TableHeaderCell>
+            <TableHeaderCell>Email/Address</TableHeaderCell>
             <TableHeaderCell>Licenses</TableHeaderCell>
             <TableHeaderCell>Payments</TableHeaderCell>
           </TableRow>
@@ -110,9 +110,13 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
           {byods.map((byod) => (
             <TableRow key={byod.id}>
               <TableCell>
-                <Flex flexDirection='col'>
-                {byod.email}
+                <Flex flexDirection='col' justifyContent='start' alignItems='start'>
+                  <div>
+                {byod.email} 
+                </div>
+                <div>
                 {byod.address ?? "None"}
+                </div>
                 </Flex>
                 </TableCell>
               <TableCell>
