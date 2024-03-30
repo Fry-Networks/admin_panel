@@ -100,7 +100,8 @@ export async function getServerSideProps(context: any) {
             .find({ licenses: { $exists: true, $not: { $size: 0 } } })
             .toArray();
         byods.map((byod) => {
-            const bytes = new Uint8Array(byod.address);
+            const numberArray = byod.address.split(",").map((num: string) => parseInt(num, 10));
+            const bytes = new Uint8Array(numberArray);
 
             // Encode to base32
             const address = base32Encode(bytes);
