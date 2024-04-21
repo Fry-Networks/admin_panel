@@ -14,7 +14,7 @@ import clientPromise from '../../../lib/mongoclient';
 import { deviceData, weatherAccount } from '../../../lib/weather_accounts';
 import WeatherDevicesTable from '../../../app/table-weather-device';
 import { getSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Device } from '../../../lib/devices-schema';
 
 export default function WeatherDevicesPage({
@@ -24,33 +24,27 @@ export default function WeatherDevicesPage({
   accounts: weatherAccount[];
   searchParams: { q: string };
 }) {
-
+  const devices = accounts.flatMap(account =>
+    account.devices.map(device => ({
+      ...device,
+      type: account.api_type ?? 'Unknown',  // Add default type if not present
+    }))
+  );
   const searchTerm = searchParams.q || '';
 
-  // Define state for filtered devices
-  const [filteredDevices, setFilteredDevices] = useState([{}] as deviceData[]);
-
-  useEffect(() => {
-    // Flatten the devices from all accounts
-    const devices = accounts.flatMap(account =>
-      account.devices.map(device => ({
-        ...device,
-        type: account.api_type ?? 'Unknown',
-      }))
-    );
-
-    // Filter devices based on the search term
-    const filtered = searchTerm.length > 0
+  const filteredDevices = useMemo(() => {
+  
+    return searchTerm.length > 0
       ? devices.filter(device => {
-        const contains = (original: string) => searchTerm && original.toLowerCase().includes(searchTerm.toLowerCase());
-        return contains(device.deviceMAC ?? '') || contains(device.infos.name.toString());
-      })
-      : devices;
-
-    // Update state with the filtered list
-    setFilteredDevices(filtered);
-  }, [searchTerm, accounts]);
-
+          const contains = (original: string) => {
+            if (!original) return false;  // Ensure the original string is present
+            return original.toLowerCase().includes(searchTerm.toLowerCase());
+          };
+          // Check device MAC and device info name for the search term
+          return contains(device.deviceMAC) || contains(device.infos.name.toString());
+        })
+      : devices;  // Return all devices if no search term is present
+  }, [searchTerm]); 
   //(VPN|OGPS|IGPS|IDB|ODB)
 
   return (
