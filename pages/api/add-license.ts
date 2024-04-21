@@ -6,12 +6,12 @@ import mongoose from "mongoose";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await getServerSession(req, res, authOptions);
 
-    // Check if user is authenticated and is an admin
-    /*if (!session || !session.user.admin) {
+   
+    if (!session || !session.user.admin) {
         res.status(401).json({ message: "Unauthorized" });
         return;
     }
-*/
+
     const client = await clientPromise;
     const db = client.db();
     const collection = db.collection('byods');
@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
         console.log(data);
-
+        
         try {
             await collection.updateOne({ email: data.email }, {
                 $push: {
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }
             });
 
-
+            console.log(`License ${data.license} added successfully by ${session.user.email}`);
             res.status(200).json({ message: "License added successfully" });
         } catch (error) {
             console.error(error);

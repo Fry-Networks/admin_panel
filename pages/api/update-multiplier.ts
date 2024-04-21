@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
         console.log("Updating mutiplier to ", multiplier);
-
+        console.log(`Mult updated successfully by ${session.user.email}`);
         try {
             await collection.updateOne({ name: "rewards" }, { $set: { multiplier: multiplier } });
 
