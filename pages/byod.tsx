@@ -57,6 +57,14 @@ export default function DevicesPage({
             license: "AZFUIOYIAZEDUIOPAZAZEUIZEUIOPERUIOPRAZEUIOPZERAUIOPAZERUIOPAZERUIOPAAAAAAAAAAAAZERUIOPRAZEUIOP",
             used: true
         }]
+    },    //@ts-ignore
+    {
+        email: "simonøDAZJIFAZUORUIOAZUROAZ",
+        address: "simon",
+        licenses: [{
+            license: "AZFUIOYIAZEDUIIOPZERAUIOPAZERUIOPAZERUIOPAAAAAAAAAAAAZERUIOPRAZEUIOP",
+            used: true
+        }]
     }];
 
     return (

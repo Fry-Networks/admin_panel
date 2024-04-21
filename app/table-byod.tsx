@@ -148,6 +148,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
                   let color: "red" | "green" = license_data.used ? "red" : "green"
                   // Directly using <div> here
                   return (<div key={index} className="license-text">
+                    <Flex flexDirection='row' justifyContent='between' alignItems='center'>
                     {license_data.license}
                     <Button
                       color={color}
@@ -159,6 +160,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
                       }}>
                       Mark as used
                     </Button>
+                    </Flex>
                   </div>
                   );
 
