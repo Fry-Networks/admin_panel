@@ -27,21 +27,29 @@ export default function WeatherDevicesPage({
 
   const searchTerm = searchParams.q || '';
 
-  const devices = accounts.map(account => {
-    return account.devices.map(device => {
-      return {
+  // Define state for filtered devices
+  const [filteredDevices, setFilteredDevices] = useState([{}] as deviceData[]);
+
+  useEffect(() => {
+    // Flatten the devices from all accounts
+    const devices = accounts.flatMap(account =>
+      account.devices.map(device => ({
         ...device,
         type: account.api_type ?? 'Unknown',
-      }
-    })
-  }).flat();
+      }))
+    );
 
-  const filtered = searchTerm.length > 0
-    ? devices.filter(device => {
-      const contains = (original: string) => searchTerm && original.toLowerCase().includes(searchTerm.toLowerCase());
-      return contains(device.deviceMAC ?? '') || contains(device.infos.name.toString());
-    })
-    : devices;
+    // Filter devices based on the search term
+    const filtered = searchTerm.length > 0
+      ? devices.filter(device => {
+        const contains = (original: string) => searchTerm && original.toLowerCase().includes(searchTerm.toLowerCase());
+        return contains(device.deviceMAC ?? '') || contains(device.infos.name.toString());
+      })
+      : devices;
+
+    // Update state with the filtered list
+    setFilteredDevices(filtered);
+  }, [searchTerm, accounts]);
 
   //(VPN|OGPS|IGPS|IDB|ODB)
 
@@ -52,11 +60,11 @@ export default function WeatherDevicesPage({
         <Search />
       </Flex>
       <div style={{ marginTop: '20px' }}>
-        <Text>{filtered.length} devices matching your search</Text>
+        <Text>{filteredDevices.length} devices matching your search</Text>
       </div>
 
       <Card className="mt-6">
-        <WeatherDevicesTable devicesData={filtered} />
+        <WeatherDevicesTable devicesData={filteredDevices} />
       </Card>
     </main>
   );
