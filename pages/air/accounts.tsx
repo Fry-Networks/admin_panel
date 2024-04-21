@@ -2,19 +2,19 @@
 import { Card, Metric, Text, Title, BarList, Flex, Grid, MultiSelect, MultiSelectItem } from '@tremor/react';
 import Search from '../../app/search';
 import clientPromise from '../../lib/mongoclient';
-import { weatherAccount } from '../../lib/weather_accounts';
-import WeatherAccountsTable from '../../app/table-weather-account';
 import { getSession } from 'next-auth/react';
+import { AirAccount } from '../../lib/air_accounts';
+import AirAccountsTable from '../../app/table-air-account';
 
 
-export default function WeatherAccountsPage({ accounts, searchParams }: { accounts: weatherAccount[], searchParams: { q: string } }) {
+export default function AirAccountsPage({ accounts, searchParams }: { accounts: AirAccount[], searchParams: { q: string } }) {
   const searchTerm = searchParams.q || "";
   const filtered = (searchTerm.length > 0) ? accounts.filter((account) => {
     const contains = (original: string) => {
       if (!searchTerm) return true;
       return original.toLowerCase().includes(searchTerm.toLowerCase());
     }
-    return contains(account.api_key ?? "") || contains(account._id.toString());
+    return contains(account?.api_key ?? "") || contains(account._id.toString()) || contains(account?.owner ?? "") || contains(account?.imei ?? "") || contains(account?.read_key ?? "") || contains(account?.sensor ?? "");
 
   }) : accounts;
   //(VPN|OGPS|IGPS|IDB|ODB)
@@ -23,7 +23,7 @@ export default function WeatherAccountsPage({ accounts, searchParams }: { accoun
 
   return (
     <main className="p-4 md:p-10 mx-auto max-w-7xl">
-      <Title>Weather Accounts</Title>
+      <Title>Air Accounts</Title>
       <Flex alignItems='end' flexDirection='row' className='mt-6'>
         <Search />
       </Flex>
@@ -34,7 +34,7 @@ export default function WeatherAccountsPage({ accounts, searchParams }: { accoun
       </div>
 
       <Card className="mt-6">
-        <WeatherAccountsTable accounts={filtered} />
+        <AirAccountsTable accounts={filtered} />
       </Card>
     </main>
   );
@@ -53,17 +53,20 @@ export async function getServerSideProps(context: any) {
     const db = client.db("main");
 
     const accounts = (await db
-      .collection("weather_accounts")
+      .collection("air_accounts")
       .find({})
       .toArray()).map((account) => {
         if(account.token) {
-          account.token = account.token.substring(0, 20) + "..."
+          account.token = account.token.substring(0, 8) + "..."
         }
         if(account.api_key) {
-          account.api_key = account.api_key.substring(0, 20) + "..."
+          account.api_key = account.api_key.substring(0, 8) + "..."
         }
         if(account.app_key) {
-          account.app_key = account.app_key.substring(0, 20) + "..."
+          account.app_key = account.app_key.substring(0, 8) + "..."
+        }
+        if(account.read_key) {
+          account.read_key = account.read_key.substring(0, 8) + "..."
         }
         return account;
       });

@@ -5,27 +5,27 @@ import { MongoDBAdapter } from "@auth/mongodb-adapter"
 import clientPromise from "../../../lib/mongoclient"
 import { Adapter } from 'next-auth/adapters';
 import { Session } from 'next-auth';
-
+console.log((process.env.NODE_ENV === 'development' ? process.env.GITHUB_ID_DEV : process.env.GITHUB_ID) )
 export const authOptions: NextAuthOptions = {
   jwt: {
     secret: process.env.NEXTAUTH_SECRET as string,
-   
+
   },
   adapter: MongoDBAdapter(clientPromise, {
-      collections: {
-        Accounts: 'webaccounts',
-        Sessions: 'websessions',
-        Users: 'webusers',
-        VerificationTokens: 'webverificationtokens',
-      },
-      
-      databaseName: 'main',
+    collections: {
+      Accounts: 'webaccounts',
+      Sessions: 'websessions',
+      Users: 'webusers',
+      VerificationTokens: 'webverificationtokens',
+    },
+
+    databaseName: 'main',
   }) as Adapter,
   providers: [
     GithubProvider({
-      clientId: process.env.GITHUB_ID as string,
-      clientSecret: process.env.GITHUB_SECRET as string,
-      
+      clientId: (process.env.NODE_ENV === 'development' ? process.env.GITHUB_ID_DEV : process.env.GITHUB_ID) as string,
+      clientSecret: (process.env.NODE_ENV === 'development' ? process.env.GITHUB_SECRET_DEV : process.env.GITHUB_SECRET) as string,
+
     }),
   ],
   session: {
@@ -51,5 +51,6 @@ export interface MySession extends Session {
     image: string;
     emailVerified: string | null;
     admin: boolean;
+    owner: boolean;
   }
 }

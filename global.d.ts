@@ -12,6 +12,7 @@ declare module 'next-auth' {
       email: string;
       image: string;
       admin: boolean; // Your custom session property
+      owner: boolean; // Your custom session property
     };
   }
 }
