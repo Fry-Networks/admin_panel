@@ -74,11 +74,34 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
       console.error('Error adding license:', err);
     }
   }
+  const resetPayments = async (email: string) => {
+    try {
+      const response = await fetch('/api/reset-user-payments', { // Replace with your actual API endpoint
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        setUpdateSuccess("error"); // Reset success state
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Reset payments:', result);
+      setUpdateSuccess("payments"); // Set success state to true
+      setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
+    } catch (err) {
+      console.error('Error resetting payments:', err);
+    }
+  }
   console.log(byods);
   return (
 
 
-    <div>
+    <div style={{ width: "100%  " }}>
       <Flex flexDirection='row' justifyContent='evenly' alignItems='center' style={{ marginBottom: "2px" }}>
       <TextInput placeholder="License" style={{ marginTop: "2px" }} onValueChange={(value) => setLicense(value)} />
       <TextInput placeholder="Email" style={{ marginTop: "2px" }} onValueChange={(value) => setEmail(value)} />
@@ -96,7 +119,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
           Error updating license!
         </Callout>
       )}
-      <Table>
+      <Table style={{width: "100%"}}>
       
 
         <TableHead>
@@ -124,7 +147,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
 
                   let color: "red" | "green" = license_data.used ? "red" : "green"
                   // Directly using <div> here
-                  return (<div key={index}>
+                  return (<div key={index} className="license-text">
                     {license_data.license}
                     <Button
                       color={color}
@@ -145,7 +168,22 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
               </TableCell>
               <TableCell>
                 {/* Assuming Text component doesn't need a component prop here */}
+                <Flex flexDirection='col' justifyContent='center' alignItems='center'>
                 <div>{`Algo: ${byod.algo ? "Yes" : "No"} | Fry: ${byod.fry ? "Yes" : "No"}`}</div>
+                <Button
+                style={{
+                  marginTop: "2px",
+                  marginBottom: "2px",
+                
+                }}
+                color='yellow'
+                  onClick={() => {
+                    resetPayments(byod.email);
+                  }}
+                >
+                  Reset payments
+                </Button>
+                </Flex>
               </TableCell>
             </TableRow>
           ))}

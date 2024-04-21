@@ -49,10 +49,18 @@ export default function DevicesPage({
             })
             : byodUsers;
     }, [byodUsers, searchTerm]);
-    if (process.env.NODE_ENV === 'development') filtered = [];
+    //@ts-ignore
+    if (process.env.NODE_ENV === 'development') filtered = [{
+        email: "simonøDAZJIFAZUORUIOAZUROAZ",
+        address: "simon",
+        licenses: [{
+            license: "AZFUIOYIAZEDUIOPAZAZEUIZEUIOPERUIOPRAZEUIOPZERAUIOPAZERUIOPAZERUIOPAAAAAAAAAAAAZERUIOPRAZEUIOP",
+            used: true
+        }]
+    }];
 
     return (
-        <main className="p-4 md:p-10 mx-auto max-w-7xl">
+        <main className="p-4 md:p-10 mx-auto max-w-max">
             <Title>Byod Users</Title>
 
             <TabGroup>
