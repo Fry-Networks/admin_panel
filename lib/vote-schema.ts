@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 export interface Vote extends mongoose.Document {
     expires_on: Date;
     total_votes: number;
+    createdAt: Date;
     title: string;
     description: string;
     votes: [
@@ -19,17 +20,17 @@ export interface Vote extends mongoose.Document {
 
 export const voteSchema = new mongoose.Schema({
     expires_on: Date,
-    total_votes: Number,
+    total_votes: { type: Number, default: 0},
+    createdAt: { type: Date, default: Date.now },
     title: String,
     description: String,
     votes: [
         {
-            id: String,
             option: String,
             description: String,
             title: String,
-            votes: Number,
-            different_people: Number
+            votes: { type: Number, default: 0},
+            different_people: { type: Number, default: 0}
         }
     ]
 });

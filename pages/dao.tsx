@@ -9,6 +9,7 @@ import {
     MultiSelect,
     MultiSelectItem,
     Textarea,
+    DatePicker,
 
 } from '@tremor/react';
 import clientPromise from '../lib/mongoclient';
@@ -19,31 +20,24 @@ import { Vote } from '../lib/vote-schema';
 import { Dialog, DialogPanel, Divider, TextInput } from '@tremor/react';
 
 import { RiArrowDownSLine, RiCloseLine } from '@remixicon/react';
+import ModalCreateVote from '../components/create-vote';
 export default function DaoPage({
     votes
 }: {
     votes: Vote[]
 }) {
-
+    console.log("bla", votes);
     const [isOpen, setIsOpen] = useState(false);
     const [vote_title, setVoteTitle] = useState("");
     const [vote_description, setVoteDescription] = useState("");
-    const [vote_options, setVoteOptions] = useState([{}] as any);
-
+    const [vote_end_date, setVoteEndDate] = useState(new Date());
+    const [vote_options, setVoteOptions] = useState([{}] as { title: string, description: string }[]);
+    const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
     const handleAddOption = (e: any) => {
         e.preventDefault();
         setVoteOptions([...vote_options, { title: "", description: "" }]);
     };
 
-    const updateOption = (index: any, field: any, value: any) => {
-        const updatedOptions = vote_options.map((option: any, idx: any) => {
-            if (idx === index) {
-                return { ...option, [field]: value };
-            }
-            return option;
-        });
-        setVoteOptions(updatedOptions);
-    };
 
     return (
         <main className="p-4 md:p-10 mx-auto max-w-7xl">
@@ -58,63 +52,43 @@ export default function DaoPage({
                 >
                     Create Vote
                 </button>
-
-                <Dialog
-                    open={isOpen}
-                    onClose={() => setIsOpen(false)}
-                    static={true}
-                    className="z-[100]"
-                >
-                    <DialogPanel className="sm:max-w-md">
-                        <div className="absolute right-0 top-0 pr-3 pt-3">
-                            <button
-                                type="button"
-                                className="rounded-tremor-small p-2 text-tremor-content-subtle hover:bg-tremor-background-subtle hover:text-tremor-content dark:text-dark-tremor-content-subtle hover:dark:bg-dark-tremor-background-subtle hover:dark:text-tremor-content"
-                                onClick={() => setIsOpen(false)}
-                                aria-label="Close"
-                            >
-                                <RiCloseLine
-                                    className="h-5 w-5 shrink-0"
-                                    aria-hidden={true}
-                                />
-                            </button>
-                        </div>
-                        <form action="#" method="POST">
-                            <h4 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                                Create a Vote
-                            </h4>
-                            <p className="mt-2 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                                Note: this will replace the current vote if there is one.
-                            </p>
-                            <TextInput placeholder="Title" className='mt-2' onValueChange={(value) => setVoteTitle(value)} />
-                            <Textarea placeholder="Description" className='mt-2' onValueChange={(value) => setVoteDescription(value)} />
-                            <Flex className="grid grid-cols-2 gap-4">
-                            {vote_options.map((option: { title: string | undefined; description: string | number | undefined; }, index: Key | null | undefined) => (
-                                <div key={index}>
-                                    <Divider />
-                                    <h4 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                                        Option {+(index ?? 0) + 1}
-                                    </h4>
-                                    <TextInput placeholder="Option Title" value={option.title}
-                                               onValueChange={(value) => updateOption(index, 'title', value)} />
-                                    <Textarea placeholder="Option Description" value={option.description}
-                                              onValueChange={(value) => updateOption(index, 'description', value)} />
-                                </div>
-                            ))}
-                            </Flex>
-                            <Button className="mt-2"
-                                onClick={handleAddOption}
-                            >
-                                Add option</Button>
-                            <div id='options'>
-
-                            </div>
-                        </form>
-                    </DialogPanel>
-                </Dialog>
-
+                <div className="sm:max-w-5xl">
+                <ModalCreateVote isOpen={isOpen} setIsOpen={setIsOpen} />
+                </div>
 
             </Flex>
+            <Divider />
+            <Flex>
+
+                {votes ? votes.map((vote) => {
+                    console.log("vote", vote);
+                    return (
+                        <Card key={vote._id} className='ml-4 mr-4 mt-4'>
+                            <Flex flexDirection="col" alignItems='center' justifyContent='center'>
+                            <Title style={{fontSize: "25px"}}  className='mb-2' >{vote.title}</Title>
+                            <Text className='mb-5'>{vote.description}</Text>
+                            </Flex>
+                            
+                            {vote.votes.map((option, index) => {
+                                console.log("option", option);
+                                return (
+                                    <div key={index}>
+                                    <Title style={{fontSize: "15px"}} key={index}>{index}.{option.title}</Title>
+                                    <Text key={index}>{option.description}</Text>
+                                    </div>
+                                )
+                            })}
+                            <Flex flexDirection='row' justifyContent='center' alignItems='center'>
+                            <Button color="green" className='mt-3'
+                            >Choose as current vote</Button>
+                            </Flex>
+                        </Card>
+                    )
+                }) : <Text>No votes found</Text>}
+            </Flex>
+
+
+
 
         </main >
     );
@@ -122,11 +96,12 @@ export default function DaoPage({
 
 export async function getServerSideProps(context: any) {
     const session = await getSession(context);
-    if (!session || !session.user?.admin) {
+    /*if (!session || !session.user?.admin) {
         return {
             props: { error: 'Unauthorized access' },
         };
     }
+    */
     try {
         const client = await clientPromise;
         const db = client.db("main");
@@ -135,7 +110,7 @@ export async function getServerSideProps(context: any) {
             .collection("dao")
             .find({})
             .toArray();
-
+        console.log("coucou", votes);
         return {
             props: { votes: JSON.parse(JSON.stringify(votes)) },
         };
