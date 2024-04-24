@@ -112,6 +112,8 @@ export default function ModalCreateVote({isOpen, setIsOpen}: {isOpen: boolean, s
                                             e.preventDefault(); 
                                             console.log(vote_title, vote_description, vote_options, vote_end_date);
                                             handleSubmit(e);
+                                            window.location.reload();
+                                            setIsOpen(false);
                                         }}
                                     >
                                         Submit</Button>

@@ -10,6 +10,7 @@ import {
     MultiSelectItem,
     Textarea,
     DatePicker,
+    Icon,
 
 } from '@tremor/react';
 import clientPromise from '../lib/mongoclient';
@@ -19,8 +20,9 @@ import '../app/css/devices.css';
 import { Vote } from '../lib/vote-schema';
 import { Dialog, DialogPanel, Divider, TextInput } from '@tremor/react';
 
-import { RiArrowDownSLine, RiCloseLine } from '@remixicon/react';
+import { RiArrowDownSLine, RiCheckboxCircleFill, RiCloseLine } from '@remixicon/react';
 import ModalCreateVote from '../components/create-vote';
+import ModalChooseAsCurrent from '../components/choose-vote';
 export default function DaoPage({
     votes
 }: {
@@ -28,15 +30,37 @@ export default function DaoPage({
 }) {
     console.log("bla", votes);
     const [isOpen, setIsOpen] = useState(false);
-    const [vote_title, setVoteTitle] = useState("");
-    const [vote_description, setVoteDescription] = useState("");
-    const [vote_end_date, setVoteEndDate] = useState(new Date());
+    const [openModalId, setOpenModalId] = useState(null);
     const [vote_options, setVoteOptions] = useState([{}] as { title: string, description: string }[]);
-    const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
-    const handleAddOption = (e: any) => {
-        e.preventDefault();
-        setVoteOptions([...vote_options, { title: "", description: "" }]);
+    const handleOpenModal = (id: any) => {
+        setOpenModalId(id);
     };
+
+    const handleCloseModal = () => {
+        setOpenModalId(null);
+    };
+    const handleStop = async (id: any) => {
+            const updateData = {
+                id: id,
+            };
+            const response = await fetch('/api/stop-vote', { // Replace with your actual API endpoint
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updateData),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Updated product:', result);
+            //reload page
+            window.location.reload();
+   
+    }
 
 
     return (
@@ -53,35 +77,41 @@ export default function DaoPage({
                     Create Vote
                 </button>
                 <div className="sm:max-w-5xl">
-                <ModalCreateVote isOpen={isOpen} setIsOpen={setIsOpen} />
+                    <ModalCreateVote isOpen={isOpen} setIsOpen={setIsOpen} />
                 </div>
 
             </Flex>
             <Divider />
             <Flex>
 
-                {votes ? votes.map((vote) => {
+                {votes ? votes.map((vote, index) => {
                     console.log("vote", vote);
                     return (
                         <Card key={vote._id} className='ml-4 mr-4 mt-4'>
                             <Flex flexDirection="col" alignItems='center' justifyContent='center'>
-                            <Title style={{fontSize: "25px"}}  className='mb-2' >{vote.title}</Title>
-                            <Text className='mb-5'>{vote.description}</Text>
+                                <Flex flexDirection='row' alignItems='center' justifyContent='center'>
+                                    {vote.current ? <Icon color="green" size="xl" icon={RiCheckboxCircleFill} /> : null}
+                                    <Title style={{ fontSize: "25px" }} className='mb-2' >{vote.title}</Title>
+                                </Flex>
+                                <Text className='mb-5'>{vote.description}</Text>
                             </Flex>
-                            
-                            {vote.votes.map((option, index) => {
-                                console.log("option", option);
-                                return (
-                                    <div key={index}>
-                                    <Title style={{fontSize: "15px"}} key={index}>{index}.{option.title}</Title>
-                                    <Text key={index}>{option.description}</Text>
-                                    </div>
-                                )
-                            })}
-                            <Flex flexDirection='row' justifyContent='center' alignItems='center'>
-                            <Button color="green" className='mt-3'
-                            >Choose as current vote</Button>
+
+                            {vote.votes.map((option, index) => (
+                                <div key={option.id || index}>  {/* Assuming each option has a unique 'id' */}
+                                    <Title style={{ fontSize: "15px" }}>{index + 1}.{option.title}</Title>
+                                    <Text>{option.description}</Text>
+                                    <Text>Votes: {option.votes}</Text>
+                                </div>
+                            ))}
+                            <Flex className='mt-3' flexDirection='row' justifyContent='center' alignItems='center'>
+                                {!vote.current ? <Button color="green" className='mr-3' onClick={() => handleOpenModal(vote._id)}
+                                >Choose as current vote</Button> : <Button color="amber" className='mr-3' onClick={(e) => handleStop(vote._id)} >Stop vote</Button>}
+                                <Button
+                                    color="red"
+                                >Delete</Button>
                             </Flex>
+                            <ModalChooseAsCurrent index={index} key={vote._id} isOpen={openModalId === vote._id}
+                                setIsOpen={handleCloseModal} vote={{ id: vote._id, title: vote.title }} />
                         </Card>
                     )
                 }) : <Text>No votes found</Text>}

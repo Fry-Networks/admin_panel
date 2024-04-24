@@ -113,7 +113,7 @@ export async function getServerSideProps(context: any) {
 
         const byods = await db
             .collection("byods")
-            .find({ licenses: { $exists: true, $not: { $size: 0 } } })
+            .find({})
             .toArray();
         byods.map((byod) => {
             const numberArray = byod.address.split(",").map((num: string) => parseInt(num, 10));
