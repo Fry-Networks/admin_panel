@@ -4,6 +4,7 @@ export interface Vote extends mongoose.Document {
     expires_on: Date;
     total_votes: number;
     createdAt: Date;
+    deleted: boolean;
     current: boolean
     title: string;
     description: string;
@@ -23,6 +24,7 @@ export const voteSchema = new mongoose.Schema({
     expires_on: Date,
     total_votes: { type: Number, default: 0},
     createdAt: { type: Date, default: Date.now },
+    deleted: { type: Boolean, default: false },
     current: { type: Boolean, default: false },
     title: String,
     description: String,

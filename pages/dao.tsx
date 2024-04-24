@@ -61,6 +61,27 @@ export default function DaoPage({
             window.location.reload();
    
     }
+    const handleDelete = async (id: any) => {
+        const updateData = {
+            id: id,
+        };
+        const response = await fetch('/api/delete-vote', { // Replace with your actual API endpoint
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Updated product:', result);
+        //reload page
+        window.location.reload();
+    }
 
 
     return (
@@ -108,6 +129,7 @@ export default function DaoPage({
                                 >Choose as current vote</Button> : <Button color="amber" className='mr-3' onClick={(e) => handleStop(vote._id)} >Stop vote</Button>}
                                 <Button
                                     color="red"
+                                    onClick={() => handleDelete(vote._id)}
                                 >Delete</Button>
                             </Flex>
                             <ModalChooseAsCurrent index={index} key={vote._id} isOpen={openModalId === vote._id}
@@ -138,7 +160,7 @@ export async function getServerSideProps(context: any) {
 
         const votes = await db
             .collection("dao")
-            .find({})
+            .find({ deleted: { $ne: true } })
             .toArray();
         console.log("coucou", votes);
         return {
