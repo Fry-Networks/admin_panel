@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         description: option.description,
                         title: option.title,
                         votes: 0,
-                        different_people: 0
+                        different_people: []
                     }
                 })
 
