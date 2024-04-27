@@ -18,8 +18,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const collection = db.collection('dao');
 
     if (req.method === 'PUT') {
-        const data: { id: string, end_date: Date } = req.body;
-        const { id, end_date } = data;
+        const data: { id: string, end_date: Date, super_majority: boolean } = req.body;
+        const { id, end_date, super_majority } = data;
 
 
         console.log("Selecting vote", id);
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (previousVote) {
                 await collection.updateOne({ _id: previousVote._id }, { $set: { current: false } });
             }
-            await collection.updateOne({ _id: new mongoose.Types.ObjectId(id) }, { $set: { current: true, end_date } });
+            await collection.updateOne({ _id: new mongoose.Types.ObjectId(id) }, { $set: { current: true, end_date, super_majority } });
 
             console.log(`Vote successfully selected by ${session?.user.email}`);
             res.status(200).json({ message: "Vote added successfully" });

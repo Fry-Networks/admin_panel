@@ -3,6 +3,7 @@ import {
     Flex,
     Textarea,
     DatePicker,
+    Switch,
 
 } from '@tremor/react';
 import { Key, useState } from 'react';
@@ -15,12 +16,14 @@ export default function ModalChooseAsCurrent({ isOpen, setIsOpen, vote, index }:
 
     const [vote_end_date, setVoteEndDate] = useState(new Date());
     const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
+    const [isSwitchOn, setIsSwitchOn] = useState(false);
 
 
     const handleSubmit = async (e: any) => {
         const updateData = {
             id: vote,
-            end_date: vote_end_date
+            end_date: vote_end_date,
+            super_majority: isSwitchOn
         };
         const response = await fetch('/api/choose-vote', { // Replace with your actual API endpoint
             method: 'PUT',
@@ -75,7 +78,19 @@ export default function ModalChooseAsCurrent({ isOpen, setIsOpen, vote, index }:
                         The previous vote will be archived and the new vote will be selected as the current vote.
                     </p>
                     <DatePicker placeholder='Select the end date' onValueChange={(value) => setVoteEndDate(value ?? new Date())} minDate={new Date(new Date().getTime() + 24 * 60 * 60 * 1000)} />
-
+                    <Flex flexDirection='row' className='mt-5' alignItems='start' justifyContent='start'>
+                        <Switch
+                            id="switch"
+                            name="switch"
+                            className='mr-2'
+                            checked={isSwitchOn}
+                            onChange={() => setIsSwitchOn(!isSwitchOn)}
+                        />
+                        <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                            Activate{' '}
+                            <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">super majority (need half the votes + 1)</span>
+                        </label>
+                    </Flex>
                     <Flex flexDirection='col' className='mt-2' alignItems='start' justifyContent='start'>
 
                         <div className="w-full flex justify-center"> {/* Container to center the button */}
