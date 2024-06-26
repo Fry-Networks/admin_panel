@@ -64,7 +64,7 @@ export async function addDevice({ email, device_type }: { email: string, device_
             "Unknown Device";
     }
 
-    axios.post("http://fryfoundation.ddns.net:3006/adddevice", {
+    axios.post("http://frynetworks.ddns.net:3006/adddevice", {
         email: email,
         device_name: device_name,
         api_key: process.env.BASE_API_KEY,
