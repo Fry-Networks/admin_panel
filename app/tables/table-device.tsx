@@ -7,9 +7,9 @@ import {
   TableCell,
   Text
 } from '@tremor/react';
-import { webUser } from '../lib/webusers-model';
-import { User } from '../lib/users-schema';
-import { Device } from '../lib/devices-schema';
+import { webUser } from '../../lib/webusers-model';
+import { User } from '../../lib/users-schema';
+import { Device } from '../../lib/devices-schema';
 
 export default function DevicesTable({ devices }: { devices: Device[] }) {
   function formatDate(dateStr: string) {

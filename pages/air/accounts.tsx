@@ -4,7 +4,7 @@ import Search from '../../app/search';
 import clientPromise from '../../lib/mongoclient';
 import { getSession } from 'next-auth/react';
 import { AirAccount } from '../../lib/air_accounts';
-import AirAccountsTable from '../../app/table-air-account';
+import AirAccountsTable from '../../app/tables/table-air-account';
 
 
 export default function AirAccountsPage({ accounts, searchParams }: { accounts: AirAccount[], searchParams: { q: string } }) {

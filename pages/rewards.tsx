@@ -18,7 +18,7 @@ import {
   import Search from '../app/search';
   import clientPromise from '../lib/mongoclient';
   import { useEffect, useRef, useState } from 'react';
-  import ProductsTable from '../app/table-products';
+  import ProductsTable from '../app/tables/table-products';
   import { getSession } from 'next-auth/react';
   import UserForm from '../components/form-user';
   import RemoveUserForm from '../components/remove-user';

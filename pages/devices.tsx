@@ -11,7 +11,7 @@ import {
 } from '@tremor/react';
 import Search from '../app/search';
 import clientPromise from '../lib/mongoclient';
-import DevicesTable from '../app/table-device';
+import DevicesTable from '../app/tables/table-device';
 import { useEffect, useMemo, useState } from 'react';
 import { Device } from '../lib/devices-schema';
 import { getSession } from 'next-auth/react';

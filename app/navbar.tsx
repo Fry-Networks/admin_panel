@@ -16,6 +16,8 @@ const navigation = [
   { name: 'Byod', href: '/byod' },
   { name: 'Air Accounts', href: '/air/accounts' },
   { name: 'DAO', href: '/dao' },
+  { name: 'Energy', href: '/energy' },
+  { name: 'Water', href: '/water' },
 ];
 
 function classNames(...classes: string[]) {

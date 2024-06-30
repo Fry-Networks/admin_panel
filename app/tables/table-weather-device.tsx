@@ -8,7 +8,7 @@ import {
   Text,
   Button
 } from '@tremor/react';
-import { deviceData } from '../lib/weather_accounts';
+import { deviceData } from '../../lib/weather_accounts';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 export default function WeatherDevicesTable({

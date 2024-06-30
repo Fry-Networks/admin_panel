@@ -12,9 +12,9 @@ import {
 import Search from '../../../app/search';
 import clientPromise from '../../../lib/mongoclient';
 import { weatherAccount } from '../../../lib/weather_accounts';
-import WeatherDevicesTable from '../../../app/table-weather-device';
+import WeatherDevicesTable from '../../../app/tables/table-weather-device';
 import { getSession } from 'next-auth/react';
-import WeatherDeviceData from '../../../app/table-weather-data';
+import WeatherDeviceData from '../../../app/tables/table-weather-data';
 
 export default function WeatherDataPage({
   weather_data,
@@ -72,7 +72,7 @@ export async function getServerSideProps(context: any) {
 
   try {
     const client = await clientPromise;
-    const db = client.db('main');
+    const db = client.db('weather');
 
     const weather_data = await db
       .collection('weathers')

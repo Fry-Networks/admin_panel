@@ -8,12 +8,12 @@ import {
   Text
 } from '@tremor/react';
 import Link from 'next/link';
-import { webUser } from '../lib/webusers-model';
-import { User } from '../lib/users-schema';
-import { Device } from '../lib/devices-schema';
-import { AirAccount } from '../lib/air_accounts';
+import { webUser } from '../../lib/webusers-model';
+import { User } from '../../lib/users-schema';
+import { Device } from '../../lib/devices-schema';
+import { AirAccount } from '../../lib/air_accounts';
 import { Fragment } from 'react';
-export default function AirAccountsTable({ accounts }: { accounts: AirAccount[] }) {
+export default function WaterAccountsTable({ accounts }: { accounts: any[] }) {
   return (
     <Table>
       <TableHead>
@@ -21,7 +21,6 @@ export default function AirAccountsTable({ accounts }: { accounts: AirAccount[] 
           <TableHeaderCell>Type</TableHeaderCell>
           <TableHeaderCell>Data</TableHeaderCell>
           <TableHeaderCell>Devices</TableHeaderCell>
-          <TableHeaderCell>User ID</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -30,11 +29,9 @@ export default function AirAccountsTable({ accounts }: { accounts: AirAccount[] 
             <TableCell>{account.api_type}</TableCell>
             <TableCell>
             {[
-    { key: 'API Key', value: account.api_key },
-    { key: 'Read Key', value: account.read_key },
-    { key: 'Sensor', value: account.sensor },
-    { key: 'Owner', value: account.owner },
-    { key: 'IMEI', value: account.imei },
+    { key: 'API Key', value: account?.api_key },
+    { key: 'Read Key', value: account?.read_key },
+    { key: 'Main', value: account?.show },
   ].filter(item => Boolean(item.value)).map((item, index, arr) => (
     <Fragment key={index}>
       <span>{item.key}: {item.value}</span>
@@ -44,12 +41,6 @@ export default function AirAccountsTable({ accounts }: { accounts: AirAccount[] 
             </TableCell>
             <TableCell>
               <Text>{account.devices?.length ?? "No devices"}</Text>
-            </TableCell>
-            <TableCell>
-              <Link href="/users?q=[id]" as={`/users?q=${account.user_id}`}>
-                <Text>{account.user_id.toString()}</Text>
-              </Link>
-
             </TableCell>
           </TableRow>
         ))}

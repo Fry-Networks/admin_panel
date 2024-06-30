@@ -14,8 +14,8 @@ import {
 } from '@tremor/react';
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import Modal from 'react-modal';
-import { webUser } from '../lib/webusers-model';
-import { Product, ProductModel } from '../lib/products-schema';
+import { webUser } from '../../lib/webusers-model';
+import { Product, ProductModel } from '../../lib/products-schema';
 import { useRef, useState } from 'react';
 import ReactModal from 'react-modal';
 

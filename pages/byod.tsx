@@ -15,7 +15,7 @@ import { getSession } from 'next-auth/react';
 import '../app/css/devices.css';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import { ByodUser } from '../lib/byod-schema';
-import ByodTable from '../app/table-byod';
+import ByodTable from '../app/tables/table-byod';
 import Search from '../app/search';
 import { base32 } from '@scure/base';
 export default function DevicesPage({
