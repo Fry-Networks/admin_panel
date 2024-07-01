@@ -25,7 +25,7 @@ export default function WeatherDevicesPage({
   searchParams: { q: string };
 }) {
   const devices = accounts.flatMap(account =>
-    account.devices.map(device => ({
+    account.devices?.map(device => ({
       ...device,
       type: account.api_type ?? 'Unknown',  // Add default type if not present
     }))
