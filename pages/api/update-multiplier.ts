@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const client = await clientPromise;
-    const db = client.db();
+    const db = client.db('main');
     const collection = db.collection('configs');
 
     if (req.method === 'PUT') {
