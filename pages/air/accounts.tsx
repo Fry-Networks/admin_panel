@@ -50,7 +50,7 @@ export async function getServerSideProps(context: any) {
   }
   try {
     const client = await clientPromise;
-    const db = client.db("main");
+    const db = client.db("air");
 
     const accounts = (await db
       .collection("air_accounts")
