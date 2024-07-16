@@ -29,7 +29,7 @@ export default function WeatherDevicesPage({
       ...device,
       type: account.api_type ?? 'Unknown',  // Add default type if not present
     }))
-  );
+  ).filter(device => device);  // Filter out undefined devices
   const searchTerm = searchParams.q || '';
 
   const filteredDevices = useMemo(() => {
@@ -66,7 +66,7 @@ export default function WeatherDevicesPage({
 
 export async function getServerSideProps(context: any) {
   const session = await getSession(context);
-  if ((!session || !session.user.admin ) && process.env.NODE_ENV !== 'development') {
+  if ((!session || !session.user.admin) && process.env.NODE_ENV !== 'development') {
     return {
       props: { error: 'Unauthorized access' }
     };
@@ -76,28 +76,43 @@ export async function getServerSideProps(context: any) {
     const client = await clientPromise;
     const db = client.db('weather');
 
+    const searchParams = context.query;
+    const searchTerm = searchParams.q || '';
+
+    // Build query based on search term
+    const query = searchTerm.length > 0
+      ? {
+          $or: [
+            { 'devices.deviceMAC': { $regex: searchTerm, $options: 'i' } },
+            { 'devices.infos.name': { $regex: searchTerm, $options: 'i' } }
+          ]
+        }
+      : {};
+
     const accounts = (await db
       .collection("weather_accounts")
-      .find({})
-      .toArray()).map((account) => {
-        if(account.token) {
-          account.token = account.token.substring(0, 20) + "..."
+      .find(query, { limit: 100 })
+      .toArray())
+      .map(account => {
+        if (account.token) {
+          account.token = account.token.substring(0, 20) + "...";
         }
-        if(account.api_key) {
-          account.api_key = account.api_key.substring(0, 20) + "..."
+        if (account.api_key) {
+          account.api_key = account.api_key.substring(0, 20) + "...";
         }
-        if(account.app_key) {
-          account.app_key = account.app_key.substring(0, 20) + "..."
+        if (account.app_key) {
+          account.app_key = account.app_key.substring(0, 20) + "...";
         }
         return account;
       });
-      console.log(accounts, 'accounts');
-    const searchParams = context.query;
 
     return {
       props: { accounts: JSON.parse(JSON.stringify(accounts)), searchParams }
     };
   } catch (e) {
     console.error(e);
+    return {
+      props: { error: 'Failed to fetch data' }
+    };
   }
 }

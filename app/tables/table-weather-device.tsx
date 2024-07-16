@@ -16,8 +16,16 @@ export default function WeatherDevicesTable({
 }: {
   devicesData: deviceData[];
 }) {
-  const router = useRouter();
+  const [displayData, setDisplayData] = useState<deviceData[]>(devicesData);
 
+  useEffect(() => {
+    // Log the new data
+    console.log('Updated devicesData:', devicesData);
+    // Update the state to trigger re-render
+    setDisplayData(devicesData);
+  }, [devicesData]);
+
+  const router = useRouter();
   return (
     <Table>
       <TableHead>
@@ -29,33 +37,33 @@ export default function WeatherDevicesTable({
         </TableRow>
       </TableHead>
       <TableBody>
-        {devicesData?.filter((device) => device).
-        map((device) => (
-          <TableRow key={device.deviceMAC}>
-            <TableCell>{device.infos.name}</TableCell>
-            <TableCell>
-              <Text>{device.type}</Text>
-            </TableCell>
-            <TableCell>
-              <Text>{device.deviceMAC}</Text>
-            </TableCell>
-            <TableCell>
-              <Text>
-                {device.infos.coords.lat}, {device.infos.coords.lon}
-              </Text>
-            </TableCell>
-            <TableCell>
-              <Button
-                onClick={() =>
-                  router.push(`/weather/devices/${device.deviceMAC}`)
-                }
-                variant="secondary"
-              >
-                Show Data
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
+        {displayData?.filter((device) => device).
+          map((device) => (
+            <TableRow key={device.deviceMAC}>
+              <TableCell>{device.infos.name}</TableCell>
+              <TableCell>
+                <Text>{device.type}</Text>
+              </TableCell>
+              <TableCell>
+                <Text>{device.deviceMAC}</Text>
+              </TableCell>
+              <TableCell>
+                <Text>
+                  {device.infos.coords.lat}, {device.infos.coords.lon}
+                </Text>
+              </TableCell>
+              <TableCell>
+                <Button
+                  onClick={() =>
+                    router.push(`/weather/devices/${device.deviceMAC}`)
+                  }
+                  variant="secondary"
+                >
+                  Show Data
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
       </TableBody>
     </Table>
   );
