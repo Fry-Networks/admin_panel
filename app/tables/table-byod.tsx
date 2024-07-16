@@ -130,7 +130,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {byods.map((byod) => (
+          {byods?.map((byod) => (
             <TableRow key={byod.id}>
               <TableCell>
                 <Flex flexDirection='col' justifyContent='start' alignItems='start'>
