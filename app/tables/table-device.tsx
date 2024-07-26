@@ -32,6 +32,8 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
           <TableHeaderCell>Miner Key</TableHeaderCell>
           <TableHeaderCell>Is registered ?</TableHeaderCell>
           <TableHeaderCell>Added on </TableHeaderCell>
+          <TableHeaderCell>Order</TableHeaderCell>
+          <TableHeaderCell>Email</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -46,6 +48,12 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
             </TableCell>
             <TableCell>
               <Text>{device.created_at ? formatDate(device.created_at) : "Unknown"}</Text>
+            </TableCell>
+            <TableCell>
+              <Text>{device.order}</Text>
+            </TableCell>
+            <TableCell>
+              <Text>{device.email}</Text>
             </TableCell>
           </TableRow>
         ))}
