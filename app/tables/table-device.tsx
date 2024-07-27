@@ -45,7 +45,7 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
               <Text>{device.miner_key}</Text>
             </TableCell>
             <TableCell>
-              <Flex flexDirection='col'>
+              <Flex flexDirection='col' justifyContent='start' alignItems='start'>
               <Text>Registered: {device.is_registered ? 'Yes' : 'No'}</Text>
               <Text>Verified: {device.verified ? 'Yes' : 'No'}</Text>
               </Flex>
