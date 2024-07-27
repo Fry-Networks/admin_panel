@@ -5,7 +5,8 @@ import {
   TableHeaderCell,
   TableBody,
   TableCell,
-  Text
+  Text,
+  Flex
 } from '@tremor/react';
 import { webUser } from '../../lib/webusers-model';
 import { User } from '../../lib/users-schema';
@@ -30,7 +31,7 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
         <TableRow>
           <TableHeaderCell>Name</TableHeaderCell>
           <TableHeaderCell>Miner Key</TableHeaderCell>
-          <TableHeaderCell>Is registered ?</TableHeaderCell>
+          <TableHeaderCell>Infos</TableHeaderCell>
           <TableHeaderCell>Added on </TableHeaderCell>
           <TableHeaderCell>Order</TableHeaderCell>
           <TableHeaderCell>Email</TableHeaderCell>
@@ -44,7 +45,10 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
               <Text>{device.miner_key}</Text>
             </TableCell>
             <TableCell>
-              <Text>{device.is_registered ? 'Yes' : 'No'}</Text>
+              <Flex flexDirection='col'>
+              <Text>Registered: {device.is_registered ? 'Yes' : 'No'}</Text>
+              <Text>Verified: {device.verified ? 'Yes' : 'No'}</Text>
+              </Flex>
             </TableCell>
             <TableCell>
               <Text>{device.created_at ? formatDate(device.created_at) : "Unknown"}</Text>
