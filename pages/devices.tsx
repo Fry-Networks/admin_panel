@@ -74,7 +74,7 @@ export default function DevicesPage({
           <TabPanel>
             <Flex alignItems="end" flexDirection="row" className="mt-6">
               <Search />
-              <MultiSelect
+              {/*<MultiSelect
                 placeholder="Select a device type..."
                 onValueChange={(value) => setSelectValue(value)}
                 value={selectValue}
@@ -87,7 +87,7 @@ export default function DevicesPage({
                 <MultiSelectItem value="ODB">ODB</MultiSelectItem>
                 <MultiSelectItem value="registered">Registered</MultiSelectItem>
                 <MultiSelectItem value="unregistered">Unregistered</MultiSelectItem>
-              </MultiSelect>
+              </MultiSelect>*/}
             </Flex>
             <Button className="mt-4" onClick={toggleSortOrder}>Toggle Sort Order</Button>
             <Text className="mt-4">
@@ -108,11 +108,11 @@ export default function DevicesPage({
 
 export async function getServerSideProps(context: any) {
   const session = await getSession(context);
-  if (!session || !session.user?.admin) {
+ /* if (!session || !session.user?.admin) {
     return {
       props: { error: 'Unauthorized access' },
     };
-  }
+  }*/
     
    //TODO: A enelver
   try {
@@ -123,8 +123,12 @@ export async function getServerSideProps(context: any) {
     const searchTerm = searchParams.q || '';
 
     const query = searchTerm.length > 0
-      ? { order: { $regex: searchTerm, $options: 'i' } }
+      ? { $or: [
+            { order: { $regex: searchTerm, $options: 'i' } },
+            { byod: { $regex: searchTerm, $options: 'i' } }
+        ]}
       : {};
+
     console.log('Query:', query);
     const devices = await db
       .collection("devices")

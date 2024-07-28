@@ -16,6 +16,7 @@ export interface Device extends mongoose.Document {
     registered_at: Date,
     created_at: string,
     order: string,
+    byod?: string,
     email: string,
     verified: boolean
 }

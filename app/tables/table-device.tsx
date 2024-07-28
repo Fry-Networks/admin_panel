@@ -30,7 +30,7 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
       <TableHead>
         <TableRow>
           <TableHeaderCell>Name</TableHeaderCell>
-          <TableHeaderCell>Miner Key</TableHeaderCell>
+          <TableHeaderCell>Miner Key / Byod</TableHeaderCell>
           <TableHeaderCell>Infos</TableHeaderCell>
           <TableHeaderCell>Added on </TableHeaderCell>
           <TableHeaderCell>Order</TableHeaderCell>
@@ -42,7 +42,10 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
           <TableRow key={device.id}>
             <TableCell>{device.name}</TableCell>
             <TableCell>
-              <Text>{device.miner_key}</Text>
+              <Flex flexDirection='col' justifyContent='start' alignItems='start'>
+              <Text>Key: {device.miner_key}</Text>
+              <Text>Byod: {device.byod ?? 'No'}</Text>
+              </Flex>
             </TableCell>
             <TableCell>
               <Flex flexDirection='col' justifyContent='start' alignItems='start'>
