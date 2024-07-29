@@ -17,13 +17,15 @@ export default function ModalChooseAsCurrent({ isOpen, setIsOpen, vote, index }:
     const [vote_end_date, setVoteEndDate] = useState(new Date());
     const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
     const [isSwitchOn, setIsSwitchOn] = useState(false);
+    const [isHiddenSwitchOn, setIsHiddenSwitchOn] = useState(false);
 
 
     const handleSubmit = async (e: any) => {
         const updateData = {
             id: vote,
             end_date: vote_end_date,
-            super_majority: isSwitchOn
+            super_majority: isSwitchOn,
+            hidden: isHiddenSwitchOn
         };
         const response = await fetch('/api/choose-vote', { // Replace with your actual API endpoint
             method: 'PUT',
@@ -89,6 +91,19 @@ export default function ModalChooseAsCurrent({ isOpen, setIsOpen, vote, index }:
                         <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
                             Activate{' '}
                             <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">super majority (need half the votes + 1)</span>
+                        </label>
+                    </Flex>
+                    <Flex flexDirection='row' className='mt-5' alignItems='start' justifyContent='start'>
+                        <Switch
+                            id="switch_hidden"
+                            name="switch_hidden"
+                            className='mr-2'
+                            checked={isHiddenSwitchOn}
+                            onChange={() => setIsHiddenSwitchOn(!isHiddenSwitchOn)}
+                        />
+                        <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                            Activate{' '}
+                            <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">hidden votes</span>
                         </label>
                     </Flex>
                     <Flex flexDirection='col' className='mt-2' alignItems='start' justifyContent='start'>

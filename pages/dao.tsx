@@ -162,7 +162,6 @@ export async function getServerSideProps(context: any) {
             .collection("dao")
             .find({ deleted: { $ne: true } })
             .toArray();
-        console.log("coucou", votes);
         return {
             props: { votes: JSON.parse(JSON.stringify(votes)) },
         };
