@@ -4,6 +4,8 @@ export const devicesSchema = new mongoose.Schema({
     miner_key: String, 
     name: String,
     is_registered: { type: Boolean, default: false },
+    email: String,
+    order: String,
     registered_at: Date,
     created_at: { type: Date, default: Date.now },
  

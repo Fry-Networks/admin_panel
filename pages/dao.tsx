@@ -148,12 +148,12 @@ export default function DaoPage({
 
 export async function getServerSideProps(context: any) {
     const session = await getSession(context);
-    /*if (!session || !session.user?.admin) {
+    if (!session || !session.user?.admin) {
         return {
             props: { error: 'Unauthorized access' },
         };
     }
-    */
+    
     try {
         const client = await clientPromise;
         const db = client.db("main");

@@ -20,15 +20,18 @@ import '../app/css/devices.css';
 import DeviceForm from '../components/form-device';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import { User } from '../lib/users-schema';
-import RemoveDeviceForm from '../components/remove-device';
+import ChangeDeviceForm from '../components/change-device';
 import { useRouter } from 'next/router';
 
 export default function DevicesPage({
   devices = [],  // Default to an empty array if devices is undefined
-  searchParams = {}  // Default to an empty object if searchParams is undefined
+  products,
+  searchParams = {},  // Default to an empty object if searchParams is undefined
+  
 }: {
   devices: Device[];
   searchParams: any;
+  products: any[];
 }) {
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
 
@@ -68,7 +71,7 @@ export default function DevicesPage({
         <TabList className="mt-8">
           <Tab>List</Tab>
           <Tab>Add Device</Tab>
-          <Tab>Remove Device</Tab>
+          <Tab>Update Device</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -98,7 +101,10 @@ export default function DevicesPage({
             </Card>
           </TabPanel>
           <TabPanel>
-            <RemoveDeviceForm devices={devices} />
+            <DeviceForm products={products}/>
+          </TabPanel>
+          <TabPanel>
+            <ChangeDeviceForm products={products}/>
           </TabPanel>
         </TabPanels>
       </TabGroup>
@@ -108,15 +114,16 @@ export default function DevicesPage({
 
 export async function getServerSideProps(context: any) {
   const session = await getSession(context);
- /* if (!session || !session.user?.admin) {
+  if (!session || !session.user?.admin) {
     return {
       props: { error: 'Unauthorized access' },
     };
-  }*/
+  }
     
    //TODO: A enelver
   try {
     const client = await clientPromise;
+    let products;
     const db = client.db("main");
 
     const searchParams = context.query;
@@ -136,10 +143,16 @@ export async function getServerSideProps(context: any) {
       .limit(100)
       .toArray();
     console.log('Devices:', devices.length);
-
+        if(!products) {
+          products = await db
+            .collection("products")
+            .find({})
+            .toArray()
+        }
     return {
       props: {
         devices: JSON.parse(JSON.stringify(devices)),
+        products: JSON.parse(JSON.stringify(products)),
         searchParams
       },
     };

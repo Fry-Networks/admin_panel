@@ -87,11 +87,11 @@ export default function DevicesPage({
 
 export async function getServerSideProps(context: any) {
     const session = await getSession(context);
-   /* if (!session || !session.user?.admin) {
+    if (!session || !session.user?.admin) {
         return {
             props: { error: 'Unauthorized access' },
         };
-    }*/
+    }
 
     try {
        

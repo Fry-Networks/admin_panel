@@ -19,7 +19,7 @@ import { Product, ProductModel } from '../../lib/products-schema';
 import { useRef, useState } from 'react';
 import ReactModal from 'react-modal';
 
-export default function ProductsTable({ products, updateProducts }: { products: Product[], updateProducts: Function }) {
+export default function ProductsTable({ products }: { products: Product[] }) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [globalMultiplier, setGlobalMultiplier] = useState(1);
   const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
@@ -32,6 +32,7 @@ export default function ProductsTable({ products, updateProducts }: { products: 
   };
   const unverifiedRewardRef = useRef<HTMLInputElement>(null);
   const verifiedRewardRef = useRef<HTMLInputElement>(null);
+  const stakeRef = useRef<HTMLInputElement>(null);
   const globalMultiplierRef = useRef<HTMLInputElement>(null);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -44,9 +45,10 @@ export default function ProductsTable({ products, updateProducts }: { products: 
 
     const unverifiedReward = unverifiedRewardRef.current?.value;
     const verifiedReward = verifiedRewardRef.current?.value;
+    const stake = stakeRef.current?.value;
 
     // Ensure the values are retrieved
-    if (unverifiedReward === undefined || verifiedReward === undefined) {
+    if (unverifiedReward === undefined || verifiedReward === undefined || stake === undefined) {
       console.error('Form elements are missing');
       return;
     }
@@ -54,7 +56,8 @@ export default function ProductsTable({ products, updateProducts }: { products: 
     const updateData = {
       productId: editingProduct.wix_id, // Use the appropriate identifier for the product
       unverifiedReward: unverifiedReward,
-      verifiedReward: verifiedReward
+      verifiedReward: verifiedReward,
+      stake: stake,
     };
 
     try {
@@ -75,7 +78,6 @@ export default function ProductsTable({ products, updateProducts }: { products: 
 
       const result = await response.json();
       console.log('Updated product:', result);
-      updateProducts(); // Update products table
       setUpdateSuccess(editingProduct.name); // Set success state to true
       setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
     } catch (err) {
@@ -148,12 +150,13 @@ export default function ProductsTable({ products, updateProducts }: { products: 
             <TableHeaderCell>Key</TableHeaderCell>
             <TableHeaderCell>Unverified rewards</TableHeaderCell>
             <TableHeaderCell>Verified rewards</TableHeaderCell>
+            <TableHeaderCell>Stake amount</TableHeaderCell>
             <TableHeaderCell>Added on </TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {products.map((product) => (
+          {products?.map((product) => (
             <TableRow key={product.wix_id}>
               <TableCell>{product.name}</TableCell>
               <TableCell>
@@ -164,6 +167,9 @@ export default function ProductsTable({ products, updateProducts }: { products: 
               </TableCell>
               <TableCell>
                 <Text>{product.reward.verified}</Text>
+              </TableCell>
+              <TableCell>
+                <Text>{product.reward.stake ?? '0'}</Text>
               </TableCell>
               <TableCell>
                 <Text>{product.created_at ? formatDate(product.created_at) : "Unknown"}</Text>
@@ -197,6 +203,11 @@ export default function ProductsTable({ products, updateProducts }: { products: 
             <label>Verified Reward:</label>
             <NumberInput ref={verifiedRewardRef} defaultValue={editingProduct?.reward.verified} step={0.01} />
           </div>
+          <div>
+            <label>Stake Amount ($FRY):</label>
+            <NumberInput ref={stakeRef} defaultValue={editingProduct?.reward.stake} step={1} />
+          </div>
+
           <div className='mb-4 mt-4'>
             <Button type="submit" className='mr-2' variant="primary">Update</Button>
             <Button onClick={closeModal} variant="secondary">Cancel</Button>

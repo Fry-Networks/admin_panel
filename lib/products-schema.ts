@@ -18,6 +18,7 @@ export interface Product extends mongoose.Document {
     reward: {
         unverified: number,
         verified: number,
+        stake: number
     },
     created_at: Date,
 
