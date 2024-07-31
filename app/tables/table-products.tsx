@@ -204,7 +204,7 @@ export default function ProductsTable({ products }: { products: Product[] }) {
             <NumberInput ref={verifiedRewardRef} defaultValue={editingProduct?.reward.verified} step={0.01} />
           </div>
           <div>
-            <label>Stake Amount ($FRY):</label>
+            <label>Stake Amount ($USD):</label>
             <NumberInput ref={stakeRef} defaultValue={editingProduct?.reward.stake} step={1} />
           </div>
 
