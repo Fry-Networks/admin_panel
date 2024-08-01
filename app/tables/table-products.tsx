@@ -19,11 +19,10 @@ import { Product, ProductModel } from '../../lib/products-schema';
 import { useRef, useState } from 'react';
 import ReactModal from 'react-modal';
 
-export default function ProductsTable({ products }: { products: Product[] }) {
+export default function ProductsTable({ products, enabled }: { products: Product[], enabled: boolean }) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [globalMultiplier, setGlobalMultiplier] = useState(1);
   const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
-
   const openEditModal = (product: Product) => {
     setEditingProduct(product);
   };
@@ -136,13 +135,28 @@ export default function ProductsTable({ products }: { products: Product[] }) {
           Error updating product!
         </Callout>
       )}
+      <Flex flexDirection='col'>
       <Flex flexDirection='row' className="mt-6">
         <NumberInput ref={globalMultiplierRef} defaultValue={globalMultiplier} step={0.01} onChange={(e) => setGlobalMultiplier(+e.target.value)} />
         <Button className="ml-4" onClick={() => {
           updateMultiplier();
         }}>Update multiplier</Button>
-        
       </Flex>
+      <Button className="mt-4" color={enabled ? "red" : "green"} onClick={() => {
+        fetch('/api/update-rewards-enabled', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ enabled: !enabled }),
+        }).then(() => {
+          window.location.reload();
+        });
+      }
+      }>{enabled ? "Disable rewards" : "Enable rewards"}</  Button>
+      
+      </Flex>
+
       <Table>
         <TableHead>
           <TableRow>

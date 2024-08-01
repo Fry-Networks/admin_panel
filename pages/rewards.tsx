@@ -24,7 +24,7 @@ import UserForm from '../components/form-user';
 import RemoveUserForm from '../components/remove-user';
 import { Product } from '../lib/products-schema';
 
-export default function RewardsPage({ products }: { products: Product[] }) {
+export default function RewardsPage({ products, enabled }: { products: Product[], enabled: boolean }) {
 
   //(VPN|OGPS|IGPS|IDB|ODB)
 
@@ -43,7 +43,7 @@ export default function RewardsPage({ products }: { products: Product[] }) {
             </Flex>
 
             <Card className="mt-6">
-              <ProductsTable products={products} />
+              <ProductsTable products={products} enabled={enabled}/>
             </Card>
           </TabPanel>
         </TabPanels>
@@ -69,9 +69,12 @@ export async function getServerSideProps(context: any) {
       .collection("products")
       .find({})
       .toArray();
+      const config = await db.collection("configs").findOne({name: "rewards"});
+      console.log('hey', config);
     return {
       props: {
-        products: JSON.parse(JSON.stringify(products))
+        products: JSON.parse(JSON.stringify(products)),
+        enabled: config?.enabled
       },
     };
   } catch (e) {
