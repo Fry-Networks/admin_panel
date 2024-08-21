@@ -8,9 +8,9 @@ interface ProductData {
     productId: string;
     unverifiedReward?: string;
     verifiedReward?: string;
-    stake: string;
+    stake_one?: string;
+    stake_two?: string;
 }
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await getServerSession(req, res, authOptions);
 
@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === 'PUT') {
         const data: ProductData = req.body;
-        const { productId, unverifiedReward, verifiedReward, stake } = data;
+        const { productId, unverifiedReward, verifiedReward, stake_one, stake_two } = data;
         
         
         console.log("Updating product", productId);
@@ -45,7 +45,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const updateData: any = {};
             if (unverifiedReward !== undefined) updateData['reward.unverified'] = +unverifiedReward;
             if (verifiedReward !== undefined) updateData['reward.verified'] = +verifiedReward;
-            if (stake !== undefined) updateData['reward.stake'] = +stake;
+            if (stake_one !== undefined) updateData['reward.stake.stake_one'] = +stake_one;
+            if (stake_two !== undefined) updateData['reward.stake.stake_two'] = +stake_two;
 
             // Update the product in the database
             await collection.updateOne({ wix_id: productId }, { $set: updateData });

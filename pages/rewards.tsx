@@ -30,7 +30,7 @@ export default function RewardsPage({ products, enabled }: { products: Product[]
 
   console.log(products);
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-7xl">
+    <main className="p-4 md:p-10 mx-auto max-w-8xl">
       <Title>Wix Products</Title>
       <TabGroup>
         <TabPanels>

@@ -31,7 +31,8 @@ export default function ProductsTable({ products, enabled }: { products: Product
   };
   const unverifiedRewardRef = useRef<HTMLInputElement>(null);
   const verifiedRewardRef = useRef<HTMLInputElement>(null);
-  const stakeRef = useRef<HTMLInputElement>(null);
+  const stakeOneRef = useRef<HTMLInputElement>(null);
+  const stakeTwoRef = useRef<HTMLInputElement>(null);
   const globalMultiplierRef = useRef<HTMLInputElement>(null);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -44,10 +45,10 @@ export default function ProductsTable({ products, enabled }: { products: Product
 
     const unverifiedReward = unverifiedRewardRef.current?.value;
     const verifiedReward = verifiedRewardRef.current?.value;
-    const stake = stakeRef.current?.value;
-
+    const stake_one = stakeOneRef.current?.value;
+    const stake_two = stakeTwoRef.current?.value;
     // Ensure the values are retrieved
-    if (unverifiedReward === undefined || verifiedReward === undefined || stake === undefined) {
+    if (unverifiedReward === undefined || verifiedReward === undefined || stake_one === undefined || stake_two === undefined) {
       console.error('Form elements are missing');
       return;
     }
@@ -56,7 +57,8 @@ export default function ProductsTable({ products, enabled }: { products: Product
       productId: editingProduct.wix_id, // Use the appropriate identifier for the product
       unverifiedReward: unverifiedReward,
       verifiedReward: verifiedReward,
-      stake: stake,
+      stake_one,
+      stake_two,
     };
 
     try {
@@ -183,7 +185,7 @@ export default function ProductsTable({ products, enabled }: { products: Product
                 <Text>{product.reward.verified}</Text>
               </TableCell>
               <TableCell>
-                <Text>{product.reward.stake ?? '0'}</Text>
+                <Text>{`Tier one: ${product.reward.stake?.stake_one ?? 0} | Tier two: ${product.reward.stake?.stake_two ?? 0}`}</Text>
               </TableCell>
               <TableCell>
                 <Text>{product.created_at ? formatDate(product.created_at) : "Unknown"}</Text>
@@ -218,8 +220,12 @@ export default function ProductsTable({ products, enabled }: { products: Product
             <NumberInput ref={verifiedRewardRef} defaultValue={editingProduct?.reward.verified} step={0.01} />
           </div>
           <div>
-            <label>Stake Amount ($USD):</label>
-            <NumberInput ref={stakeRef} defaultValue={editingProduct?.reward.stake} step={1} />
+            <label>Stake Amount Tier 1 ($FRY):</label>
+            <NumberInput ref={stakeOneRef} defaultValue={editingProduct?.reward.stake.stake_one} step={1} />
+          </div>
+          <div>
+            <label>Stake Amount Tier 2 ($FRY):</label>
+            <NumberInput ref={stakeTwoRef} defaultValue={editingProduct?.reward.stake.stake_two} step={1} />
           </div>
 
           <div className='mb-4 mt-4'>
