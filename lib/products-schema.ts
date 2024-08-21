@@ -22,7 +22,7 @@ export interface Product extends mongoose.Document {
     reward: {
         unverified: number,
         verified: number,
-        stake: {
+        stake?: {
             stake_one: number,
             stake_two: number
         }

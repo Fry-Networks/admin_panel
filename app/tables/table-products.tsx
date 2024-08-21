@@ -221,11 +221,11 @@ export default function ProductsTable({ products, enabled }: { products: Product
           </div>
           <div>
             <label>Stake Amount Tier 1 ($FRY):</label>
-            <NumberInput ref={stakeOneRef} defaultValue={editingProduct?.reward.stake.stake_one} step={1} />
+            <NumberInput ref={stakeOneRef} defaultValue={editingProduct?.reward.stake?.stake_one ?? 0} step={1} />
           </div>
           <div>
             <label>Stake Amount Tier 2 ($FRY):</label>
-            <NumberInput ref={stakeTwoRef} defaultValue={editingProduct?.reward.stake.stake_two} step={1} />
+            <NumberInput ref={stakeTwoRef} defaultValue={editingProduct?.reward.stake?.stake_two ?? 0} step={1} />
           </div>
 
           <div className='mb-4 mt-4'>

@@ -54,11 +54,11 @@ export default function RewardsPage({ products, enabled }: { products: Product[]
 
 export async function getServerSideProps(context: any) {
   const session = await getSession(context);
-  if (!session || !session.user?.admin) {
+  /*if (!session || !session.user?.admin) {
     return {
       props: { error: 'Unauthorized access' },
     };
-  }
+  }*/
     
    //TODO: A enelver
   try {
