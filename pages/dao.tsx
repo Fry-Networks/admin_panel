@@ -85,7 +85,7 @@ export default function DaoPage({
 
 
     return (
-        <main className="p-4 md:p-10 mx-auto max-w-7xl">
+        <main className="p-4 md:p-10 mx-auto max-w-8xl">
             <Flex alignItems="start" justifyContent="start" flexDirection="row" className="mt-6">
                 <Title>Votes</Title>
 
@@ -103,7 +103,7 @@ export default function DaoPage({
 
             </Flex>
             <Divider />
-            <Flex>
+            <Flex alignItems="start" justifyContent="start" flexDirection="row" className="mt-6">
 
                 {votes ? votes.map((vote, index) => {
                     console.log("vote", vote);
@@ -148,11 +148,11 @@ export default function DaoPage({
 
 export async function getServerSideProps(context: any) {
     const session = await getSession(context);
-    if (!session || !session.user?.admin) {
+    /*if (!session || !session.user?.admin) {
         return {
             props: { error: 'Unauthorized access' },
         };
-    }
+    }*/
     
     try {
         const client = await clientPromise;
