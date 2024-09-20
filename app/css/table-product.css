@@ -1,0 +1,38 @@
+.table-container {
+  margin-top: 16px;
+  overflow-x: auto;
+  max-height: 500px; /* Adjust this as needed */
+  padding-bottom: 50px; /* Adds space below the last table row */
+}
+
+/* Optional: Smooth scrolling effect */
+.table-container {
+  scroll-behavior: smooth;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+button {
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  table th,
+  table td {
+    font-size: 12px;
+  }
+
+  .number-input {
+    width: 100%;
+  }
+}
