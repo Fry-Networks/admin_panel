@@ -24,12 +24,7 @@ import RemoveDeviceForm from '../components/remove-device';
 import { useRouter } from 'next/router';
 
 export default function DevicesPage({
-  devices,
-  totalDevices,
-  currentPage,
-  pageSize,
-  users,
-  searchParams
+  devices, totalDevices, currentPage, pageSize, users, searchParams
 }: {
   devices: Device[];
   users: User[];
@@ -48,10 +43,10 @@ export default function DevicesPage({
   // Function to sort devices
   const sortDevices = (devices: Device[]) => {
     return devices.sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
+      const dateA = (new Date(a.created_at)).getTime();
+      const dateB = (new Date(b.created_at)).getTime();
       console.log(dateA, dateB, 'date a and b');
-      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      return sortOrder === 'asc' ? (dateA - dateB) : (dateB - dateA);
     });
   };
   const searchTerm = searchParams.q || '';
@@ -65,26 +60,19 @@ export default function DevicesPage({
     'unregistered'
   ]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const sortedDevices = useMemo(
-    () => sortDevices([...devices]),
-    [devices, sortOrder]
-  );
+  const sortedDevices = useMemo(() => sortDevices([...devices]), [devices, sortOrder]);
+
 
   const filtered = useMemo(() => {
     return selectValue.length || searchTerm.length > 0
       ? sortedDevices.filter((device) => {
-          const type = device.miner_key.split('-')[0];
-          const contains = (original: string) => {
-            if (!searchTerm) return true;
-            return original.toLowerCase().includes(searchTerm.toLowerCase());
-          };
-          return (
-            selectValue.includes(type) &&
-            contains(device.miner_key) &&
-            ((selectValue.includes('registered') && device.is_registered) ||
-              (selectValue.includes('unregistered') && !device.is_registered))
-          );
-        })
+        const type = device.miner_key.split('-')[0];
+        const contains = (original: string) => {
+          if (!searchTerm) return true;
+          return original.toLowerCase().includes(searchTerm.toLowerCase());
+        };
+        return ((selectValue.includes(type) && contains(device.miner_key))) && ((selectValue.includes('registered') && device.is_registered )|| (selectValue.includes('unregistered') && !device.is_registered))
+      })
       : sortedDevices;
   }, [sortedDevices, selectValue, searchTerm]);
 
@@ -114,14 +102,10 @@ export default function DevicesPage({
                 <MultiSelectItem value="IDB">IDB</MultiSelectItem>
                 <MultiSelectItem value="ODB">ODB</MultiSelectItem>
                 <MultiSelectItem value="registered">Registered</MultiSelectItem>
-                <MultiSelectItem value="unregistered">
-                  Unregistered
-                </MultiSelectItem>
+                <MultiSelectItem value="unregistered">Unregistered</MultiSelectItem>
               </MultiSelect>
             </Flex>
-            <Button className="mt-4" onClick={toggleSortOrder}>
-              Toggle Sort Order
-            </Button>
+            <Button className="mt-4" onClick={toggleSortOrder}>Toggle Sort Order</Button>
             <Text className="mt-4">
               {filtered.length} devices matching your search
             </Text>
@@ -145,24 +129,26 @@ export async function getServerSideProps(context: any) {
   const session = await getSession(context);
   if (!session || !session.user?.admin) {
     return {
-      props: { error: 'Unauthorized access' }
+      props: { error: 'Unauthorized access' },
     };
   }
   try {
     const client = await clientPromise;
-    const db = client.db('main');
+    const db = client.db("main");
 
-    const devices = await db.collection('devices').find({}).toArray();
-    const users = await db.collection('users').find({}).toArray();
+    const devices = await db
+      .collection("devices")
+      .find({})
+      .toArray();
+    const users = await db
+      .collection("users")
+      .find({})
+      .toArray();
 
     const searchParams = context.query;
 
     return {
-      props: {
-        devices: JSON.parse(JSON.stringify(devices)),
-        users: JSON.parse(JSON.stringify(users)),
-        searchParams
-      }
+      props: { devices: JSON.parse(JSON.stringify(devices)),users: JSON.parse(JSON.stringify(users)), searchParams },
     };
   } catch (e) {
     console.error(e);
