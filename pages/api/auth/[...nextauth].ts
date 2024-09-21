@@ -5,7 +5,7 @@ import { MongoDBAdapter } from "@auth/mongodb-adapter"
 import clientPromise from "../../../lib/mongoclient"
 import { Adapter } from 'next-auth/adapters';
 import { Session } from 'next-auth';
-console.log((process.env.NODE_ENV === 'development' ? process.env.GITHUB_ID_DEV : process.env.GITHUB_ID) )
+console.log((process.env.NODE_ENV === 'development' ? process.env.GITHUB_ID_DEV : process.env.GITHUB_ID))
 export const authOptions: NextAuthOptions = {
   jwt: {
     secret: process.env.NEXTAUTH_SECRET as string,
@@ -23,8 +23,10 @@ export const authOptions: NextAuthOptions = {
   }) as Adapter,
   providers: [
     GithubProvider({
-      clientId: (process.env.NODE_ENV === 'development' ? process.env.GITHUB_ID_DEV : process.env.GITHUB_ID) as string,
-      clientSecret: (process.env.NODE_ENV === 'development' ? process.env.GITHUB_SECRET_DEV : process.env.GITHUB_SECRET) as string,
+  //    clientId: (process.env.NODE_ENV === 'development' ? process.env.GITHUB_ID_DEV : process.env.GITHUB_ID) as string,
+    //  clientSecret: (process.env.NODE_ENV === 'development' ? process.env.GITHUB_SECRET_DEV : process.env.GITHUB_SECRET) as string,
+      clientId: process.env.GITHUB_ID as string,
+      clientSecret: process.env.GITHUB_SECRET as string,
 
     }),
   ],
@@ -36,7 +38,8 @@ export const authOptions: NextAuthOptions = {
       //@ts-ignore
       session.user = user;
       return session;
-    }
+    },
+    async redirect({ url, baseUrl }) { return baseUrl }
   }
 };
 

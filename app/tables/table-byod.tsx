@@ -13,11 +13,11 @@ import {
   Tab,
   FlexDirection
 } from '@tremor/react';
-import { webUser } from '../lib/webusers-model';
-import { User } from '../lib/users-schema';
+import { webUser } from '../../lib/webusers-model';
+import { User } from '../../lib/users-schema';
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
-import { Device } from '../lib/devices-schema';
-import { ByodUser } from '../lib/byod-schema';
+import { Device } from '../../lib/devices-schema';
+import { ByodUser } from '../../lib/byod-schema';
 import { useState } from 'react';
 
 
@@ -130,7 +130,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {byods.map((byod) => (
+          {byods?.map((byod) => (
             <TableRow key={byod.id}>
               <TableCell>
                 <Flex flexDirection='col' justifyContent='start' alignItems='start'>

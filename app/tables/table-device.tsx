@@ -5,11 +5,12 @@ import {
   TableHeaderCell,
   TableBody,
   TableCell,
-  Text
+  Text,
+  Flex
 } from '@tremor/react';
-import { webUser } from '../lib/webusers-model';
-import { User } from '../lib/users-schema';
-import { Device } from '../lib/devices-schema';
+import { webUser } from '../../lib/webusers-model';
+import { User } from '../../lib/users-schema';
+import { Device } from '../../lib/devices-schema';
 
 export default function DevicesTable({ devices }: { devices: Device[] }) {
   function formatDate(dateStr: string) {
@@ -29,9 +30,11 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
       <TableHead>
         <TableRow>
           <TableHeaderCell>Name</TableHeaderCell>
-          <TableHeaderCell>Miner Key</TableHeaderCell>
-          <TableHeaderCell>Is registered ?</TableHeaderCell>
+          <TableHeaderCell>Miner Key / Byod</TableHeaderCell>
+          <TableHeaderCell>Infos</TableHeaderCell>
           <TableHeaderCell>Added on </TableHeaderCell>
+          <TableHeaderCell>Order</TableHeaderCell>
+          <TableHeaderCell>Email</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -39,13 +42,25 @@ export default function DevicesTable({ devices }: { devices: Device[] }) {
           <TableRow key={device.id}>
             <TableCell>{device.name}</TableCell>
             <TableCell>
-              <Text>{device.miner_key}</Text>
+              <Flex flexDirection='col' justifyContent='start' alignItems='start'>
+              <Text>Key: {device.miner_key}</Text>
+              <Text>Byod: {device.byod ?? 'No'}</Text>
+              </Flex>
             </TableCell>
             <TableCell>
-              <Text>{device.is_registered ? 'Yes' : 'No'}</Text>
+              <Flex flexDirection='col' justifyContent='start' alignItems='start'>
+              <Text>Registered: {device.is_registered ? 'Yes' : 'No'}</Text>
+              <Text>Verified: {device.verified ? 'Yes' : 'No'}</Text>
+              </Flex>
             </TableCell>
             <TableCell>
               <Text>{device.created_at ? formatDate(device.created_at) : "Unknown"}</Text>
+            </TableCell>
+            <TableCell>
+              <Text>{device.order}</Text>
+            </TableCell>
+            <TableCell>
+              <Text>{device.email}</Text>
             </TableCell>
           </TableRow>
         ))}

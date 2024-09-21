@@ -6,7 +6,20 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@tremor/react'],
     serverActions: true
-  }
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',  // Apply to all routes
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "form-action 'self' https://admin.frynetworks.com/api/auth/signin/github;"
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

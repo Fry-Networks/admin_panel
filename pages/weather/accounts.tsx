@@ -3,7 +3,7 @@ import { Card, Metric, Text, Title, BarList, Flex, Grid, MultiSelect, MultiSelec
 import Search from '../../app/search';
 import clientPromise from '../../lib/mongoclient';
 import { weatherAccount } from '../../lib/weather_accounts';
-import WeatherAccountsTable from '../../app/table-weather-account';
+import WeatherAccountsTable from '../../app/tables/table-weather-account';
 import { getSession } from 'next-auth/react';
 
 
@@ -18,7 +18,6 @@ export default function WeatherAccountsPage({ accounts, searchParams }: { accoun
 
   }) : accounts;
   //(VPN|OGPS|IGPS|IDB|ODB)
-
 
 
   return (
@@ -50,7 +49,7 @@ export async function getServerSideProps(context: any) {
   }
   try {
     const client = await clientPromise;
-    const db = client.db("main");
+    const db = client.db("weather");
 
     const accounts = (await db
       .collection("weather_accounts")
@@ -67,6 +66,7 @@ export async function getServerSideProps(context: any) {
         }
         return account;
       });
+
     const searchParams = context.query;
 
     return {

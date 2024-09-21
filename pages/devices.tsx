@@ -11,7 +11,7 @@ import {
 } from '@tremor/react';
 import Search from '../app/search';
 import clientPromise from '../lib/mongoclient';
-import DevicesTable from '../app/table-device';
+import DevicesTable from '../app/tables/table-device';
 import { useEffect, useMemo, useState } from 'react';
 import { Device } from '../lib/devices-schema';
 import { getSession } from 'next-auth/react';
@@ -20,18 +20,18 @@ import '../app/css/devices.css';
 import DeviceForm from '../components/form-device';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import { User } from '../lib/users-schema';
-import RemoveDeviceForm from '../components/remove-device';
+import ChangeDeviceForm from '../components/change-device';
 import { useRouter } from 'next/router';
 
 export default function DevicesPage({
-  devices, totalDevices, currentPage, pageSize, users, searchParams
+  devices = [],  // Default to an empty array if devices is undefined
+  products,
+  searchParams = {},  // Default to an empty object if searchParams is undefined
+  
 }: {
   devices: Device[];
-  users: User[];
-  searchParams: { q: string };
-  totalDevices: number;
-  currentPage: number;
-  pageSize: number;
+  searchParams: any;
+  products: any[];
 }) {
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
 
@@ -45,10 +45,10 @@ export default function DevicesPage({
     return devices.sort((a, b) => {
       const dateA = (new Date(a.created_at)).getTime();
       const dateB = (new Date(b.created_at)).getTime();
-      console.log(dateA, dateB, 'date a and b');
       return sortOrder === 'asc' ? (dateA - dateB) : (dateB - dateA);
     });
   };
+
   const searchTerm = searchParams.q || '';
   const [selectValue, setSelectValue] = useState([
     'VPN',
@@ -59,38 +59,25 @@ export default function DevicesPage({
     'registered',
     'unregistered'
   ]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const sortedDevices = useMemo(() => sortDevices([...devices]), [devices, sortOrder]);
 
+  const sortedDevices = useMemo(() => sortDevices(devices), [devices, sortOrder]);
 
-  const filtered = useMemo(() => {
-    return selectValue.length || searchTerm.length > 0
-      ? sortedDevices.filter((device) => {
-        const type = device.miner_key.split('-')[0];
-        const contains = (original: string) => {
-          if (!searchTerm) return true;
-          return original.toLowerCase().includes(searchTerm.toLowerCase());
-        };
-        return ((selectValue.includes(type) && contains(device.miner_key))) && ((selectValue.includes('registered') && device.is_registered )|| (selectValue.includes('unregistered') && !device.is_registered))
-      })
-      : sortedDevices;
-  }, [sortedDevices, selectValue, searchTerm]);
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-7xl">
+    <main className="p-4 md:p-10 mx-auto max-w-8xl">
       <Title>Devices</Title>
 
       <TabGroup>
         <TabList className="mt-8">
           <Tab>List</Tab>
           <Tab>Add Device</Tab>
-          <Tab>Remove Device</Tab>
+          <Tab>Update Device</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
             <Flex alignItems="end" flexDirection="row" className="mt-6">
               <Search />
-              <MultiSelect
+              {/*<MultiSelect
                 placeholder="Select a device type..."
                 onValueChange={(value) => setSelectValue(value)}
                 value={selectValue}
@@ -103,21 +90,21 @@ export default function DevicesPage({
                 <MultiSelectItem value="ODB">ODB</MultiSelectItem>
                 <MultiSelectItem value="registered">Registered</MultiSelectItem>
                 <MultiSelectItem value="unregistered">Unregistered</MultiSelectItem>
-              </MultiSelect>
+              </MultiSelect>*/}
             </Flex>
             <Button className="mt-4" onClick={toggleSortOrder}>Toggle Sort Order</Button>
             <Text className="mt-4">
-              {filtered.length} devices matching your search
+              {sortedDevices.length} devices matching your search
             </Text>
             <Card className="mt-6">
-              <DevicesTable devices={filtered} />
+              <DevicesTable devices={sortedDevices} />
             </Card>
           </TabPanel>
           <TabPanel>
-            <DeviceForm users={users} />
+            <DeviceForm products={products}/>
           </TabPanel>
           <TabPanel>
-            <RemoveDeviceForm devices={devices} />
+            <ChangeDeviceForm products={products}/>
           </TabPanel>
         </TabPanels>
       </TabGroup>
@@ -132,25 +119,47 @@ export async function getServerSideProps(context: any) {
       props: { error: 'Unauthorized access' },
     };
   }
+    
+   //TODO: A enelver
   try {
     const client = await clientPromise;
+    let products;
     const db = client.db("main");
 
+    const searchParams = context.query;
+    const searchTerm = searchParams.q || '';
+
+    const query = searchTerm.length > 0
+      ? { $or: [
+            { order: { $regex: searchTerm, $options: 'i' } },
+            { byod: { $regex: searchTerm, $options: 'i' } }
+        ]}
+      : {};
+
+    console.log('Query:', query);
     const devices = await db
       .collection("devices")
-      .find({})
+      .find(query)
+      .limit(100)
       .toArray();
-    const users = await db
-      .collection("users")
-      .find({})
-      .toArray();
-
-    const searchParams = context.query;
-
+    console.log('Devices:', devices.length);
+        if(!products) {
+          products = await db
+            .collection("products")
+            .find({})
+            .toArray()
+        }
     return {
-      props: { devices: JSON.parse(JSON.stringify(devices)),users: JSON.parse(JSON.stringify(users)), searchParams },
+      props: {
+        devices: JSON.parse(JSON.stringify(devices)),
+        products: JSON.parse(JSON.stringify(products)),
+        searchParams
+      },
     };
   } catch (e) {
     console.error(e);
+    return {
+      props: { error: 'Failed to fetch data' },
+    };
   }
 }

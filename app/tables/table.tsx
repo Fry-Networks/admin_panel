@@ -7,8 +7,8 @@ import {
   TableCell,
   Text
 } from '@tremor/react';
-import { webUser } from '../lib/webusers-model';
-import { User } from '../lib/users-schema';
+import { webUser } from '../../lib/webusers-model';
+import { User } from '../../lib/users-schema';
 
 export default function UsersTable({ users }: { users: User[] }) {
   const sorted = users.sort((a, b) => {

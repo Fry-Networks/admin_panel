@@ -10,12 +10,12 @@ import {
     MultiSelectItem
 } from '@tremor/react';
 import clientPromise from '../lib/mongoclient';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getSession } from 'next-auth/react';
 import '../app/css/devices.css';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import { ByodUser } from '../lib/byod-schema';
-import ByodTable from '../app/table-byod';
+import ByodTable from '../app/tables/table-byod';
 import Search from '../app/search';
 import { base32 } from '@scure/base';
 export default function DevicesPage({
@@ -38,34 +38,25 @@ export default function DevicesPage({
     const searchTerm = searchParams?.q || '';
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
-    let filtered = useMemo(() => {
-        return searchTerm && searchTerm.length > 0
-            ? byodUsers.filter((byod) => {
-                const contains = (original: string) => {
-                    if (!searchTerm) return true;
-                    return original.toLowerCase().includes(searchTerm.toLowerCase());
-                };
-                return contains(byod.email) || byod.licenses.some((license) => contains(license.license)) || contains(byod.address);
+    const [filtered, setFiltered] = useState<ByodUser[]>(byodUsers);
+
+    useEffect(() => {
+        const contains = (original: string) => {
+            if (!searchTerm) return true;
+            return original.toLowerCase().includes(searchTerm.toLowerCase());
+        };
+
+        const filteredUsers = searchTerm && searchTerm.length > 0
+            ? byodUsers.filter(byod => {
+                return contains(byod.email) || byod.licenses.some(license => contains(license.license)) || contains(byod.address);
             })
             : byodUsers;
-    }, [byodUsers, searchTerm]);
+
+        setFiltered(filteredUsers);
+        console.log('Filtered Users:', filteredUsers);
+    }, [searchTerm, byodUsers]);
     //@ts-ignore
-    if (process.env.NODE_ENV === 'development') filtered = [{
-        email: "simonøDAZJIFAZUORUIOAZUROAZ",
-        address: "simon",
-        licenses: [{
-            license: "AZFUIOYIAZEDUIOPAZAZEUIZEUIOPERUIOPRAZEUIOPZERAUIOPAZERUIOPAZERUIOPAAAAAAAAAAAAZERUIOPRAZEUIOP",
-            used: true
-        }]
-    },    //@ts-ignore
-    {
-        email: "simonøDAZJIFAZUORUIOAZUROAZ",
-        address: "simon",
-        licenses: [{
-            license: "AZFUIOYIAZEDUIIOPZERAUIOPAZERUIOPAZERUIOPAAAAAAAAAAAAZERUIOPRAZEUIOP",
-            used: true
-        }]
-    }];
+
 
     return (
         <main className="p-4 md:p-10 mx-auto max-w-max">
@@ -80,7 +71,7 @@ export default function DevicesPage({
                         <Flex alignItems="end" flexDirection="row" className="mt-6">
                             <Search />
                             <Text className="mt-4">
-                                {filtered.length} byod users matching your search
+                                {filtered?.length} byod users matching your search
                             </Text>
                         </Flex>
                         <Card className="mt-6">
@@ -101,21 +92,32 @@ export async function getServerSideProps(context: any) {
             props: { error: 'Unauthorized access' },
         };
     }
-    try {
-        if (process.env.NODE_ENV === 'development') {
-            return {
-                props: { byodUsers: [{email: "simon", address: "simon", licenses: []}], searchParams: { q: '' } },
-            };
 
-        }
+    try {
+       
+
         const client = await clientPromise;
         const db = client.db("main");
+        const searchParams = context.query;
+        const searchTerm = searchParams.q || '';
+
+        // Build query based on search term
+        const query = searchTerm.length > 0
+            ? {
+                $or: [
+                    { email: { $regex: searchTerm, $options: 'i' } },
+                    { address: { $regex: searchTerm, $options: 'i' } },
+                    { 'licenses.license': { $regex: searchTerm, $options: 'i' } }
+                ]
+            }
+            : {};
 
         const byods = await db
             .collection("byods")
-            .find({ licenses: { $exists: true, $not: { $size: 0 } } })
+            .find(query, { limit: 100 })
             .toArray();
-        byods.map((byod) => {
+
+        byods.map(byod => {
             const numberArray = byod.address.split(",").map((num: string) => parseInt(num, 10));
             const bytes = new Uint8Array(numberArray);
 
@@ -123,12 +125,14 @@ export async function getServerSideProps(context: any) {
             const address = base32.encode(bytes).split('=')[0];
             byod.address = address;
         });
-        const searchParams = context.query;
 
         return {
             props: { byodUsers: JSON.parse(JSON.stringify(byods)), searchParams },
         };
     } catch (e) {
         console.error(e);
+        return {
+            props: { byodUsers: [], searchParams: { q: '' } }
+        };
     }
 }

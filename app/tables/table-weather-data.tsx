@@ -9,11 +9,11 @@ import {
   Button
 } from '@tremor/react';
 import Link from 'next/link';
-import { webUser } from '../lib/webusers-model';
-import { User } from '../lib/users-schema';
-import { Device } from '../lib/devices-schema';
-import { deviceData, weatherAccount } from '../lib/weather_accounts';
-import { WeatherData } from '../lib/weather-schema';
+import { webUser } from '../../lib/webusers-model';
+import { User } from '../../lib/users-schema';
+import { Device } from '../../lib/devices-schema';
+import { deviceData, weatherAccount } from '../../lib/weather_accounts';
+import { WeatherData } from '../../lib/weather-schema';
 import { useRouter } from 'next/router';
 export default function WeatherDeviceData({ weathers }: { weathers: any }) {
   return (

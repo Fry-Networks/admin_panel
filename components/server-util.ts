@@ -1,34 +1,14 @@
 
 
-export async function addDevice({ email, device_type }: { email: string, device_type: string }): Promise<boolean> {
+export async function addDevice({ email, id, order, byod }: { email: string, id: string, order: string, byod?: string }): Promise<boolean> {
     let device_name = "";
-
-    switch (device_type) {
-        case "ODB":
-            device_name = "$FRY Outdoor Decibel Miner";
-            break;
-        case "IDB":
-            device_name = "$FRY Indoor Decibel Miner";
-            break;
-        case "IGPS":
-            device_name = "$FRY Indoor Satellite Miner";
-            break;
-        case "OGPS":
-            device_name = "$FRY Outdoor Satellite Miner";
-            break;
-        case "VPN":
-            device_name = "$FRY Bandwidth Miner";
-            break;
-        default:
-            "Unknown Device";
-    }
 
     const res = await fetch('/api/add-device', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, device_name, device_type })
+        body: JSON.stringify({ email,   id, order, byod })
     });
     return res.ok;
 
@@ -56,13 +36,13 @@ export async function removeUser(user_id: string): Promise<boolean> {
     return res.ok;
 }
 
-export async function removeDevice(device_id: string): Promise<boolean> {
-    const res = await fetch('/api/remove-device', {
+export async function changeDevice(id: string, miner_key: string): Promise<boolean> {
+    const res = await fetch('/api/change-device', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ device_id })
+        body: JSON.stringify({ id, miner_key})
     });
     return res.ok;
 }
