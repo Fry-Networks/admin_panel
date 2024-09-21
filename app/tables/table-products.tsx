@@ -10,19 +10,25 @@ import {
   Callout,
   NumberInput,
   TextInput,
-  Flex,
+  Flex
 } from '@tremor/react';
-import { CheckCircleIcon } from "@heroicons/react/24/solid";
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import Modal from 'react-modal';
 import { webUser } from '../../lib/webusers-model';
 import { Product, ProductModel } from '../../lib/products-schema';
 import { useRef, useState } from 'react';
 import ReactModal from 'react-modal';
 
-export default function ProductsTable({ products, enabled }: { products: Product[], enabled: boolean }) {
+export default function ProductsTable({
+  products,
+  enabled
+}: {
+  products: Product[];
+  enabled: boolean;
+}) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [globalMultiplier, setGlobalMultiplier] = useState(1);
-  const [updateSuccess, setUpdateSuccess] = useState(""); // State to track update success
+  const [updateSuccess, setUpdateSuccess] = useState(''); // State to track update success
   const openEditModal = (product: Product) => {
     setEditingProduct(product);
   };
@@ -48,7 +54,12 @@ export default function ProductsTable({ products, enabled }: { products: Product
     const stake_one = stakeOneRef.current?.value;
     const stake_two = stakeTwoRef.current?.value;
     // Ensure the values are retrieved
-    if (unverifiedReward === undefined || verifiedReward === undefined || stake_one === undefined || stake_two === undefined) {
+    if (
+      unverifiedReward === undefined ||
+      verifiedReward === undefined ||
+      stake_one === undefined ||
+      stake_two === undefined
+    ) {
       console.error('Form elements are missing');
       return;
     }
@@ -58,29 +69,33 @@ export default function ProductsTable({ products, enabled }: { products: Product
       unverifiedReward: unverifiedReward,
       verifiedReward: verifiedReward,
       stake_one,
-      stake_two,
+      stake_two
     };
 
     try {
       console.log('Updating product:', editingProduct);
 
-      const response = await fetch('/api/edit-product', { // Replace with your actual API endpoint
+      const response = await fetch('/api/edit-product', {
+        // Replace with your actual API endpoint
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify(updateData)
       });
 
       if (!response.ok) {
-        setUpdateSuccess("error"); // Reset success state
+        setUpdateSuccess('error'); // Reset success state
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const result = await response.json();
       console.log('Updated product:', result);
       setUpdateSuccess(editingProduct.name); // Set success state to true
-      setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
+      setTimeout(() => {
+        window.location.reload();
+        setUpdateSuccess('');
+      }, 1000); // Reset success state after 3 seconds
     } catch (err) {
       console.error('Error updating product:', err);
     }
@@ -92,27 +107,31 @@ export default function ProductsTable({ products, enabled }: { products: Product
 
   const updateMultiplier = async () => {
     try {
-      const response = await fetch('/api/update-multiplier', { // Replace with your actual API endpoint
+      const response = await fetch('/api/update-multiplier', {
+        // Replace with your actual API endpoint
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ multiplier: globalMultiplier }),
+        body: JSON.stringify({ multiplier: globalMultiplier })
       });
 
       if (!response.ok) {
-        setUpdateSuccess("error"); // Reset success state
+        setUpdateSuccess('error'); // Reset success state
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const result = await response.json();
       console.log('Updated multiplier:', result);
-      setUpdateSuccess("multiplier"); // Set success state to true
-      setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
+      setUpdateSuccess('multiplier'); // Set success state to true
+      setTimeout(() => {
+        window.location.reload();
+        setUpdateSuccess('');
+      }, 1000); // Reset success state after 3 seconds
     } catch (err) {
       console.error('Error updating multiplier:', err);
     }
-  }
+  };
 
   function formatDate(date: Date) {
     date = new Date(date);
@@ -127,36 +146,60 @@ export default function ProductsTable({ products, enabled }: { products: Product
 
   return (
     <div>
-      {(updateSuccess != "" && updateSuccess != "error") && (
-        <Callout className="mt-4" title="Success" icon={CheckCircleIcon} color="teal">
+      {updateSuccess != '' && updateSuccess != 'error' && (
+        <Callout
+          className="mt-4"
+          title="Success"
+          icon={CheckCircleIcon}
+          color="teal"
+        >
           Successfully updated {updateSuccess} !
         </Callout>
       )}
-      {(updateSuccess == "error") && (
-        <Callout className="mt-4" title="Error" icon={CheckCircleIcon} color="red">
+      {updateSuccess == 'error' && (
+        <Callout
+          className="mt-4"
+          title="Error"
+          icon={CheckCircleIcon}
+          color="red"
+        >
           Error updating product!
         </Callout>
       )}
-      <Flex flexDirection='col'>
-      <Flex flexDirection='row' className="mt-6">
-        <NumberInput ref={globalMultiplierRef} defaultValue={globalMultiplier} step={0.01} onChange={(e) => setGlobalMultiplier(+e.target.value)} />
-        <Button className="ml-4" onClick={() => {
-          updateMultiplier();
-        }}>Update multiplier</Button>
-      </Flex>
-      <Button className="mt-4" color={enabled ? "red" : "green"} onClick={() => {
-        fetch('/api/update-rewards-enabled', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ enabled: !enabled }),
-        }).then(() => {
-          window.location.reload();
-        });
-      }
-      }>{enabled ? "Disable rewards" : "Enable rewards"}</  Button>
-      
+      <Flex flexDirection="col">
+        <Flex flexDirection="row" className="mt-6">
+          <NumberInput
+            ref={globalMultiplierRef}
+            defaultValue={globalMultiplier}
+            step={0.01}
+            onChange={(e) => setGlobalMultiplier(+e.target.value)}
+          />
+          <Button
+            className="ml-4"
+            onClick={() => {
+              updateMultiplier();
+            }}
+          >
+            Update multiplier
+          </Button>
+        </Flex>
+        <Button
+          className="mt-4"
+          color={enabled ? 'red' : 'green'}
+          onClick={() => {
+            fetch('/api/update-rewards-enabled', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ enabled: !enabled })
+            }).then(() => {
+              window.location.reload();
+            });
+          }}
+        >
+          {enabled ? 'Disable rewards' : 'Enable rewards'}
+        </Button>
       </Flex>
 
       <Table>
@@ -185,10 +228,16 @@ export default function ProductsTable({ products, enabled }: { products: Product
                 <Text>{product.reward.verified}</Text>
               </TableCell>
               <TableCell>
-                <Text>{`Tier one: ${product.reward.stake?.stake_one ?? 0} | Tier two: ${product.reward.stake?.stake_two ?? 0}`}</Text>
+                <Text>{`Tier one: ${
+                  product.reward.stake?.stake_one ?? 0
+                } | Tier two: ${product.reward.stake?.stake_two ?? 0}`}</Text>
               </TableCell>
               <TableCell>
-                <Text>{product.created_at ? formatDate(product.created_at) : "Unknown"}</Text>
+                <Text>
+                  {product.created_at
+                    ? formatDate(product.created_at)
+                    : 'Unknown'}
+                </Text>
               </TableCell>
               <TableCell>
                 <Button
@@ -209,36 +258,57 @@ export default function ProductsTable({ products, enabled }: { products: Product
         style={customStyles}
         contentLabel="Edit Product"
       >
-        <h2 className='mb-4'><strong>Editting</strong> {editingProduct?.name} - ({editingProduct?.key})</h2>
+        <h2 className="mb-4">
+          <strong>Editting</strong> {editingProduct?.name} - (
+          {editingProduct?.key})
+        </h2>
         <form onSubmit={handleSubmit}>
-          <div className='mb-2'>
+          <div className="mb-2">
             <label>Unverified Reward:</label>
-            <NumberInput ref={unverifiedRewardRef} defaultValue={editingProduct?.reward.unverified} step={0.01} />
+            <NumberInput
+              ref={unverifiedRewardRef}
+              defaultValue={editingProduct?.reward.unverified}
+              step={0.01}
+            />
           </div>
           <div>
             <label>Verified Reward:</label>
-            <NumberInput ref={verifiedRewardRef} defaultValue={editingProduct?.reward.verified} step={0.01} />
+            <NumberInput
+              ref={verifiedRewardRef}
+              defaultValue={editingProduct?.reward.verified}
+              step={0.01}
+            />
           </div>
           <div>
             <label>Stake Amount Tier 1 ($FRY):</label>
-            <NumberInput ref={stakeOneRef} defaultValue={editingProduct?.reward.stake?.stake_one ?? 0} step={1} />
+            <NumberInput
+              ref={stakeOneRef}
+              defaultValue={editingProduct?.reward.stake?.stake_one ?? 0}
+              step={1}
+            />
           </div>
           <div>
             <label>Stake Amount Tier 2 ($FRY):</label>
-            <NumberInput ref={stakeTwoRef} defaultValue={editingProduct?.reward.stake?.stake_two ?? 0} step={1} />
+            <NumberInput
+              ref={stakeTwoRef}
+              defaultValue={editingProduct?.reward.stake?.stake_two ?? 0}
+              step={1}
+            />
           </div>
 
-          <div className='mb-4 mt-4'>
-            <Button type="submit" className='mr-2' variant="primary">Update</Button>
-            <Button onClick={closeModal} variant="secondary">Cancel</Button>
+          <div className="mb-4 mt-4">
+            <Button type="submit" className="mr-2" variant="primary">
+              Update
+            </Button>
+            <Button onClick={closeModal} variant="secondary">
+              Cancel
+            </Button>
           </div>
         </form>
       </Modal>
     </div>
-
   );
 }
-
 
 const customStyles = {
   content: {
@@ -249,7 +319,7 @@ const customStyles = {
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
     backgroundColor: 'white', // Example background color
-    color: "#6b7280",
+    color: '#6b7280',
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)'
