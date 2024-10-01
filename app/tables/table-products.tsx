@@ -208,7 +208,7 @@ export default function ProductsTable({
             <TableHeaderCell>Name</TableHeaderCell>
             <TableHeaderCell>Key</TableHeaderCell>
             <TableHeaderCell>Unverified rewards</TableHeaderCell>
-            <TableHeaderCell>Verified rewards</TableHeaderCell>
+            <TableHeaderCell>Verified rewards(1.5x | 3x)</TableHeaderCell>
             <TableHeaderCell>Stake amount</TableHeaderCell>
             <TableHeaderCell>Added on </TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
@@ -225,7 +225,7 @@ export default function ProductsTable({
                 <Text>{product.reward.unverified}</Text>
               </TableCell>
               <TableCell>
-                <Text>{product.reward.verified}</Text>
+                <Text>{`${Math.round(product.reward.unverified * 100 * 1.5) / 100} | ${Math.round(product.reward.unverified * 100 * 3) / 100}`}</Text>
               </TableCell>
               <TableCell>
                 <Text>{`Tier one: ${
