@@ -50,7 +50,7 @@ export default function ProductsTable({
     }
 
     const unverifiedReward = unverifiedRewardRef.current?.value;
-    const verifiedReward = verifiedRewardRef.current?.value;
+    const verifiedReward = unverifiedRewardRef.current?.value;
     const stake_one = stakeOneRef.current?.value;
     const stake_two = stakeTwoRef.current?.value;
     // Ensure the values are retrieved
@@ -271,14 +271,14 @@ export default function ProductsTable({
               step={0.01}
             />
           </div>
-          <div>
+          {/* <div>
             <label>Verified Reward:</label>
             <NumberInput
               ref={verifiedRewardRef}
               defaultValue={editingProduct?.reward.verified}
               step={0.01}
             />
-          </div>
+          </div> */}
           <div>
             <label>Stake Amount Tier 1 ($FRY):</label>
             <NumberInput
