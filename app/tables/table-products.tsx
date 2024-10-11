@@ -123,6 +123,8 @@ export default function ProductsTable({
 
       const result = await response.json();
       console.log('Updated multiplier:', result);
+      0;
+
       setUpdateSuccess('multiplier'); // Set success state to true
       setTimeout(() => {
         window.location.reload();
@@ -225,7 +227,11 @@ export default function ProductsTable({
                 <Text>{product.reward.unverified}</Text>
               </TableCell>
               <TableCell>
-                <Text>{`${Math.round(product.reward.unverified * 100 * 1.5) / 100} | ${Math.round(product.reward.unverified * 100 * 3) / 100}`}</Text>
+                <Text>{`${
+                  Math.round(product.reward.unverified * 100 * 1.5) / 100
+                } | ${
+                  Math.round(product.reward.unverified * 100 * 3) / 100
+                }`}</Text>
               </TableCell>
               <TableCell>
                 <Text>{`Tier one: ${
