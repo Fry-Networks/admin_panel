@@ -13,11 +13,12 @@ const navigation = [
   { name: 'Weather Devices', href: '/weather/devices' },
   { name: 'Devices', href: '/devices' },
   { name: 'Rewards', href: '/rewards' },
+  { name: 'Reduction', href: '/reduction' },
   { name: 'Byod', href: '/byod' },
   { name: 'Air Accounts', href: '/air/accounts' },
   { name: 'DAO', href: '/dao' },
   { name: 'Energy', href: '/energy' },
-  { name: 'Water', href: '/water' },
+  { name: 'Water', href: '/water' }
 ];
 
 function classNames(...classes: string[]) {
@@ -87,7 +88,10 @@ export default function Navbar() {
                       <span className="sr-only">Open user menu</span>
                       <Image
                         className="h-8 w-8 rounded-full"
-                        src={session?.user?.image || 'https://avatar.vercel.sh/leerob'}
+                        src={
+                          session?.user?.image ||
+                          'https://avatar.vercel.sh/leerob'
+                        }
                         height={32}
                         width={32}
                         alt={`${session?.user?.name || 'placeholder'} avatar`}
@@ -176,7 +180,10 @@ export default function Navbar() {
                     <div className="flex-shrink-0">
                       <Image
                         className="h-8 w-8 rounded-full"
-                        src={session?.user.image || 'https://avatar.vercel.sh/leerob'}
+                        src={
+                          session?.user.image ||
+                          'https://avatar.vercel.sh/leerob'
+                        }
                         height={32}
                         width={32}
                         alt={`${session?.user.name} avatar`}
