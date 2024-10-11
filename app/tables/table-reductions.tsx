@@ -105,7 +105,7 @@ export default function ReductionsTable({
 
       const result = await response.json();
       console.log(`Add Reduction: ${result}`);
-      setUpdateSuccess('add reudction');
+      setUpdateSuccess('added reduction');
       setTimeout(() => {
         setUpdateSuccess('');
       }, 3000);

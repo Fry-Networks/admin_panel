@@ -129,4 +129,6 @@ const EditReductionModal = forwardRef(
   }
 );
 
+EditReductionModal.displayName = 'EditReductionModal';
+
 export default EditReductionModal;
