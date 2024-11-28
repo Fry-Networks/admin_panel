@@ -10,7 +10,9 @@ import {
   Callout,
   NumberInput,
   TextInput,
-  Flex
+  Flex,
+  Select,
+  SelectItem
 } from '@tremor/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import Modal from 'react-modal';
@@ -18,18 +20,23 @@ import { webUser } from '../../lib/webusers-model';
 import { Product, ProductModel } from '../../lib/products-schema';
 import { useRef, useState } from 'react';
 import ReactModal from 'react-modal';
+import { FryToken } from '../../lib/tokens-schema';
 
 export default function ProductsTable({
   products,
+  tokens,
   enabled
 }: {
   products: Product[];
+  tokens: FryToken[];
   enabled: boolean;
 }) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [globalMultiplier, setGlobalMultiplier] = useState(1);
   const [updateSuccess, setUpdateSuccess] = useState(''); // State to track update success
   const openEditModal = (product: Product) => {
+    stakeTokenRef.current = product.reward.tokens?.stake ?? 'none';
+    rewardTokenRef.current = product.reward.tokens?.reward ?? 'none';
     setEditingProduct(product);
   };
   const closeModal = () => {
@@ -39,6 +46,8 @@ export default function ProductsTable({
   const verifiedRewardRef = useRef<HTMLInputElement>(null);
   const stakeOneRef = useRef<HTMLInputElement>(null);
   const stakeTwoRef = useRef<HTMLInputElement>(null);
+  const stakeTokenRef = useRef<string | null>(null);
+  const rewardTokenRef = useRef<string | null>(null);
   const globalMultiplierRef = useRef<HTMLInputElement>(null);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -53,6 +62,10 @@ export default function ProductsTable({
     const verifiedReward = unverifiedRewardRef.current?.value;
     const stake_one = stakeOneRef.current?.value;
     const stake_two = stakeTwoRef.current?.value;
+    const stakeToken = stakeTokenRef.current ?? 'none';
+    const rewardToken = rewardTokenRef.current ?? 'none';
+
+    console.log(stakeToken, rewardToken);
     // Ensure the values are retrieved
     if (
       unverifiedReward === undefined ||
@@ -69,7 +82,9 @@ export default function ProductsTable({
       unverifiedReward: unverifiedReward,
       verifiedReward: verifiedReward,
       stake_one,
-      stake_two
+      stake_two,
+      stake_token: stakeToken,
+      reward_token: rewardToken
     };
 
     try {
@@ -212,6 +227,8 @@ export default function ProductsTable({
             <TableHeaderCell>Unverified rewards</TableHeaderCell>
             <TableHeaderCell>Verified rewards(1.5x | 3x)</TableHeaderCell>
             <TableHeaderCell>Stake amount</TableHeaderCell>
+            <TableHeaderCell>Stake Token</TableHeaderCell>
+            <TableHeaderCell>Reward Token</TableHeaderCell>
             <TableHeaderCell>Added on </TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableRow>
@@ -237,6 +254,23 @@ export default function ProductsTable({
                 <Text>{`Tier one: ${
                   product.reward.stake?.stake_one ?? 0
                 } | Tier two: ${product.reward.stake?.stake_two ?? 0}`}</Text>
+              </TableCell>
+              <TableCell>
+                {product.reward.tokens?.stake &&
+                product.reward.tokens?.stake !== 'none'
+                  ? tokens.find((value) => {
+                      return value.asset_id === product.reward.tokens?.stake;
+                    })?.name
+                  : 'None'}
+              </TableCell>
+              <TableCell>
+                {product.reward.tokens?.reward &&
+                product.reward.tokens?.reward !== 'none'
+                  ? tokens.find(
+                      (value) =>
+                        value.asset_id === product.reward.tokens?.reward
+                    )?.name
+                  : 'None'}
               </TableCell>
               <TableCell>
                 <Text>
@@ -300,6 +334,46 @@ export default function ProductsTable({
               defaultValue={editingProduct?.reward.stake?.stake_two ?? 0}
               step={1}
             />
+          </div>
+          <div>
+            <label>Stake token type:</label>
+            <Select
+              defaultValue={editingProduct?.reward.tokens?.stake ?? 'none'}
+              onValueChange={(value) => {
+                stakeTokenRef.current = value;
+              }}
+            >
+              <SelectItem key={0} value="none">
+                None
+              </SelectItem>
+              {tokens?.map((token, index) => {
+                return (
+                  <SelectItem key={index + 1} value={token.asset_id}>
+                    {token.name}
+                  </SelectItem>
+                );
+              })}
+            </Select>
+          </div>
+          <div>
+            <label>Reward token type:</label>
+            <Select
+              defaultValue={editingProduct?.reward.tokens?.reward ?? 'none'}
+              onValueChange={(value) => {
+                rewardTokenRef.current = value;
+              }}
+            >
+              <SelectItem key={0} value="none">
+                None
+              </SelectItem>
+              {tokens?.map((token, index) => {
+                return (
+                  <SelectItem key={index + 1} value={token.asset_id}>
+                    {token.name}
+                  </SelectItem>
+                );
+              })}
+            </Select>
           </div>
 
           <div className="mb-4 mt-4">

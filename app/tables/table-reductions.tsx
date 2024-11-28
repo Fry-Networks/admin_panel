@@ -240,6 +240,7 @@ export default function ReductionsTable({
         } as Reduction;
       }
       setReductions(updateReductions);
+      setSelectedIndex(0);
     } catch (error) {
       setUpdateSuccess('error');
       console.log('Error: ' + error);
