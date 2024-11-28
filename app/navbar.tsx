@@ -11,6 +11,7 @@ const navigation = [
   { name: 'Users', href: '/users' },
   { name: 'Weather Accounts', href: '/weather/accounts' },
   { name: 'Weather Devices', href: '/weather/devices' },
+  { name: 'Fry Tokens', href: '/token' },
   { name: 'Devices', href: '/devices' },
   { name: 'Rewards', href: '/rewards' },
   { name: 'Reduction', href: '/reduction' },

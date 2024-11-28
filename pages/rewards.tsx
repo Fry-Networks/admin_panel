@@ -23,9 +23,17 @@ import { getSession } from 'next-auth/react';
 import UserForm from '../components/form-user';
 import RemoveUserForm from '../components/remove-user';
 import { Product } from '../lib/products-schema';
+import { FryToken } from '../lib/tokens-schema';
 
-export default function RewardsPage({ products, enabled }: { products: Product[], enabled: boolean }) {
-
+export default function RewardsPage({
+  products,
+  tokens,
+  enabled
+}: {
+  products: Product[];
+  tokens: FryToken[];
+  enabled: boolean;
+}) {
   //(VPN|OGPS|IGPS|IDB|ODB)
 
   console.log(products);
@@ -35,15 +43,18 @@ export default function RewardsPage({ products, enabled }: { products: Product[]
       <TabGroup>
         <TabPanels>
           <TabPanel>
-            <Flex flexDirection='row' className="mt-6">
+            <Flex flexDirection="row" className="mt-6">
               <div style={{ marginTop: '20px' }}>
                 <Text>{products?.length} products found!</Text>
               </div>
-
             </Flex>
 
             <Card className="mt-6">
-              <ProductsTable products={products} enabled={enabled}/>
+              <ProductsTable
+                products={products}
+                enabled={enabled}
+                tokens={tokens}
+              />
             </Card>
           </TabPanel>
         </TabPanels>
@@ -59,28 +70,27 @@ export async function getServerSideProps(context: any) {
       props: { error: 'Unauthorized access' },
     };
   }*/
-    
-   //TODO: A enelver
+
+  //TODO: A enelver
   try {
     const client = await clientPromise;
-    const db = client.db("main");
+    const db = client.db('main');
 
-    const products = await db
-      .collection("products")
-      .find({})
-      .toArray();
-      const config = await db.collection("configs").findOne({name: "rewards"});
-      console.log('hey', config);
+    const products = await db.collection('products').find({}).toArray();
+    const config = await db.collection('configs').findOne({ name: 'rewards' });
+    console.log('hey', config);
+    const tokens = await db.collection('tokens').find({}).toArray();
     return {
       props: {
         products: JSON.parse(JSON.stringify(products)),
+        tokens: JSON.parse(JSON.stringify(tokens)),
         enabled: config?.enabled
-      },
+      }
     };
   } catch (e) {
     console.error(e);
     return {
-      props: { error: 'Failed to fetch data' },
+      props: { error: 'Failed to fetch data' }
     };
   }
 }
