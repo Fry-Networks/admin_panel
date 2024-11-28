@@ -330,7 +330,7 @@ export default function TokensTable({
             Array.isArray(tokens) &&
             tokens.map((token, index) => {
               return (
-                <TableRow>
+                <TableRow key={index}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{token.name}</TableCell>
                   <TableCell>{token.asset_id}</TableCell>
