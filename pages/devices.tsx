@@ -24,10 +24,9 @@ import ChangeDeviceForm from '../components/change-device';
 import { useRouter } from 'next/router';
 
 export default function DevicesPage({
-  devices = [],  // Default to an empty array if devices is undefined
+  devices = [], // Default to an empty array if devices is undefined
   products,
-  searchParams = {},  // Default to an empty object if searchParams is undefined
-  
+  searchParams = {} // Default to an empty object if searchParams is undefined
 }: {
   devices: Device[];
   searchParams: any;
@@ -43,9 +42,9 @@ export default function DevicesPage({
   // Function to sort devices
   const sortDevices = (devices: Device[]) => {
     return devices.sort((a, b) => {
-      const dateA = (new Date(a.created_at)).getTime();
-      const dateB = (new Date(b.created_at)).getTime();
-      return sortOrder === 'asc' ? (dateA - dateB) : (dateB - dateA);
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
     });
   };
 
@@ -60,8 +59,10 @@ export default function DevicesPage({
     'unregistered'
   ]);
 
-  const sortedDevices = useMemo(() => sortDevices(devices), [devices, sortOrder]);
-
+  const sortedDevices = useMemo(
+    () => sortDevices(devices),
+    [devices, sortOrder]
+  );
 
   return (
     <main className="p-4 md:p-10 mx-auto max-w-8xl">
@@ -92,7 +93,9 @@ export default function DevicesPage({
                 <MultiSelectItem value="unregistered">Unregistered</MultiSelectItem>
               </MultiSelect>*/}
             </Flex>
-            <Button className="mt-4" onClick={toggleSortOrder}>Toggle Sort Order</Button>
+            <Button className="mt-4" onClick={toggleSortOrder}>
+              Toggle Sort Order
+            </Button>
             <Text className="mt-4">
               {sortedDevices.length} devices matching your search
             </Text>
@@ -101,10 +104,10 @@ export default function DevicesPage({
             </Card>
           </TabPanel>
           <TabPanel>
-            <DeviceForm products={products}/>
+            <DeviceForm products={products} />
           </TabPanel>
           <TabPanel>
-            <ChangeDeviceForm products={products}/>
+            <ChangeDeviceForm products={products} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
@@ -116,50 +119,51 @@ export async function getServerSideProps(context: any) {
   const session = await getSession(context);
   if (!session || !session.user?.admin) {
     return {
-      props: { error: 'Unauthorized access' },
+      props: { error: 'Unauthorized access' }
     };
   }
-    
-   //TODO: A enelver
+
+  //TODO: A enelver
   try {
     const client = await clientPromise;
     let products;
-    const db = client.db("main");
+    const db = client.db('main');
 
     const searchParams = context.query;
     const searchTerm = searchParams.q || '';
 
-    const query = searchTerm.length > 0
-      ? { $or: [
-            { order: { $regex: searchTerm, $options: 'i' } },
-            { byod: { $regex: searchTerm, $options: 'i' } }
-        ]}
-      : {};
+    const query =
+      searchTerm.length > 0
+        ? {
+            $or: [
+              { order: { $regex: searchTerm, $options: 'i' } },
+              { byod: { $regex: searchTerm, $options: 'i' } },
+              { email: { $regex: searchTerm, $options: 'i' } }
+            ]
+          }
+        : {};
 
     console.log('Query:', query);
     const devices = await db
-      .collection("devices")
+      .collection('devices')
       .find(query)
       .limit(100)
       .toArray();
     console.log('Devices:', devices.length);
-        if(!products) {
-          products = await db
-            .collection("products")
-            .find({})
-            .toArray()
-        }
+    if (!products) {
+      products = await db.collection('products').find({}).toArray();
+    }
     return {
       props: {
         devices: JSON.parse(JSON.stringify(devices)),
         products: JSON.parse(JSON.stringify(products)),
         searchParams
-      },
+      }
     };
   } catch (e) {
     console.error(e);
     return {
-      props: { error: 'Failed to fetch data' },
+      props: { error: 'Failed to fetch data' }
     };
   }
 }
