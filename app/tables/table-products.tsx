@@ -48,6 +48,8 @@ export default function ProductsTable({
   const stakeTwoRef = useRef<HTMLInputElement>(null);
   const stakeTokenRef = useRef<string | null>(null);
   const rewardTokenRef = useRef<string | null>(null);
+  const registerTokenRef = useRef<string | null>(null);
+  const registerUSDRef = useRef<HTMLInputElement>(null);
   const globalMultiplierRef = useRef<HTMLInputElement>(null);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -62,6 +64,8 @@ export default function ProductsTable({
     const verifiedReward = unverifiedRewardRef.current?.value;
     const stake_one = stakeOneRef.current?.value;
     const stake_two = stakeTwoRef.current?.value;
+    const registerUSD = registerUSDRef.current?.value;
+    const registerToken = registerTokenRef.current ?? 'none';
     const stakeToken = stakeTokenRef.current ?? 'none';
     const rewardToken = rewardTokenRef.current ?? 'none';
 
@@ -81,6 +85,8 @@ export default function ProductsTable({
       productId: editingProduct.wix_id, // Use the appropriate identifier for the product
       unverifiedReward: unverifiedReward,
       verifiedReward: verifiedReward,
+      register_token: registerToken,
+      register_price: registerUSD,
       stake_one,
       stake_two,
       stake_token: stakeToken,
@@ -224,11 +230,13 @@ export default function ProductsTable({
           <TableRow>
             <TableHeaderCell>Name</TableHeaderCell>
             <TableHeaderCell>Key</TableHeaderCell>
+            <TableHeaderCell>Register Token</TableHeaderCell>
+            <TableHeaderCell>Register Price(USD)</TableHeaderCell>
+            <TableHeaderCell>Verify Stake Token</TableHeaderCell>
+            <TableHeaderCell>Stake amount</TableHeaderCell>
+            <TableHeaderCell>Reward Token</TableHeaderCell>
             <TableHeaderCell>Unverified rewards</TableHeaderCell>
             <TableHeaderCell>Verified rewards(1.5x | 3x)</TableHeaderCell>
-            <TableHeaderCell>Stake amount</TableHeaderCell>
-            <TableHeaderCell>Stake Token</TableHeaderCell>
-            <TableHeaderCell>Reward Token</TableHeaderCell>
             <TableHeaderCell>Added on </TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableRow>
@@ -241,19 +249,15 @@ export default function ProductsTable({
                 <Text>{product.key}</Text>
               </TableCell>
               <TableCell>
-                <Text>{product.reward.unverified}</Text>
+                {product.reward.tokens?.register &&
+                product.reward.tokens?.register !== 'none'
+                  ? tokens.find((value) => {
+                      return value.asset_id === product.reward.tokens?.register;
+                    })?.name
+                  : 'None'}
               </TableCell>
               <TableCell>
-                <Text>{`${
-                  Math.round(product.reward.unverified * 100 * 1.5) / 100
-                } | ${
-                  Math.round(product.reward.unverified * 100 * 3) / 100
-                }`}</Text>
-              </TableCell>
-              <TableCell>
-                <Text>{`Tier one: ${
-                  product.reward.stake?.stake_one ?? 0
-                } | Tier two: ${product.reward.stake?.stake_two ?? 0}`}</Text>
+                <Text>{`${product.reward.register ?? 0}`}</Text>
               </TableCell>
               <TableCell>
                 {product.reward.tokens?.stake &&
@@ -264,6 +268,11 @@ export default function ProductsTable({
                   : 'None'}
               </TableCell>
               <TableCell>
+                <Text>{`Tier one: ${
+                  product.reward.stake?.stake_one ?? 0
+                } | Tier two: ${product.reward.stake?.stake_two ?? 0}`}</Text>
+              </TableCell>
+              <TableCell>
                 {product.reward.tokens?.reward &&
                 product.reward.tokens?.reward !== 'none'
                   ? tokens.find(
@@ -271,6 +280,16 @@ export default function ProductsTable({
                         value.asset_id === product.reward.tokens?.reward
                     )?.name
                   : 'None'}
+              </TableCell>
+              <TableCell>
+                <Text>{product.reward.unverified}</Text>
+              </TableCell>
+              <TableCell>
+                <Text>{`${
+                  Math.round(product.reward.unverified * 100 * 1.5) / 100
+                } | ${
+                  Math.round(product.reward.unverified * 100 * 3) / 100
+                }`}</Text>
               </TableCell>
               <TableCell>
                 <Text>
@@ -332,6 +351,34 @@ export default function ProductsTable({
             <NumberInput
               ref={stakeTwoRef}
               defaultValue={editingProduct?.reward.stake?.stake_two ?? 0}
+              step={1}
+            />
+          </div>
+          <div>
+            <label>Register token type:</label>
+            <Select
+              defaultValue={editingProduct?.reward.tokens?.register ?? 'none'}
+              onValueChange={(value) => {
+                registerTokenRef.current = value;
+              }}
+            >
+              <SelectItem key={0} value="none">
+                None
+              </SelectItem>
+              {tokens?.map((token, index) => {
+                return (
+                  <SelectItem key={index + 1} value={token.asset_id}>
+                    {token.name}
+                  </SelectItem>
+                );
+              })}
+            </Select>
+          </div>
+          <div>
+            <label>Register Price (USD):</label>
+            <NumberInput
+              ref={registerUSDRef}
+              defaultValue={editingProduct?.reward.register ?? 0}
               step={1}
             />
           </div>

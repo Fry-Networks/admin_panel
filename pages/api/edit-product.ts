@@ -8,6 +8,8 @@ interface ProductData {
   productId: string;
   unverifiedReward?: string;
   verifiedReward?: string;
+  register_token?: string;
+  register_price?: string;
   stake_one?: string;
   stake_two?: string;
   stake_token?: string;
@@ -37,6 +39,8 @@ export default async function handler(
       verifiedReward,
       stake_one,
       stake_two,
+      register_token,
+      register_price,
       stake_token,
       reward_token
     } = data;
@@ -55,6 +59,10 @@ export default async function handler(
     try {
       // Construct an update object
       const updateData: any = {};
+      if (register_token !== undefined)
+        updateData['reward.tokens.register'] = register_token;
+      if (register_price !== undefined)
+        updateData['reward.register'] = +register_price;
       if (unverifiedReward !== undefined)
         updateData['reward.unverified'] = +unverifiedReward;
       if (verifiedReward !== undefined)
