@@ -24,19 +24,29 @@ import UserForm from '../components/form-user';
 import RemoveUserForm from '../components/remove-user';
 import { Product } from '../lib/products-schema';
 import { FryToken } from '../lib/tokens-schema';
+import StakeProductsTable from '../app/tables/table-stake-products';
 
-export default function RewardsPage({
+export default function StakesPage({
   products,
-  tokens,
-  enabled
+  tokens
 }: {
   products: Product[];
   tokens: FryToken[];
-  enabled: boolean;
 }) {
-  //(VPN|OGPS|IGPS|IDB|ODB)
+  const [normalProducts, setNormalProducts] = useState<Product[]>([]);
+  const [nodeProducts, setNodeProducts] = useState<Product[]>([]);
+  useEffect(() => {
+    const normals = products.filter((product) => {
+      return product.name.includes('Node') === false;
+    });
 
-  console.log(products);
+    const nodes = products.filter((product) => {
+      return product.name.includes('Node');
+    });
+
+    setNormalProducts(normals);
+    setNodeProducts(nodes);
+  }, [products, tokens]);
   return (
     <main className="p-4 md:p-10 mx-auto max-w-8xl">
       <Title>Wix Products</Title>
@@ -50,10 +60,18 @@ export default function RewardsPage({
             </Flex>
 
             <Card className="mt-6">
-              <RewardProductsTable
-                products={products}
-                enabled={enabled}
+              <StakeProductsTable
+                products={normalProducts}
                 tokens={tokens}
+                node={false}
+              />
+            </Card>
+
+            <Card className="mt-6">
+              <StakeProductsTable
+                products={nodeProducts}
+                tokens={tokens}
+                node={true}
               />
             </Card>
           </TabPanel>
@@ -66,10 +84,10 @@ export default function RewardsPage({
 export async function getServerSideProps(context: any) {
   const session = await getSession(context);
   /*if (!session || !session.user?.admin) {
-    return {
-      props: { error: 'Unauthorized access' },
-    };
-  }*/
+      return {
+        props: { error: 'Unauthorized access' },
+      };
+    }*/
 
   //TODO: A enelver
   try {

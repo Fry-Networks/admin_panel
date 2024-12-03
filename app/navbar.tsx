@@ -13,6 +13,7 @@ const navigation = [
   { name: 'Weather Devices', href: '/weather/devices' },
   { name: 'Fry Tokens', href: '/token' },
   { name: 'Devices', href: '/devices' },
+  { name: 'Stakes', href: '/stakes' },
   { name: 'Rewards', href: '/rewards' },
   { name: 'Reduction', href: '/reduction' },
   { name: 'Byod', href: '/byod' },
