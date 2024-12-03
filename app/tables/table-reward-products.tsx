@@ -22,7 +22,7 @@ import { useRef, useState } from 'react';
 import ReactModal from 'react-modal';
 import { FryToken } from '../../lib/tokens-schema';
 
-export default function ProductsTable({
+export default function RewardProductsTable({
   products,
   tokens,
   enabled
@@ -35,7 +35,6 @@ export default function ProductsTable({
   const [globalMultiplier, setGlobalMultiplier] = useState(1);
   const [updateSuccess, setUpdateSuccess] = useState(''); // State to track update success
   const openEditModal = (product: Product) => {
-    stakeTokenRef.current = product.reward.tokens?.stake ?? 'none';
     rewardTokenRef.current = product.reward.tokens?.reward ?? 'none';
     setEditingProduct(product);
   };
@@ -44,12 +43,7 @@ export default function ProductsTable({
   };
   const unverifiedRewardRef = useRef<HTMLInputElement>(null);
   const verifiedRewardRef = useRef<HTMLInputElement>(null);
-  const stakeOneRef = useRef<HTMLInputElement>(null);
-  const stakeTwoRef = useRef<HTMLInputElement>(null);
-  const stakeTokenRef = useRef<string | null>(null);
   const rewardTokenRef = useRef<string | null>(null);
-  const registerTokenRef = useRef<string | null>(null);
-  const registerUSDRef = useRef<HTMLInputElement>(null);
   const globalMultiplierRef = useRef<HTMLInputElement>(null);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -62,34 +56,12 @@ export default function ProductsTable({
 
     const unverifiedReward = unverifiedRewardRef.current?.value;
     const verifiedReward = unverifiedRewardRef.current?.value;
-    const stake_one = stakeOneRef.current?.value;
-    const stake_two = stakeTwoRef.current?.value;
-    const registerUSD = registerUSDRef.current?.value;
-    const registerToken = registerTokenRef.current ?? 'none';
-    const stakeToken = stakeTokenRef.current ?? 'none';
     const rewardToken = rewardTokenRef.current ?? 'none';
-
-    console.log(stakeToken, rewardToken);
-    // Ensure the values are retrieved
-    if (
-      unverifiedReward === undefined ||
-      verifiedReward === undefined ||
-      stake_one === undefined ||
-      stake_two === undefined
-    ) {
-      console.error('Form elements are missing');
-      return;
-    }
 
     const updateData = {
       productId: editingProduct.wix_id, // Use the appropriate identifier for the product
       unverifiedReward: unverifiedReward,
       verifiedReward: verifiedReward,
-      register_token: registerToken,
-      register_price: registerUSD,
-      stake_one,
-      stake_two,
-      stake_token: stakeToken,
       reward_token: rewardToken
     };
 
@@ -230,10 +202,6 @@ export default function ProductsTable({
           <TableRow>
             <TableHeaderCell>Name</TableHeaderCell>
             <TableHeaderCell>Key</TableHeaderCell>
-            <TableHeaderCell>Register Token</TableHeaderCell>
-            <TableHeaderCell>Register Price(USD)</TableHeaderCell>
-            <TableHeaderCell>Verify Stake Token</TableHeaderCell>
-            <TableHeaderCell>Stake amount</TableHeaderCell>
             <TableHeaderCell>Reward Token</TableHeaderCell>
             <TableHeaderCell>Unverified rewards</TableHeaderCell>
             <TableHeaderCell>Verified rewards(1.5x | 3x)</TableHeaderCell>
@@ -247,30 +215,6 @@ export default function ProductsTable({
               <TableCell>{product.name}</TableCell>
               <TableCell>
                 <Text>{product.key}</Text>
-              </TableCell>
-              <TableCell>
-                {product.reward.tokens?.register &&
-                product.reward.tokens?.register !== 'none'
-                  ? tokens.find((value) => {
-                      return value.asset_id === product.reward.tokens?.register;
-                    })?.name
-                  : 'None'}
-              </TableCell>
-              <TableCell>
-                <Text>{`${product.reward.register ?? 0}`}</Text>
-              </TableCell>
-              <TableCell>
-                {product.reward.tokens?.stake &&
-                product.reward.tokens?.stake !== 'none'
-                  ? tokens.find((value) => {
-                      return value.asset_id === product.reward.tokens?.stake;
-                    })?.name
-                  : 'None'}
-              </TableCell>
-              <TableCell>
-                <Text>{`Tier one: ${
-                  product.reward.stake?.stake_one ?? 0
-                } | Tier two: ${product.reward.stake?.stake_two ?? 0}`}</Text>
               </TableCell>
               <TableCell>
                 {product.reward.tokens?.reward &&
@@ -329,78 +273,6 @@ export default function ProductsTable({
               defaultValue={editingProduct?.reward.unverified}
               step={0.01}
             />
-          </div>
-          {/* <div>
-            <label>Verified Reward:</label>
-            <NumberInput
-              ref={verifiedRewardRef}
-              defaultValue={editingProduct?.reward.verified}
-              step={0.01}
-            />
-          </div> */}
-          <div>
-            <label>Stake Amount Tier 1 ($FRY):</label>
-            <NumberInput
-              ref={stakeOneRef}
-              defaultValue={editingProduct?.reward.stake?.stake_one ?? 0}
-              step={1}
-            />
-          </div>
-          <div>
-            <label>Stake Amount Tier 2 ($FRY):</label>
-            <NumberInput
-              ref={stakeTwoRef}
-              defaultValue={editingProduct?.reward.stake?.stake_two ?? 0}
-              step={1}
-            />
-          </div>
-          <div>
-            <label>Register token type:</label>
-            <Select
-              defaultValue={editingProduct?.reward.tokens?.register ?? 'none'}
-              onValueChange={(value) => {
-                registerTokenRef.current = value;
-              }}
-            >
-              <SelectItem key={0} value="none">
-                None
-              </SelectItem>
-              {tokens?.map((token, index) => {
-                return (
-                  <SelectItem key={index + 1} value={token.asset_id}>
-                    {token.name}
-                  </SelectItem>
-                );
-              })}
-            </Select>
-          </div>
-          <div>
-            <label>Register Price (USD):</label>
-            <NumberInput
-              ref={registerUSDRef}
-              defaultValue={editingProduct?.reward.register ?? 0}
-              step={1}
-            />
-          </div>
-          <div>
-            <label>Stake token type:</label>
-            <Select
-              defaultValue={editingProduct?.reward.tokens?.stake ?? 'none'}
-              onValueChange={(value) => {
-                stakeTokenRef.current = value;
-              }}
-            >
-              <SelectItem key={0} value="none">
-                None
-              </SelectItem>
-              {tokens?.map((token, index) => {
-                return (
-                  <SelectItem key={index + 1} value={token.asset_id}>
-                    {token.name}
-                  </SelectItem>
-                );
-              })}
-            </Select>
           </div>
           <div>
             <label>Reward token type:</label>

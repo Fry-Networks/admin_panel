@@ -10,6 +10,8 @@ interface ProductData {
   verifiedReward?: string;
   register_token?: string;
   register_price?: string;
+  node_token?: string;
+  node_price?: string;
   stake_one?: string;
   stake_two?: string;
   stake_token?: string;
@@ -37,6 +39,8 @@ export default async function handler(
       productId,
       unverifiedReward,
       verifiedReward,
+      node_token,
+      node_price,
       stake_one,
       stake_two,
       register_token,
@@ -62,7 +66,11 @@ export default async function handler(
       if (register_token !== undefined)
         updateData['reward.tokens.register'] = register_token;
       if (register_price !== undefined)
-        updateData['reward.register'] = +register_price;
+        updateData['reward.stake.register'] = +register_price;
+      if (node_token !== undefined)
+        updateData['reward.tokens.node'] = node_token;
+      if (node_price !== undefined)
+        updateData['reward.stake.node'] = +node_price;
       if (unverifiedReward !== undefined)
         updateData['reward.unverified'] = +unverifiedReward;
       if (verifiedReward !== undefined)
