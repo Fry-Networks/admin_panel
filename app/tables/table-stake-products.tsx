@@ -177,7 +177,7 @@ export default function StakeProductsTable({
             {node && (
               <>
                 <TableHeaderCell>Node Stake Token</TableHeaderCell>
-                <TableHeaderCell>Node Stake Amount(PURE)</TableHeaderCell>
+                <TableHeaderCell>Node Stake Amount(USD)</TableHeaderCell>
               </>
             )}
             <TableHeaderCell>Verify Stake Token</TableHeaderCell>
@@ -314,7 +314,7 @@ export default function StakeProductsTable({
                 </Select>
               </div>
               <div>
-                <label>Node Stake Amount(PURE):</label>
+                <label>Node Stake Amount(USD):</label>
                 <NumberInput
                   ref={nodeStakeAmountRef}
                   defaultValue={editingProduct?.reward.stake?.node ?? 0}
