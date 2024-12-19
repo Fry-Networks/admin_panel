@@ -62,5 +62,6 @@ export interface MySession extends Session {
     emailVerified: string | null;
     admin: boolean;
     owner: boolean;
+    mods: boolean;
   };
 }
