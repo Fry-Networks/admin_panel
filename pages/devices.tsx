@@ -22,14 +22,17 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import { User } from '../lib/users-schema';
 import ChangeDeviceForm from '../components/change-device';
 import { useRouter } from 'next/router';
+import { FryToken } from '../lib/tokens-schema';
 
 export default function DevicesPage({
   devices = [], // Default to an empty array if devices is undefined
   products,
+  tokens = [],
   searchParams = {} // Default to an empty object if searchParams is undefined
 }: {
   devices: Device[];
   searchParams: any;
+  tokens: FryToken[];
   products: any[];
 }) {
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
@@ -100,7 +103,7 @@ export default function DevicesPage({
               {sortedDevices.length} devices matching your search
             </Text>
             <Card className="mt-6">
-              <DevicesTable devices={sortedDevices} />
+              <DevicesTable devices={sortedDevices} tokens={tokens} />
             </Card>
           </TabPanel>
           <TabPanel>
@@ -138,7 +141,8 @@ export async function getServerSideProps(context: any) {
             $or: [
               { order: { $regex: searchTerm, $options: 'i' } },
               { byod: { $regex: searchTerm, $options: 'i' } },
-              { email: { $regex: searchTerm, $options: 'i' } }
+              { email: { $regex: searchTerm, $options: 'i' } },
+              { miner_key: { $regex: searchTerm, $options: 'i' } }
             ]
           }
         : {};
@@ -150,6 +154,7 @@ export async function getServerSideProps(context: any) {
       .limit(100)
       .toArray();
     console.log('Devices:', devices.length);
+    const tokens = await db.collection('tokens').find({}).toArray();
     if (!products) {
       products = await db.collection('products').find({}).toArray();
     }
@@ -157,6 +162,7 @@ export async function getServerSideProps(context: any) {
       props: {
         devices: JSON.parse(JSON.stringify(devices)),
         products: JSON.parse(JSON.stringify(products)),
+        tokens: JSON.parse(JSON.stringify(tokens)),
         searchParams
       }
     };

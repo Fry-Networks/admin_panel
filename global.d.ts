@@ -3,7 +3,7 @@ declare module globalThis {
 }
 // types.d.ts
 
-import 'next-auth'
+import 'next-auth';
 
 declare module 'next-auth' {
   interface Session {
@@ -13,6 +13,7 @@ declare module 'next-auth' {
       image: string;
       admin: boolean; // Your custom session property
       owner: boolean; // Your custom session property
+      mods: boolean;
     };
   }
 }
