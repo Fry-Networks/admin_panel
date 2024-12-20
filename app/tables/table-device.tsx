@@ -440,7 +440,7 @@ export default function DevicesTable({
                   >
                     Cancel
                   </Button>
-                  <Button onClick={() => handleStake()}>Unstake</Button>
+                  <Button onClick={() => handleUnstake()}>Unstake</Button>
                 </Flex>
               </div>
             </Flex>
