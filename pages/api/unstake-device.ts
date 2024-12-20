@@ -65,7 +65,7 @@ export default async function handler(
         { miner_key: miner_key },
         {
           $set: {
-            verified: true,
+            verified: false,
             'staked.type': '',
             'staked.amount': 0
           }
