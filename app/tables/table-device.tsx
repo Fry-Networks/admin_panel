@@ -23,7 +23,7 @@ import Modal from 'react-modal';
 import { FryToken } from '../../lib/tokens-schema';
 import { TimeInput } from '@nextui-org/date-input';
 import { Time } from '@internationalized/date';
-import { getSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 
 export default function DevicesTable({
@@ -48,6 +48,7 @@ export default function DevicesTable({
   const [stakeAmount, setStakeAmount] = useState(1);
   const [txId, setTxId] = useState('');
   const [stakeDate, setStakeDate] = useState(new Date(Date.now()));
+  const { data: session } = useSession();
 
   const isNodeDevice = (device: Device) => {
     return device.name.includes('Node');
@@ -213,7 +214,11 @@ export default function DevicesTable({
             <TableHeaderCell>Added on </TableHeaderCell>
             <TableHeaderCell>Order</TableHeaderCell>
             <TableHeaderCell>Email</TableHeaderCell>
-            <TableHeaderCell>Action</TableHeaderCell>
+            {session &&
+              session.user &&
+              (session.user.owner || session.user.mods) && (
+                <TableHeaderCell>Action</TableHeaderCell>
+              )}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -264,34 +269,38 @@ export default function DevicesTable({
               <TableCell>
                 <Text>{device.email}</Text>
               </TableCell>
-              <TableCell>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setSelectedDevice(device);
-                    setShowVerifyModal(true);
-                  }}
-                >
-                  Stake
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="text-yellow-700 border-yellow-700 hover:bg-yellow-50 hover:text-yellow-700 ml-1"
-                  onClick={() => {
-                    setSelectedDevice(device);
-                    setShowUnstakeModal(true);
-                  }}
-                >
-                  Unstake
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="text-red-700 border-red-700 hover:bg-red-50 hover:text-red-700 ml-1"
-                  onClick={() => {}}
-                >
-                  Refund
-                </Button>
-              </TableCell>
+              {session &&
+                session.user &&
+                (session.user.owner || session.user.mods) && (
+                  <TableCell>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setSelectedDevice(device);
+                        setShowVerifyModal(true);
+                      }}
+                    >
+                      Stake
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className="text-yellow-700 border-yellow-700 hover:bg-yellow-50 hover:text-yellow-700 ml-1"
+                      onClick={() => {
+                        setSelectedDevice(device);
+                        setShowUnstakeModal(true);
+                      }}
+                    >
+                      Unstake
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className="text-red-700 border-red-700 hover:bg-red-50 hover:text-red-700 ml-1"
+                      onClick={() => {}}
+                    >
+                      Refund
+                    </Button>
+                  </TableCell>
+                )}
             </TableRow>
           ))}
         </TableBody>
