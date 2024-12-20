@@ -63,7 +63,7 @@ export default async function handler(
     let result;
     const txnDate = await getTxCompletedDate(txId);
 
-    if (!txnDate) {
+    if (!txnDate || amount <= 0) {
       console.log(`[Stake Api Hanlder] {Error: Get transaction time failed}`);
       res.status(501).json({ message: 'Get transaction time failed' });
       return;
