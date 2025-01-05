@@ -13,6 +13,7 @@ export interface Device extends mongoose.Document {
   user_id: mongoose.Schema.Types.ObjectId | string;
   miner_key: string;
   name: string;
+  address: string;
   is_registered: boolean;
   registered_at: Date;
   created_at: string;

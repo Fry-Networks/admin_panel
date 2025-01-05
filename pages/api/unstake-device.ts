@@ -66,8 +66,10 @@ export default async function handler(
         {
           $set: {
             verified: false,
-            'staked.type': '',
             'staked.amount': 0
+          },
+          $unset: {
+            'staked.type': ''
           }
         }
       );

@@ -42,10 +42,13 @@ export default function DevicesTable({
   );
 
   const stakeTerms = ['Verification', 'Registration', 'Node'];
+  const refundTerms = ['stake', 'reward'];
   const [stakeTermsValue, setStakeTermsValue] = useState('Verification');
+  const [refundTermValue, setRefundTermValue] = useState('stake');
   const [assetId, setAssetId] = useState(tokens[0].asset_id ?? '');
   const [stakeType, setStakeType] = useState('one');
   const [stakeAmount, setStakeAmount] = useState(1);
+  const [refundAmount, setRefundAmount] = useState(1);
   const [txId, setTxId] = useState('');
   const [stakeDate, setStakeDate] = useState(new Date(Date.now()));
   const { data: session } = useSession();
@@ -72,6 +75,8 @@ export default function DevicesTable({
     setStakeType('one');
     setStakeAmount(1);
     setTxId('');
+    setRefundAmount(1);
+    setRefundTermValue('stake');
   }, [showVerifyModal, showUnstakeModal]);
 
   function formatDate(dateStr: string) {
@@ -183,6 +188,66 @@ export default function DevicesTable({
     }
   };
 
+  const handleRefund = async () => {
+    const aimDevice = { ...selectedDevice };
+
+    if (!aimDevice.address || !aimDevice.is_registered) {
+      setUpdateSuccess('error');
+      setTimeout(() => {
+        setUpdateSuccess('');
+      }, 3_000);
+      return;
+    }
+
+    console.log(
+      aimDevice.address,
+      refundTermValue,
+      assetId,
+      refundAmount,
+      aimDevice.miner_key
+    );
+
+    const response = await fetch('api/refund-device', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        address: aimDevice.address,
+        refundFrom: refundTermValue,
+        assetId: assetId,
+        amount: refundAmount,
+        miner_key: aimDevice.miner_key
+      })
+    });
+
+    if (!response.ok) {
+      setUpdateSuccess('error');
+      setTimeout(() => {
+        setUpdateSuccess('');
+      }, 3_000);
+
+      return;
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      setUpdateSuccess('error');
+      setTimeout(() => {
+        setUpdateSuccess('');
+      }, 3_000);
+
+      return;
+    }
+
+    setUpdateSuccess('Successfully refund specific amount of tokens to user');
+    setTimeout(() => {
+      setUpdateSuccess('');
+    }, 3_000);
+
+    return;
+  };
+
   return (
     <div>
       {updateSuccess != '' && updateSuccess != 'error' && (
@@ -214,6 +279,7 @@ export default function DevicesTable({
             <TableHeaderCell>Added on </TableHeaderCell>
             <TableHeaderCell>Order</TableHeaderCell>
             <TableHeaderCell>Email</TableHeaderCell>
+            <TableHeaderCell>Address</TableHeaderCell>
             {session &&
               session.user &&
               (session.user.owner || session.user.mods) && (
@@ -269,6 +335,9 @@ export default function DevicesTable({
               <TableCell>
                 <Text>{device.email}</Text>
               </TableCell>
+              <TableCell>
+                <Text>{device.address}</Text>
+              </TableCell>
               {session &&
                 session.user &&
                 (session.user.owner || session.user.mods) && (
@@ -295,7 +364,10 @@ export default function DevicesTable({
                     <Button
                       variant="secondary"
                       className="text-red-700 border-red-700 hover:bg-red-50 hover:text-red-700 ml-1"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setSelectedDevice(device);
+                        setShowRefundModal(true);
+                      }}
                     >
                       Refund
                     </Button>
@@ -441,6 +513,77 @@ export default function DevicesTable({
                     Cancel
                   </Button>
                   <Button onClick={() => handleUnstake()}>Unstake</Button>
+                </Flex>
+              </div>
+            </Flex>
+          </Modal>
+          <Modal
+            isOpen={showRefundModal}
+            closeTimeoutMS={500}
+            style={customStyles}
+            contentLabel="Refund"
+          >
+            <Flex flexDirection="col" className="gap-2 w-full">
+              <h2>
+                <strong>Refund to Device</strong>
+              </h2>
+              <div className="w-full">
+                <label>Refund Terms:</label>
+                <Select
+                  defaultValue={refundTermValue}
+                  onValueChange={(value) => {
+                    setRefundTermValue(value);
+                  }}
+                >
+                  {refundTerms.map((value, index) => {
+                    return (
+                      <SelectItem key={index + 1} value={value}>
+                        {value}
+                      </SelectItem>
+                    );
+                  })}
+                </Select>
+              </div>
+              {tokens && (
+                <div className="w-full">
+                  <label>Token:</label>
+                  <Select
+                    defaultValue={assetId}
+                    onValueChange={(value) => {
+                      setAssetId(value);
+                    }}
+                  >
+                    {tokens.map((value, index) => {
+                      return (
+                        <SelectItem key={index + 1} value={value.asset_id}>
+                          {value.name}
+                        </SelectItem>
+                      );
+                    })}
+                  </Select>
+                </div>
+              )}
+              <div className="w-full">
+                <label>Refund Amount:</label>
+                <NumberInput
+                  step={1}
+                  defaultValue={1}
+                  value={refundAmount}
+                  min={1}
+                  onValueChange={(value) => setRefundAmount(value)}
+                  placeholder="Please input stake amount"
+                />
+              </div>
+              <div>
+                <Flex className="gap-2">
+                  <Button
+                    onClick={() => {
+                      setShowRefundModal(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={() => handleRefund()}>Refund</Button>
                 </Flex>
               </div>
             </Flex>
