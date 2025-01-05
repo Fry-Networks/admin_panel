@@ -140,7 +140,9 @@ export default async function handler(
       return;
     }
 
-    res.status(200).json({ success: true, message: 'Success on refunding' });
+    res
+      .status(200)
+      .json({ success: true, message: `Success on refunding ${tx.txid}` });
     return;
   } catch (error) {
     console.error(error);
