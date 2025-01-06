@@ -25,6 +25,7 @@ import { TimeInput } from '@nextui-org/date-input';
 import { Time } from '@internationalized/date';
 import { getSession, useSession } from 'next-auth/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useRouter } from 'next/router';
 
 export default function DevicesTable({
   devices,
@@ -37,9 +38,11 @@ export default function DevicesTable({
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [showUnstakeModal, setShowUnstakeModal] = useState(false);
   const [showRefundModal, setShowRefundModal] = useState(false);
+  const [showBlacklistModal, setShowBlacklistModal] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<Device | undefined>(
     undefined
   );
+  const router = useRouter();
 
   const stakeTerms = ['Verification', 'Registration', 'Node'];
   const refundTerms = ['stake', 'reward'];
@@ -77,7 +80,7 @@ export default function DevicesTable({
     setTxId('');
     setRefundAmount(1);
     setRefundTermValue('stake');
-  }, [showVerifyModal, showUnstakeModal]);
+  }, [showVerifyModal, showUnstakeModal, showRefundModal, showBlacklistModal]);
 
   function formatDate(dateStr: string) {
     const date = new Date(dateStr);
@@ -139,6 +142,42 @@ export default function DevicesTable({
       }, 3_000);
       console.log('Success to update data');
     }
+  };
+
+  const handleBlacklist = async () => {
+    const aimedDevice = { ...selectedDevice };
+    const response = await fetch('api/blacklist-device', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({ miner_key: aimedDevice.miner_key })
+    });
+
+    if (!response.ok) {
+      setUpdateSuccess('error');
+      setTimeout(() => {
+        setUpdateSuccess('');
+      }, 3_000);
+      return;
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      setUpdateSuccess('error');
+      setTimeout(() => {
+        setUpdateSuccess('');
+      }, 3_000);
+      return;
+    }
+
+    setUpdateSuccess(result.message);
+    setTimeout(() => {
+      setUpdateSuccess('');
+      router.reload();
+    }, 3_000);
+
+    setShowBlacklistModal(false);
   };
 
   const handleUnstake = async () => {
@@ -371,6 +410,18 @@ export default function DevicesTable({
                     >
                       Refund
                     </Button>
+                    {session.user.owner && (
+                      <Button
+                        variant="secondary"
+                        className="text-gray-700 border-gray-700 hover:bg-gray-50 hover:text-gray-700 ml-1"
+                        onClick={() => {
+                          setSelectedDevice(device);
+                          setShowBlacklistModal(true);
+                        }}
+                      >
+                        BlackList
+                      </Button>
+                    )}
                   </TableCell>
                 )}
             </TableRow>
@@ -584,6 +635,31 @@ export default function DevicesTable({
                     Cancel
                   </Button>
                   <Button onClick={() => handleRefund()}>Refund</Button>
+                </Flex>
+              </div>
+            </Flex>
+          </Modal>
+          <Modal
+            isOpen={showBlacklistModal}
+            closeTimeoutMS={500}
+            style={customStyles}
+            contentLabel="BlackList"
+          >
+            <Flex flexDirection="col" className="gap-2 w-full">
+              <h2>
+                <strong>Blacklist the device</strong>
+              </h2>
+              <Text>Do you really want to blacklist current device?</Text>
+              <div>
+                <Flex className="gap-2">
+                  <Button
+                    onClick={() => {
+                      setShowBlacklistModal(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={() => handleBlacklist()}>OK</Button>
                 </Flex>
               </div>
             </Flex>
