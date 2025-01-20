@@ -48,7 +48,9 @@ export default function DevicesTable({
   const refundTerms = ['stake', 'reward'];
   const [stakeTermsValue, setStakeTermsValue] = useState('Verification');
   const [refundTermValue, setRefundTermValue] = useState('stake');
-  const [assetId, setAssetId] = useState(tokens[0].asset_id ?? '');
+  const [assetId, setAssetId] = useState(
+    tokens && tokens.length > 0 ? tokens[0].asset_id : ''
+  );
   const [stakeType, setStakeType] = useState('one');
   const [stakeAmount, setStakeAmount] = useState(1);
   const [refundAmount, setRefundAmount] = useState(1);
