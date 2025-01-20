@@ -47,6 +47,8 @@ export async function getServerSideProps(context: any) {
 
     const tokens = await db.collection('tokens').find({}).toArray();
 
+    console.log(tokens);
+
     if (!tokens) {
       return {
         props: {
