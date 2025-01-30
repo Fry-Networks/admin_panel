@@ -1,0 +1,106 @@
+import { Button, Card, DatePicker, Flex, Text, TextInput } from '@tremor/react';
+import { FryToken } from '../lib/tokens-schema';
+import { useEffect, useState } from 'react';
+import { Reward } from '../lib/reward-schema';
+import RewardsTable from '../app/tables/table-rewards';
+
+export default function RewardHistory({ tokens }: { tokens: FryToken[] }) {
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [filterString, setFilterString] = useState('');
+  const [rewards, setRewards] = useState<Reward[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const onFilterClicked = () => {
+    fetchRewards();
+  };
+
+  const fetchRewards = async () => {
+    const queryParams: Record<string, any> = {};
+
+    if (startDate) queryParams.startDate = startDate.toISOString(); // Convert to ISO string
+    if (endDate) queryParams.endDate = endDate.toISOString();
+    if (filterString) queryParams.filterString = filterString;
+
+    queryParams.page = currentPage;
+
+    const response = await fetch('/api/reward-history', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(queryParams)
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+
+      if (result.success) {
+        setRewards(result.rewards);
+        setTotalCount(result.totalCount);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchRewards();
+  }, []);
+
+  useEffect(() => {
+    fetchRewards();
+  }, [currentPage]);
+
+  const onPageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  return (
+    <div>
+      <Card>
+        <Flex
+          flexDirection="row"
+          className="gap-3"
+          style={{ marginBottom: '2px' }}
+        >
+          <Flex flexDirection="row" className="gap-2">
+            <Text className="no-wrap-text">Start&nbsp;Date:</Text>
+            <DatePicker onValueChange={(value) => setStartDate(value)} />
+          </Flex>
+
+          <Flex flexDirection="row" className="gap-2">
+            <Text>End&nbsp;Date: </Text>
+            <DatePicker onValueChange={(value) => setEndDate(value)} />
+          </Flex>
+
+          <TextInput
+            placeholder="Please input address or miner key to fillter"
+            value={filterString}
+            onValueChange={(value) => setFilterString(value)}
+          />
+          <Button onClick={onFilterClicked}>Filter</Button>
+        </Flex>
+
+        <RewardsTable rewards={rewards} tokens={tokens} />
+      </Card>
+
+      <Flex justifyContent="center" className="mt-4">
+        <Button
+          disabled={currentPage <= 1}
+          onClick={() => onPageChange(currentPage - 1)}
+        >
+          Previous
+        </Button>
+        <Text className="mx-2">
+          {currentPage} of {Math.ceil(totalCount / 30)}
+        </Text>
+        <Button
+          disabled={currentPage >= Math.ceil(totalCount / 30)}
+          onClick={() => onPageChange(currentPage + 1)}
+        >
+          Next
+        </Button>
+      </Flex>
+    </div>
+  );
+}

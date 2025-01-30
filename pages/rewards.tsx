@@ -24,6 +24,7 @@ import UserForm from '../components/form-user';
 import RemoveUserForm from '../components/remove-user';
 import { Product } from '../lib/products-schema';
 import { FryToken } from '../lib/tokens-schema';
+import RewardHistory from '../components/reward-history';
 
 export default function RewardsPage({
   products,
@@ -39,8 +40,12 @@ export default function RewardsPage({
   console.log(products);
   return (
     <main className="p-4 md:p-10 mx-auto max-w-8xl">
-      <Title>Wix Products</Title>
+      <Title>Reward Management & Review</Title>
       <TabGroup>
+        <TabList className="mt-8">
+          <Tab>Rewards Options</Tab>
+          <Tab>Rewards History</Tab>
+        </TabList>
         <TabPanels>
           <TabPanel>
             <Flex flexDirection="row" className="mt-6">
@@ -56,6 +61,9 @@ export default function RewardsPage({
                 tokens={tokens}
               />
             </Card>
+          </TabPanel>
+          <TabPanel>
+            <RewardHistory tokens={tokens} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
