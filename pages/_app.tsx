@@ -53,7 +53,7 @@ const ProtectedComponent: React.FC<ProtectedComponentProps> = ({
     if (!session.user?.admin) {
       return showInfo('User is not an admin!');
     }
-    if ((router.pathname === '/rewards' || router.pathname === '/dao') && !session.user?.owner) {
+    if (router.pathname === '/dao' && !session.user?.owner) {
       return showInfo('Sorry guys, only owners can access this page!');
     }
     //if the user is at /rewards and is not an owner, return a message
