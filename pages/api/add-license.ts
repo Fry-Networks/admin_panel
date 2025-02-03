@@ -34,6 +34,7 @@ export default async function handler(
           email: data.email,
           algo: false,
           fry: false,
+          address: '',
           adder: session.user.email
         });
       }
