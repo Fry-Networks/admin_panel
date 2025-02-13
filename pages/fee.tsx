@@ -12,7 +12,9 @@ import {
   TabPanels,
   TextInput,
   Text,
-  Title
+  Title,
+  TabList,
+  Tab
 } from '@tremor/react';
 import TokensTable from '../app/tables/table-tokens';
 import { getSession } from 'next-auth/react';
@@ -20,17 +22,22 @@ import { DateInput, useDateInput } from '@nextui-org/date-input';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import FeesTable from '../app/tables/table-fees';
+import ByodHistory from '../components/byod-history';
+import FryWorldHistory from '../components/fryworld-history';
+import { FryToken } from '../lib/tokens-schema';
 
 export default function FeePage({
   fees = [],
   totalFee,
   totalCount,
-  currentPage
+  currentPage,
+  tokens
 }: {
   fees: Fee[];
   totalFee: number;
   totalCount: number;
   currentPage: number;
+  tokens: FryToken[];
 }) {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
@@ -71,8 +78,13 @@ export default function FeePage({
 
   return (
     <main className="p-4 md:p-10 mx-auto max-w-8xl">
-      <Title>Fees Histroy</Title>
+      <Title>Crypto Income</Title>
       <TabGroup className="mt-3">
+        <TabList>
+          <Tab>Reward</Tab>
+          <Tab>Byod</Tab>
+          <Tab>Fry World</Tab>
+        </TabList>
         <TabPanels>
           <TabPanel>
             <Card>
@@ -100,8 +112,9 @@ export default function FeePage({
               </Flex>
 
               <Flex justifyContent="center" className="mt-5">
-                <Title>{`Calculated Fee: ${Number(totalFee).toFixed(
-                  2
+                <Title>{`Calculated Fee: $${Number(totalFee).toLocaleString(
+                  'en-US',
+                  { minimumFractionDigits: 2, maximumFractionDigits: 2 }
                 )} (USD)`}</Title>
               </Flex>
               <FeesTable fees={fees} />
@@ -127,6 +140,12 @@ export default function FeePage({
                 Next
               </Button>
             </Flex>
+          </TabPanel>
+          <TabPanel>
+            <ByodHistory />
+          </TabPanel>
+          <TabPanel>
+            <FryWorldHistory tokens={tokens} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
@@ -220,12 +239,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     .limit(pageSize)
     .toArray();
 
+  const tokens = await db.collection('tokens').find({}).toArray();
+
   return {
     props: {
       fees: JSON.parse(JSON.stringify(rewards)),
       totalFee,
       totalCount,
-      currentPage: Number(page) // Return the current page
+      currentPage: Number(page), // Return the current page
+      tokens: JSON.parse(JSON.stringify(tokens))
     }
   };
 };
