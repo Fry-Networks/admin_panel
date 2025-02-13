@@ -11,18 +11,19 @@ const navigation = [
   { name: 'Users', href: '/users' },
   { name: 'Weather Accounts', href: '/weather/accounts' },
   { name: 'Weather Devices', href: '/weather/devices' },
-  { name: 'Fry Tokens', href: '/token' },
+  { name: 'Energy', href: '/energy' },
+  { name: 'Water', href: '/water' },
+  { name: 'Air Accounts', href: '/air/accounts' },
   { name: 'Devices', href: '/devices' },
-  { name: 'Crypto Income', href: '/fee' },
   { name: 'Blacklist', href: '/blacklist' },
+  { name: 'Byod', href: '/byod' },
+  { name: 'Fry Tokens', href: '/token' },
   { name: 'Stakes', href: '/stakes' },
   { name: 'Rewards', href: '/rewards' },
   { name: 'Reduction', href: '/reduction' },
-  { name: 'Byod', href: '/byod' },
-  { name: 'Air Accounts', href: '/air/accounts' },
-  { name: 'DAO', href: '/dao' },
-  { name: 'Energy', href: '/energy' },
-  { name: 'Water', href: '/water' }
+  { name: 'Crypto Income', href: '/fee' },
+  { name: 'Prices', href: '/prices' },
+  { name: 'DAO', href: '/dao' }
 ];
 
 function classNames(...classes: string[]) {
