@@ -34,6 +34,7 @@ export default function PricesPage({
   const [updateSuccess, setUpdateSuccess] = useState('');
   const [openAddModal, setOpenAddModal] = useState(false);
   const [assetId, setAssetId] = useState('');
+  const [isUSD, setIsUSD] = useState(true);
   const [projectName, setProjectName] = useState('');
   const [price, setPrice] = useState(0);
   const router = useRouter();
@@ -47,6 +48,7 @@ export default function PricesPage({
       setAssetId('');
       setProjectName('');
       setPrice(0);
+      setIsUSD(true);
     }
   }, [openAddModal]);
 
@@ -66,7 +68,8 @@ export default function PricesPage({
         no: prices.length + 1,
         projectName,
         price,
-        assetId
+        assetId,
+        isUSD
       })
     });
 
@@ -149,12 +152,29 @@ export default function PricesPage({
           />
         </div>
         <div className="w-full mt-4">
-          <label>Price (USD)</label>
+          <label>Price</label>
           <NumberInput
             placeholder="Please input the price"
             className="mt-2"
             onValueChange={(e) => setPrice(e)}
           />
+        </div>
+        <div className="w-full mt-4">
+          <label>Price Measure</label>
+          <Select
+            defaultValue="usd"
+            onValueChange={(e) => {
+              console.log(e);
+              setIsUSD(e === 'usd');
+            }}
+          >
+            <SelectItem key={0} value={'usd'}>
+              USD
+            </SelectItem>
+            <SelectItem key={0} value={'token'}>
+              Token
+            </SelectItem>
+          </Select>
         </div>
         <div className="w-full mt-4">
           <label>Asset Id</label>

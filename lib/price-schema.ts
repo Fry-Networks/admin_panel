@@ -5,12 +5,14 @@ export const priceSchema = new mongoose.Schema({
   no: Number,
   project_name: String,
   price: Number,
+  isUSD: { type: Boolean, default: true },
   asset_id: String
 });
 export interface Price extends mongoose.Document {
   no: number;
   project_name: string;
   price: number;
+  isUSD: boolean;
   asset_id: string;
 }
 
