@@ -768,11 +768,11 @@ export default function DevicesTable({
             isOpen={showDeleteModal}
             closeTimeoutMS={500}
             style={customStyles}
-            contentLabel="BlackList"
+            contentLabel="Delete Device"
           >
             <Flex flexDirection="col" className="gap-2 w-full">
               <h2>
-                <strong>Blacklist the device</strong>
+                <strong>Delete Device</strong>
               </h2>
               <Text>Do you really want to delete current device?</Text>
               <div>
@@ -793,11 +793,11 @@ export default function DevicesTable({
             isOpen={showUnregisterModal}
             closeTimeoutMS={500}
             style={customStyles}
-            contentLabel="BlackList"
+            contentLabel="Unregister"
           >
             <Flex flexDirection="col" className="gap-2 w-full">
               <h2>
-                <strong>Blacklist the device</strong>
+                <strong>Unregister Device</strong>
               </h2>
               <Text>Do you really want to unregister current device?</Text>
               <div>
