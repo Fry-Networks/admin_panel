@@ -39,6 +39,8 @@ export default function DevicesTable({
   const [showUnstakeModal, setShowUnstakeModal] = useState(false);
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [showBlacklistModal, setShowBlacklistModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showUnregisterModal, setShowUnregisterModal] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<Device | undefined>(
     undefined
   );
@@ -180,6 +182,78 @@ export default function DevicesTable({
     }, 3_000);
 
     setShowBlacklistModal(false);
+  };
+
+  const handleDelete = async () => {
+    const aimedDevice = { ...selectedDevice };
+    const response = await fetch('api/delete-device', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({ miner_key: aimedDevice.miner_key })
+    });
+
+    if (!response.ok) {
+      setUpdateSuccess('error');
+      setTimeout(() => {
+        setUpdateSuccess('');
+      }, 3_000);
+      return;
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      setUpdateSuccess('error');
+      setTimeout(() => {
+        setUpdateSuccess('');
+      }, 3_000);
+      return;
+    }
+
+    setUpdateSuccess(result.message);
+    setTimeout(() => {
+      setUpdateSuccess('');
+      router.reload();
+    }, 3_000);
+
+    setShowDeleteModal(false);
+  };
+
+  const handleUnregister = async () => {
+    const aimedDevice = { ...selectedDevice };
+    const response = await fetch('api/unregister-device', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({ miner_key: aimedDevice.miner_key })
+    });
+
+    if (!response.ok) {
+      setUpdateSuccess('error');
+      setTimeout(() => {
+        setUpdateSuccess('');
+      }, 3_000);
+      return;
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      setUpdateSuccess('error');
+      setTimeout(() => {
+        setUpdateSuccess('');
+      }, 3_000);
+      return;
+    }
+
+    setUpdateSuccess(result.message);
+    setTimeout(() => {
+      setUpdateSuccess('');
+      router.reload();
+    }, 3_000);
+
+    setShowUnregisterModal(false);
   };
 
   const handleUnstake = async () => {
@@ -424,6 +498,30 @@ export default function DevicesTable({
                         BlackList
                       </Button>
                     )}
+                    {(session.user.owner || session.user.mods) && (
+                      <Button
+                        variant="secondary"
+                        className="text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700 ml-1"
+                        onClick={() => {
+                          setSelectedDevice(device);
+                          setShowDeleteModal(true);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    )}
+                    {(session.user.owner || session.user.mods) && (
+                      <Button
+                        variant="secondary"
+                        className="text-green-700 border-green-700 hover:bg-green-50 hover:text-green-700 ml-1"
+                        onClick={() => {
+                          setSelectedDevice(device);
+                          setShowUnregisterModal(true);
+                        }}
+                      >
+                        Unregister
+                      </Button>
+                    )}
                   </TableCell>
                 )}
             </TableRow>
@@ -662,6 +760,56 @@ export default function DevicesTable({
                     Cancel
                   </Button>
                   <Button onClick={() => handleBlacklist()}>OK</Button>
+                </Flex>
+              </div>
+            </Flex>
+          </Modal>
+          <Modal
+            isOpen={showDeleteModal}
+            closeTimeoutMS={500}
+            style={customStyles}
+            contentLabel="BlackList"
+          >
+            <Flex flexDirection="col" className="gap-2 w-full">
+              <h2>
+                <strong>Blacklist the device</strong>
+              </h2>
+              <Text>Do you really want to delete current device?</Text>
+              <div>
+                <Flex className="gap-2">
+                  <Button
+                    onClick={() => {
+                      setShowDeleteModal(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={() => handleDelete()}>OK</Button>
+                </Flex>
+              </div>
+            </Flex>
+          </Modal>
+          <Modal
+            isOpen={showUnregisterModal}
+            closeTimeoutMS={500}
+            style={customStyles}
+            contentLabel="BlackList"
+          >
+            <Flex flexDirection="col" className="gap-2 w-full">
+              <h2>
+                <strong>Blacklist the device</strong>
+              </h2>
+              <Text>Do you really want to unregister current device?</Text>
+              <div>
+                <Flex className="gap-2">
+                  <Button
+                    onClick={() => {
+                      setShowUnregisterModal(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={() => handleUnregister()}>OK</Button>
                 </Flex>
               </div>
             </Flex>

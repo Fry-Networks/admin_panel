@@ -132,7 +132,7 @@ export default function PriceTable({
           <TableRow>
             <TableHeaderCell>No</TableHeaderCell>
             <TableHeaderCell>Project Name</TableHeaderCell>
-            <TableHeaderCell>Price(USD)</TableHeaderCell>
+            <TableHeaderCell>Price(USD/TOKEN)</TableHeaderCell>
             <TableHeaderCell>Payment Token</TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableRow>
@@ -142,7 +142,9 @@ export default function PriceTable({
             <TableRow key={index}>
               <TableCell>{price.no}</TableCell>
               <TableCell>{price.project_name}</TableCell>
-              <TableCell>{`$${price.price}`}</TableCell>
+              <TableCell>{`$${price.price} (${
+                price.isUSD ? 'USD' : 'Token'
+              })`}</TableCell>
               <TableCell>{getTokenNameById(price.asset_id)}</TableCell>
               <TableCell>
                 <Button onClick={() => onEditButton(price.no)}>Edit</Button>

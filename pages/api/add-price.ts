@@ -9,6 +9,7 @@ export interface PriceData {
   projectName: string;
   price: number;
   assetId: string;
+  isUSD: boolean;
 }
 
 export default async function handler(
@@ -50,13 +51,14 @@ export default async function handler(
       return;
     }
 
-    const { no, projectName, price, assetId } = req.body as PriceData;
+    const { no, projectName, price, assetId, isUSD } = req.body as PriceData;
 
     const result = await collection.insertOne({
       no: no,
       project_name: projectName,
       price: price,
-      asset_id: assetId
+      asset_id: assetId,
+      isUSD: isUSD
     });
 
     if (!result) {
