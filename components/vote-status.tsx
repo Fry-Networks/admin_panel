@@ -71,9 +71,9 @@ export default function ModalVoteStatus({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {optionOneInfo.map((info) => {
+                {optionOneInfo.map((info, index) => {
                   return (
-                    <TableRow>
+                    <TableRow key={index}>
                       <TableCell>{info.address}</TableCell>
                       <TableCell>{info.votes}</TableCell>
                       <TableCell>{info.stakes}</TableCell>
@@ -94,9 +94,9 @@ export default function ModalVoteStatus({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {optionTwoInfo.map((info) => {
+                {optionTwoInfo.map((info, index) => {
                   return (
-                    <TableRow>
+                    <TableRow key={index}>
                       <TableCell>{info.address}</TableCell>
                       <TableCell>{info.votes}</TableCell>
                       <TableCell>{info.stakes}</TableCell>
