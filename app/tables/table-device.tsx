@@ -486,7 +486,7 @@ export default function DevicesTable({
                     >
                       Refund
                     </Button>
-                    {session.user.owner && (
+                    {(session.user.owner || session.user.mods) && (
                       <Button
                         variant="secondary"
                         className="text-gray-700 border-gray-700 hover:bg-gray-50 hover:text-gray-700 ml-1"
