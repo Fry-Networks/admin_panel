@@ -100,7 +100,13 @@ export default function ModalEditVote({
       static={true}
       className={'z-[' + (2000 + 200 * index) + ']'}
     >
-      <DialogPanel className="sm:max-w-5xl">
+      <DialogPanel
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        className="sm:max-w-5xl"
+      >
         <div className="absolute right-0 top-0 pr-3 pt-3">
           <button
             type="button"
