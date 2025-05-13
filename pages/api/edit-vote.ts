@@ -3,13 +3,13 @@ import clientPromise from '../../lib/mongoclient';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import mongoose from 'mongoose';
+import { Vote } from '../../lib/vote-schema';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const session = await getServerSession(req, res, authOptions);
-
   const testMode = process.env.NEXT_PUBLIC_DAO_TEST === 'true' ? true : false;
   // Check if user is authenticated and is an admin
   if (
@@ -26,31 +26,43 @@ export default async function handler(
 
   if (req.method === 'PUT') {
     const data: {
+      id: string;
       title: string;
       description: string;
       options: { title: string; description: string }[];
     } = req.body;
-    const { title, description, options } = data;
+    const { id, title, description, options } = data;
 
-    console.log('Adding vote', title);
-    console.log(`Vote successfully added by ${session?.user.email}`);
+    console.log(id, title, description, options);
+
+    console.log('Update vote', title);
+    console.log(`Vote successfully update by ${session?.user.email}`);
     try {
-      await collection.insertOne({
-        title: title,
-        total_votes: 0,
-        createdAt: new Date(),
-        current: false,
-        description: description,
-        votes: options.map((option, index) => {
-          return {
-            option: index.toString(),
-            description: option.description,
-            title: option.title,
-            votes: 0,
-            different_people: []
-          };
-        })
-      });
+      let updatingVote = (await collection.findOne({
+        _id: new mongoose.Types.ObjectId(id)
+      })) as Vote;
+
+      console.log(updatingVote);
+
+      updatingVote.title = title;
+      updatingVote.description = description;
+      for (let i = 0; i < updatingVote.votes.length; i++) {
+        updatingVote.votes[i].title = options[i].title;
+        updatingVote.votes[i].description = options[i].description;
+      }
+
+      console.log(updatingVote);
+
+      const result = await collection.updateOne(
+        { _id: new mongoose.Types.ObjectId(id) },
+        {
+          $set: {
+            title: updatingVote.title,
+            description: updatingVote.description,
+            votes: updatingVote.votes
+          }
+        }
+      );
 
       res.status(200).json({ message: 'Vote added successfully' });
     } catch (error) {
