@@ -86,12 +86,7 @@ export default function ModalEditVote({
     window.location.reload();
   };
   return (
-    <Dialog
-      open={isOpen}
-      onClose={() => setIsOpen(false)}
-      static={true}
-      className="z-[100]"
-    >
+    <Dialog open={isOpen} onClose={() => {}} static={true} className="z-[100]">
       <DialogPanel className="sm:max-w-5xl">
         <div className="absolute right-0 top-0 pr-3 pt-3">
           <button
