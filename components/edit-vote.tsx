@@ -9,11 +9,13 @@ import { title } from 'process';
 export default function ModalEditVote({
   isOpen,
   setIsOpen,
-  vote
+  vote,
+  index
 }: {
   isOpen: boolean;
   setIsOpen: Function;
   vote: { id: string; vote: Vote | undefined } | undefined;
+  index: number;
 }) {
   const [vote_title, setVoteTitle] = useState(
     vote && vote.vote ? vote.vote.title : ''
@@ -86,7 +88,18 @@ export default function ModalEditVote({
     window.location.reload();
   };
   return (
-    <Dialog open={isOpen} onClose={() => {}} static={true} className="z-[100]">
+    <Dialog
+      open={isOpen}
+      onClose={() => {
+        setIsOpen(false);
+      }}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      static={true}
+      className={'z-[' + (2000 + 200 * index) + ']'}
+    >
       <DialogPanel className="sm:max-w-5xl">
         <div className="absolute right-0 top-0 pr-3 pt-3">
           <button

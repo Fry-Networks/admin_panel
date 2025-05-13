@@ -252,6 +252,8 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                   isOpen={voteSelected !== undefined}
                   setIsOpen={handleCloseEditModal}
                   vote={{ id: vote._id, vote: voteSelected }}
+                  index={index}
+                  key={vote.title}
                 />
               </Card>
             );
