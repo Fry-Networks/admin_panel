@@ -27,6 +27,7 @@ import {
 import ModalCreateVote from '../components/create-vote';
 import ModalChooseAsCurrent from '../components/choose-vote';
 import ModalVoteStatus from '../components/vote-status';
+import ModalEditVote from '../components/edit-vote';
 export default function DaoPage({ votes }: { votes: Vote[] }) {
   console.log('bla', votes);
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +38,7 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
   }[]);
   const [openStatusModalId, setOpenStatusModalId] = useState(null);
   const [stakeInfo, setStakeInfo] = useState([]);
+  const [voteSelected, setVoteSelected] = useState<Vote | undefined>(undefined);
   const handleOpenModal = (id: any) => {
     setOpenModalId(id);
   };
@@ -48,6 +50,11 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
   const handleCloseStatusModal = () => {
     setOpenStatusModalId(null);
   };
+
+  const handleCloseEditModal = () => {
+    setVoteSelected(undefined);
+  };
+
   const handleStop = async (id: any) => {
     const updateData = {
       id: id
@@ -218,8 +225,15 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                   >
                     Delete
                   </Button>
-                  <Button color="green" onClick={() => handleState(vote._id)}>
+                  <Button
+                    color="green"
+                    className="mr-3"
+                    onClick={() => handleState(vote._id)}
+                  >
                     View State
+                  </Button>
+                  <Button color="purple" onClick={() => setVoteSelected(vote)}>
+                    Edit
                   </Button>
                 </Flex>
                 <ModalChooseAsCurrent
@@ -233,6 +247,11 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                   isOpen={openStatusModalId === vote._id}
                   setIsOpen={handleCloseStatusModal}
                   stakeInfo={stakeInfo}
+                />
+                <ModalEditVote
+                  isOpen={voteSelected !== undefined}
+                  setIsOpen={handleCloseEditModal}
+                  vote={{ id: vote._id, vote: voteSelected }}
                 />
               </Card>
             );
