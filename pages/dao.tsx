@@ -249,11 +249,11 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                   stakeInfo={stakeInfo}
                 />
                 <ModalEditVote
-                  isOpen={voteSelected !== undefined}
+                  isOpen={voteSelected?._id === vote._id}
                   setIsOpen={handleCloseEditModal}
                   vote={{ id: vote._id, vote: voteSelected }}
                   index={index}
-                  key={vote.title}
+                  key={vote._id}
                 />
               </Card>
             );
