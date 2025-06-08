@@ -58,8 +58,7 @@ export default async function handler(
           });
 
           if (!stakeForOne) {
-            res.status(404).json({ message: 'Error fetching vote status' });
-            return;
+            continue;
           }
 
           stakesInformation.push(stakeForOne);

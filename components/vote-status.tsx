@@ -53,14 +53,14 @@ export default function ModalVoteStatus({
       isOpen={isOpen}
       closeTimeoutMS={500}
       style={customStyles}
-      contentLabel="Refund"
+      contentLabel="VoteStatus"
     >
-      <div className="max-h-[700px]">
+      <div className="max-h-[700px] overflow-scroll">
         <Flex flexDirection="row-reverse">
           <Button onClick={() => setIsOpen()}>X</Button>
         </Flex>
         <Flex className="mt-2 gap-2" alignItems="start">
-          <div className="w-2/4">
+          <div className="w-2/4 max-h-[700px] overflow-scroll">
             <Title>Option One</Title>
             <Table>
               <TableHead>
@@ -83,7 +83,7 @@ export default function ModalVoteStatus({
               </TableBody>
             </Table>
           </div>
-          <div className="w-2/4">
+          <div className="w-2/4 max-h-[700px] overflow-scroll">
             <Title>Option Two</Title>
             <Table>
               <TableHead>
@@ -125,7 +125,8 @@ const customStyles = {
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-    minWidth: '320px'
+    minWidth: '320px',
+    maxHeight: '700px'
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
