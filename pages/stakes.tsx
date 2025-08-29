@@ -36,12 +36,14 @@ export default function StakesPage({
   const [normalProducts, setNormalProducts] = useState<Product[]>([]);
   const [nodeProducts, setNodeProducts] = useState<Product[]>([]);
   useEffect(() => {
-    const normals = products.filter((product) => {
-      return product.name.includes('Node') === false;
+    const nodes = products.filter((product) => {
+    const name = product.name.toLowerCase();
+    return name.includes('node') || name.includes('edge');
     });
 
-    const nodes = products.filter((product) => {
-      return product.name.includes('Node') || product.name.includes('Edge'); //includes 'AI Edge Miner' in the "nodes" list
+    const normals = products.filter((product) => {
+    const name = product.name.toLowerCase();
+    return !name.includes('node') && !name.includes('edge');
     });
 
     setNormalProducts(normals);
