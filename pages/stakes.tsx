@@ -41,7 +41,7 @@ export default function StakesPage({
     });
 
     const nodes = products.filter((product) => {
-      return product.name.includes('Node');
+      return product.name.includes('Node') || product.name.includes('edge'); //includes 'AI edge miner' in the "nodes" list
     });
 
     setNormalProducts(normals);
