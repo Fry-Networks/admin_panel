@@ -59,9 +59,16 @@ export default function DevicesTable({
   const [txId, setTxId] = useState('');
   const [stakeDate, setStakeDate] = useState(new Date(Date.now()));
   const { data: session } = useSession();
+  const [errorMessage, setErrorMessage] = useState('');
 
   const isNodeDevice = (device: Device) => {
-    return device.name.includes('Node');
+    const name = device.name?.toLowerCase() ?? '';
+    return name.includes('node');
+  };
+
+  const isAemDevice = (device: Device) => {
+    const name = device.name?.toLowerCase() ?? '';
+    return name.includes('aem') || name.includes('ai edge');
   };
 
   const isRegistrationStaked = (device: Device) => {
@@ -84,6 +91,7 @@ export default function DevicesTable({
     setTxId('');
     setRefundAmount(1);
     setRefundTermValue('stake');
+    setErrorMessage('');
   }, [showVerifyModal, showUnstakeModal, showRefundModal, showBlacklistModal]);
 
   function formatDate(dateStr: string) {
@@ -336,31 +344,42 @@ export default function DevicesTable({
       })
     });
 
+    let payload: any = {};
+    try {
+      payload = await response.json();
+    } catch (err) {
+      payload = {};
+    }
+
     if (!response.ok) {
       setUpdateSuccess('error');
+      setErrorMessage(
+        payload?.message || `Refund failed with status ${response.status}`
+      );
       setTimeout(() => {
         setUpdateSuccess('');
+        setErrorMessage('');
       }, 3_000);
 
       return;
     }
 
-    const result = await response.json();
-    if (!result.success) {
+    if (!payload.success) {
       setUpdateSuccess('error');
+      setErrorMessage(payload?.message || 'Failed to process refund');
       setTimeout(() => {
         setUpdateSuccess('');
+        setErrorMessage('');
       }, 3_000);
 
       return;
     }
 
     setUpdateSuccess('Successfully refund specific amount of tokens to user');
+    setErrorMessage('');
     setTimeout(() => {
       setUpdateSuccess('');
     }, 3_000);
-
-    return;
   };
 
   return (
@@ -382,7 +401,7 @@ export default function DevicesTable({
           icon={CheckCircleIcon}
           color="red"
         >
-          Error occured during action!
+          {errorMessage || 'Error occured during action!'}
         </Callout>
       )}
       <Table>
@@ -424,16 +443,16 @@ export default function DevicesTable({
                 >
                   <Text>Registered: {device.is_registered ? 'Yes' : 'No'}</Text>
                   <Text>Verified: {device.verified ? 'Yes' : 'No'}</Text>
+                  {(isNodeDevice(device) || isAemDevice(device)) && (
+                    <Text>
+                      Staked for Reg:{' '}
+                      {isRegistrationStaked(device) ? 'Yes' : 'No'}
+                    </Text>
+                  )}
                   {isNodeDevice(device) && (
-                    <>
-                      <Text>
-                        Registration:{' '}
-                        {isRegistrationStaked(device) ? 'Yes' : 'No'}
-                      </Text>
-                      <Text>
-                        Verified: {isNodeStaked(device) ? 'Yes' : 'No'}
-                      </Text>
-                    </>
+                    <Text>
+                      Staked for Node Op: {isNodeStaked(device) ? 'Yes' : 'No'}
+                    </Text>
                   )}
                 </Flex>
               </TableCell>

@@ -13,6 +13,14 @@ const algodClient = new algosdk.Algodv2(tokenToSend, server, port);
 const indexServer = 'https://mainnet-idx.algonode.cloud/';
 const indexer = new Indexer(tokenToSend, indexServer, port);
 
+const DEFAULT_MAX_REFUND = 500000;
+const parsedCap =
+  typeof process.env.MAX_REFUND_AMOUNT === 'string'
+    ? Number(process.env.MAX_REFUND_AMOUNT)
+    : NaN;
+const MAX_REFUND_AMOUNT =
+  Number.isFinite(parsedCap) && parsedCap > 0 ? parsedCap : DEFAULT_MAX_REFUND;
+
 // Function to fetch asset decimals
 const getAssetDecimals = async (assetId: number): Promise<number | null> => {
   try {
@@ -46,6 +54,12 @@ export default async function handler(
 
   console.log(address, amount, refundFrom, assetId, miner_key);
 
+  const normalizedAmount = Number(amount);
+  if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+    res.status(402).json({ message: 'Refund amount must be a positive number' });
+    return;
+  }
+
   try {
     const client = await clientPromise;
     const db = client.db('main');
@@ -57,8 +71,10 @@ export default async function handler(
       return;
     }
 
-    if (amount > 50000) {
-      res.status(402).json({ message: 'Huge amount to refund at once' });
+    if (normalizedAmount > MAX_REFUND_AMOUNT) {
+      res.status(402).json({
+        message: `Refund amount exceeds limit of ${MAX_REFUND_AMOUNT}`
+      });
       return;
     }
 
@@ -67,23 +83,34 @@ export default async function handler(
       return;
     }
 
-    const mnemonic =
-      refundFrom === 'stake'
-        ? process.env.STAKE_MNEMONIC
-        : process.env.REWARD_MNEMONIC;
+    const isStakeRefund = refundFrom === 'stake';
+    const senderMnemonic = isStakeRefund
+      ? process.env.STAKE_MNEMONIC
+      : process.env.REWARD_MNEMONIC;
+    const signerMnemonic = isStakeRefund
+      ? process.env.STAKE_REKEY || process.env.STAKE_MNEMONIC
+      : process.env.REWARD_REKEY || process.env.REWARD_MNEMONIC; // fall back to legacy secret if no rekey is configured
 
-    if (!mnemonic) {
-      res.status(403).json({ message: 'No environment setted' });
+    if (!senderMnemonic) {
+      res.status(403).json({ message: 'Refund address mnemonic missing' });
       return;
     }
 
-    const privateKey = mnemonicToSecretKey(mnemonic!);
+    if (!signerMnemonic) {
+      res
+        .status(403)
+        .json({ message: 'Refund signer mnemonic missing (check *_REKEY env)' });
+      return;
+    }
+
+    const senderAccount = mnemonicToSecretKey(senderMnemonic);
+    const signerAccount = mnemonicToSecretKey(signerMnemonic);
 
     const noteInfo = {
       action: 'Refund',
       type: refundFrom,
       miner_key: miner_key,
-      amount: amount,
+      amount: normalizedAmount,
       to: address
     };
     const enc = new TextEncoder();
@@ -96,25 +123,25 @@ export default async function handler(
       return;
     }
 
-    const from = privateKey.addr;
+    const from = senderAccount.addr;
     const suggestedParams = await algodClient.getTransactionParams().do();
     const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
       sender: from,
       receiver: address,
-      amount: Number(amount) * Math.pow(10, decimal),
+      amount: normalizedAmount * Math.pow(10, decimal),
       assetIndex: Number(assetId),
       note: note,
       suggestedParams
     });
 
-    console.log(Number(amount) * Math.pow(10, decimal));
+    console.log(normalizedAmount * Math.pow(10, decimal));
 
     if (!txn) {
       res.status(403).json({ message: 'Failed to make refund transaction' });
       return;
     }
 
-    const signedTxn = txn.signTxn(privateKey.sk);
+    const signedTxn = txn.signTxn(signerAccount.sk);
     const tx = await algodClient.sendRawTransaction(signedTxn).do();
 
     if (!tx) {
@@ -126,7 +153,7 @@ export default async function handler(
     const result = await collection.insertOne({
       type: refundFrom,
       address: address,
-      amount: amount,
+      amount: normalizedAmount,
       assetId: assetId,
       txId: tx.txid,
       confirmer: session.user.email,
