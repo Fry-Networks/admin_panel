@@ -23,6 +23,7 @@ const navigation = [
   { name: 'Reduction', href: '/reduction' },
   { name: 'Crypto Income', href: '/fee' },
   { name: 'Prices', href: '/prices' },
+  { name: 'Announcements', href: '/announcements' },
   { name: 'DAO', href: '/dao' }
 ];
 
