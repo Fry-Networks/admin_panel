@@ -10,7 +10,8 @@ import {
   MultiSelectItem,
   Textarea,
   DatePicker,
-  Icon
+  Icon,
+  Callout
 } from '@tremor/react';
 import clientPromise from '../lib/mongoclient';
 import { Key, useEffect, useMemo, useState } from 'react';
@@ -28,8 +29,20 @@ import ModalCreateVote from '../components/create-vote';
 import ModalChooseAsCurrent from '../components/choose-vote';
 import ModalVoteStatus from '../components/vote-status';
 import ModalEditVote from '../components/edit-vote';
+type ActivationResult = {
+  status: 'success' | 'error';
+  message: string;
+  payload?: {
+    id: string;
+    end_date: Date;
+    super_majority: boolean;
+    hidden: boolean;
+  };
+};
+
 export default function DaoPage({ votes }: { votes: Vote[] }) {
   console.log('bla', votes);
+  const [voteList, setVoteList] = useState(votes);
   const [isOpen, setIsOpen] = useState(false);
   const [openModalId, setOpenModalId] = useState(null);
   const [vote_options, setVoteOptions] = useState([{}] as {
@@ -39,6 +52,16 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
   const [openStatusModalId, setOpenStatusModalId] = useState(null);
   const [stakeInfo, setStakeInfo] = useState([]);
   const [voteSelected, setVoteSelected] = useState<Vote | undefined>(undefined);
+  const [activationToast, setActivationToast] = useState<ActivationResult | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (!activationToast) return;
+    const timer = setTimeout(() => setActivationToast(null), 4000);
+    return () => clearTimeout(timer);
+  }, [activationToast]);
+
   const handleOpenModal = (id: any) => {
     setOpenModalId(id);
   };
@@ -53,6 +76,26 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
 
   const handleCloseEditModal = () => {
     setVoteSelected(undefined);
+  };
+
+  const handleVoteActivated = (result: ActivationResult) => {
+    setActivationToast(result);
+    if (result.status === 'success' && result.payload) {
+      setVoteList((prevVotes) =>
+        prevVotes.map((vote) =>
+          vote._id === result.payload!.id
+            ? ({
+                ...vote,
+                current: true,
+                end_date: result.payload!.end_date,
+                super_majority: result.payload!.super_majority,
+                hidden: result.payload!.hidden
+              } as unknown as Vote)
+            : vote
+        )
+      );
+      setOpenModalId(null);
+    }
   };
 
   const handleStop = async (id: any) => {
@@ -149,14 +192,23 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
         </div>
       </Flex>
       <Divider />
+      {activationToast && (
+        <Callout
+          className="mt-4"
+          title={activationToast.status === 'success' ? 'Success' : 'Error'}
+          color={activationToast.status === 'success' ? 'teal' : 'red'}
+        >
+          {activationToast.message}
+        </Callout>
+      )}
       <Flex
         alignItems="start"
         justifyContent="start"
         flexDirection="row"
         className="mt-6"
       >
-        {votes ? (
-          votes.map((vote, index) => {
+        {voteList ? (
+          voteList.map((vote, index) => {
             console.log('vote', vote);
             return (
               <Card key={vote._id} className="ml-4 mr-4 mt-4">
@@ -207,7 +259,7 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                       className="mr-3"
                       onClick={() => handleOpenModal(vote._id)}
                     >
-                      Choose as current vote
+                      Activate vote
                     </Button>
                   ) : (
                     <Button
@@ -240,8 +292,11 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                   index={index}
                   key={vote._id}
                   isOpen={openModalId === vote._id}
-                  setIsOpen={handleCloseModal}
+                  setIsOpen={(value: boolean) =>
+                    value ? setOpenModalId(vote._id) : handleCloseModal()
+                  }
                   vote={{ id: vote._id, title: vote.title }}
+                  onActivate={handleVoteActivated}
                 />
                 <ModalVoteStatus
                   isOpen={openStatusModalId === vote._id}

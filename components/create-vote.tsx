@@ -1,10 +1,4 @@
-import {
-    Button,
-    Flex,
-    Textarea,
-    DatePicker,
-
-} from '@tremor/react';
+import { Button, Flex, Textarea } from '@tremor/react';
 import { Key, useState } from 'react';
 import '../app/css/devices.css';
 import { Vote } from '../lib/vote-schema';
@@ -80,7 +74,7 @@ export default function ModalCreateVote({isOpen, setIsOpen}: {isOpen: boolean, s
                                 Create a Vote
                             </h4>
                             <p className="mt-2 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                                Note: this won&apos;t replace the current vote, you will have to select the new vote manually.
+                                Note: creating a vote won&apos;t publish it. Use the &quot;Activate vote&quot; action when you&apos;re ready—multiple votes can stay active simultaneously.
                             </p>
                             <TextInput placeholder="Title" className='mt-2' onValueChange={(value) => setVoteTitle(value)} />
                             <Textarea placeholder="Description" className='mt-2' onValueChange={(value) => setVoteDescription(value)} />

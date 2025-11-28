@@ -10,10 +10,7 @@ if (!process.env.MONGO_URI) {
 }
 
 const uri = process.env.MONGO_URI;
-const options = {
-  keepAlive: true,
-  
-};
+const options = {};
 
 let client;
 let clientPromise: Promise<MongoClient>;
