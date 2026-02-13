@@ -15,7 +15,8 @@ import {
   Tab,
   NumberInput
 } from '@tremor/react';
-import Search from '../app/search';
+// Use pages-router search component for pages directory.
+import Search from '../components/search';
 import clientPromise from '../lib/mongoclient';
 import { useEffect, useRef, useState } from 'react';
 import RewardProductsTable from '../app/tables/table-reward-products';

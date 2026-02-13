@@ -1,6 +1,7 @@
 
 import { Card, Metric, Text, Title, BarList, Flex, Grid, MultiSelect, MultiSelectItem } from '@tremor/react';
-import Search from '../app/search';
+// Use pages-router search component for pages directory.
+import Search from '../components/search';
 import clientPromise from '../lib/mongoclient';
 import { getSession } from 'next-auth/react';
 import { AirAccount } from '../lib/air_accounts';

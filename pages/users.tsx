@@ -14,7 +14,8 @@ import {
   TabList,
   Tab
 } from '@tremor/react';
-import Search from '../app/search';
+// Use pages-router search component for pages directory.
+import Search from '../components/search';
 import clientPromise from '../lib/mongoclient';
 import { useState } from 'react';
 import { User } from '../lib/users-schema';

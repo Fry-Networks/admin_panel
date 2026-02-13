@@ -16,7 +16,8 @@ import '../app/css/devices.css';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import { ByodUser } from '../lib/byod-schema';
 import ByodTable from '../app/tables/table-byod';
-import Search from '../app/search';
+// Use pages-router search component for pages directory.
+import Search from '../components/search';
 import { base32 } from '@scure/base';
 export default function DevicesPage({
   byodUsers,

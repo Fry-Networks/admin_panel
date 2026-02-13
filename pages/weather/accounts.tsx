@@ -1,6 +1,7 @@
 
 import { Card, Metric, Text, Title, BarList, Flex, Grid, MultiSelect, MultiSelectItem } from '@tremor/react';
-import Search from '../../app/search';
+// Use pages-router search component for pages directory.
+import Search from '../../components/search';
 import clientPromise from '../../lib/mongoclient';
 import { weatherAccount } from '../../lib/weather_accounts';
 import WeatherAccountsTable from '../../app/tables/table-weather-account';

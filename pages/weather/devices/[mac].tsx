@@ -9,7 +9,8 @@ import {
   MultiSelect,
   MultiSelectItem
 } from '@tremor/react';
-import Search from '../../../app/search';
+// Use pages-router search component for pages directory.
+import Search from '../../../components/search';
 import clientPromise from '../../../lib/mongoclient';
 import { weatherAccount } from '../../../lib/weather_accounts';
 import WeatherDevicesTable from '../../../app/tables/table-weather-device';

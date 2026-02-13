@@ -1,30 +1,37 @@
 'use client';
 
 import { Fragment } from 'react';
-import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 
-const navigation = [
-  { name: 'Users', href: '/users' },
-  { name: 'Weather Accounts', href: '/weather/accounts' },
-  { name: 'Weather Devices', href: '/weather/devices' },
-  { name: 'Energy', href: '/energy' },
-  { name: 'Water', href: '/water' },
-  { name: 'Air Accounts', href: '/air/accounts' },
+type NavItem = { name: string; href: string; disabled?: boolean };
+
+// Keep enabled items first and group disabled items separately for clarity.
+const navigation: NavItem[] = [
   { name: 'Devices', href: '/devices' },
-  { name: 'Blacklist', href: '/blacklist' },
   { name: 'Byod', href: '/byod' },
-  { name: 'Fry Tokens', href: '/token' },
-  { name: 'Stakes', href: '/stakes' },
-  { name: 'Rewards', href: '/rewards' },
-  { name: 'Reduction', href: '/reduction' },
-  { name: 'Crypto Income', href: '/fee' },
-  { name: 'Prices', href: '/prices' },
+  { name: 'DAO', href: '/dao' },
   { name: 'Announcements', href: '/announcements' },
-  { name: 'DAO', href: '/dao' }
+  { name: 'Users', href: '/users' },
+  { name: 'Blacklist', href: '/blacklist' },
+  { name: 'Stakes', href: '/stakes' },
+  { name: 'Prices', href: '/prices' },
+  { name: 'Fry Tokens', href: '/token' },
+  { name: 'Rewards', href: '/rewards' },
+  { name: 'Crypto Income', href: '/fee' },
+  { name: 'Reduction', href: '/reduction' }
+];
+
+// Disabled routes remain visible but non-clickable for now.
+const disabledNavigation: NavItem[] = [
+  { name: 'Weather Accounts', href: '/weather/accounts', disabled: true },
+  { name: 'Weather Devices', href: '/weather/devices', disabled: true },
+  { name: 'Energy', href: '/energy', disabled: true },
+  { name: 'Water', href: '/water', disabled: true },
+  { name: 'Air Accounts', href: '/air/accounts', disabled: true }
 ];
 
 function classNames(...classes: string[]) {
@@ -36,11 +43,14 @@ import { useSession } from 'next-auth/react';
 export default function Navbar() {
   const { data: session, status } = useSession();
   const isLoading = status === 'loading';
-  const pathname = usePathname();
+  const { pathname } = useRouter();
   if (isLoading) return <div>Loading...</div>; // Or some loading spinner
 
   return (
-    <Disclosure as="nav" className="bg-white shadow-sm">
+    <Disclosure
+      as="nav"
+      className="bg-white/90 backdrop-blur border-b border-slate-200 shadow-sm"
+    >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
@@ -69,22 +79,57 @@ export default function Navbar() {
                     />
                   </svg>
                 </div>
-                <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-                  {navigation.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      className={classNames(
-                        pathname === item.href
-                          ? 'border-slate-500 text-gray-900'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                        'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium'
-                      )}
-                      aria-current={pathname === item.href ? 'page' : undefined}
-                    >
-                      {item.name}
-                    </a>
-                  ))}
+                <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:items-center sm:space-x-6">
+                  {navigation.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        className={classNames(
+                          isActive
+                            ? 'border-slate-900 text-slate-900'
+                            : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300',
+                          'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium tracking-wide'
+                        )}
+                        aria-current={isActive ? 'page' : undefined}
+                      >
+                        {item.name}
+                      </a>
+                    );
+                  })}
+                  {/* Divider + label for disabled items */}
+                  <div className="flex items-center gap-2">
+                    <span className="h-5 w-px bg-slate-200" />
+                    <span className="text-[11px] uppercase tracking-widest text-slate-400">
+                      Disabled
+                    </span>
+                  </div>
+                  {disabledNavigation.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <a
+                        key={item.name}
+                        href={undefined}
+                        className={classNames(
+                          isActive
+                            ? 'border-slate-500 text-gray-900'
+                            : 'border-transparent text-gray-400',
+                          'cursor-not-allowed opacity-70',
+                          'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium'
+                        )}
+                        title="Currently disabled"
+                        aria-current={isActive ? 'page' : undefined}
+                        aria-disabled="true"
+                        onClick={(event) => {
+                          // Prevent navigation for disabled links.
+                          event.preventDefault();
+                        }}
+                      >
+                        {item.name}
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
@@ -162,18 +207,48 @@ export default function Navbar() {
 
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pt-2 pb-3">
-              {navigation.map((item) => (
+              {navigation.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Disclosure.Button
+                    key={item.name}
+                    as="a"
+                    href={item.href}
+                    className={classNames(
+                      isActive
+                        ? 'bg-slate-50 border-slate-500 text-slate-700'
+                        : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+                      'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+                    )}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {item.name}
+                  </Disclosure.Button>
+                );
+              })}
+              {/* Divider + label for disabled items */}
+              <div className="px-3 pt-4 pb-2">
+                <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-slate-400">
+                  <span className="h-px flex-1 bg-slate-200" />
+                  <span>Disabled</span>
+                  <span className="h-px flex-1 bg-slate-200" />
+                </div>
+              </div>
+              {disabledNavigation.map((item) => (
                 <Disclosure.Button
                   key={item.name}
                   as="a"
-                  href={item.href}
+                  href={undefined}
                   className={classNames(
-                    pathname === item.href
-                      ? 'bg-slate-50 border-slate-500 text-slate-700'
-                      : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
-                    'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+                    'block pl-3 pr-4 py-2 border-l-4 text-base font-medium',
+                    'border-transparent text-gray-400 cursor-not-allowed opacity-70'
                   )}
-                  aria-current={pathname === item.href ? 'page' : undefined}
+                  title="Currently disabled"
+                  aria-disabled="true"
+                  onClick={(event) => {
+                    // Prevent navigation for disabled links.
+                    event.preventDefault();
+                  }}
                 >
                   {item.name}
                 </Disclosure.Button>

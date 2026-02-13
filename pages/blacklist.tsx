@@ -9,7 +9,8 @@ import {
   MultiSelect,
   MultiSelectItem
 } from '@tremor/react';
-import Search from '../app/search';
+// Use pages-router search component for pages directory.
+import Search from '../components/search';
 import clientPromise from '../lib/mongoclient';
 import DevicesTable from '../app/tables/table-device';
 import { useEffect, useMemo, useState } from 'react';

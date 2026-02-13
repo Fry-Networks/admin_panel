@@ -1,14 +1,15 @@
 'use client';
 
+import { useRouter } from 'next/router';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
-import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 
 let lastParams: URLSearchParams = new URLSearchParams();
+
 export default function Search({ disabled }: { disabled?: boolean }) {
-  // Use app-router navigation hooks inside the app directory.
+  // Pages-router implementation to keep next/router usage out of app directory.
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = router.pathname;
   const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -17,10 +18,11 @@ export default function Search({ disabled }: { disabled?: boolean }) {
     const params = new URLSearchParams(window.location.search);
     setSearchTerm(params.get('q') ?? '');
   }, []);
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       handleSearch(searchTerm);
-    }, 500); //wait for 0.5 second before handling search
+    }, 500);
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
@@ -31,9 +33,8 @@ export default function Search({ disabled }: { disabled?: boolean }) {
     } else {
       params.delete('q');
     }
-    
+
     startTransition(() => {
-     
       router.replace(`${pathname}?${params.toString()}`);
       lastParams = params;
     });
