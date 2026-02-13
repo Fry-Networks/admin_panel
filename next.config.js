@@ -1,11 +1,37 @@
+const path = require('path');
+// Use an absolute alias for webpack and a project-relative alias for Turbopack.
+const reactModalAliasWebpack = path.resolve(
+  __dirname,
+  'components/compat/react-modal.tsx'
+);
+const reactModalAliasTurbo = './components/compat/react-modal.tsx';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['avatars.githubusercontent.com', 'avatar.vercel.sh']
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatar.vercel.sh'
+      }
+    ]
   },
-  experimental: {
-    serverComponentsExternalPackages: ['@tremor/react'],
-    serverActions: true
+  turbopack: {
+    resolveAlias: {
+      // Turbopack expects project-relative paths here.
+      'react-modal': reactModalAliasTurbo
+    }
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      // Webpack expects absolute paths for aliases.
+      'react-modal': reactModalAliasWebpack
+    };
+    return config;
   },
   async headers() {
     return [

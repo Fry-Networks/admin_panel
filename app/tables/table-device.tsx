@@ -21,9 +21,9 @@ import { Device } from '../../lib/devices-schema';
 import { useEffect, useRef, useState } from 'react';
 import Modal from 'react-modal';
 import { FryToken } from '../../lib/tokens-schema';
-import { TimeInput } from '@nextui-org/date-input';
+import { TimeInput } from '@heroui/date-input';
 import { Time } from '@internationalized/date';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/router';
 

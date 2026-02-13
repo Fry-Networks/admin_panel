@@ -1,4 +1,14 @@
 import type { Config } from 'tailwindcss';
+import plugin from 'tailwindcss/plugin';
+
+// Fallback variant to avoid hard dependency on @headlessui/tailwindcss.
+const headlessUiVariantFallback = plugin(({ addVariant }) => {
+  // Match Headless UI "selected" state used by Tremor components.
+  addVariant('ui-selected', [
+    '&[data-headlessui-state~="selected"]',
+    '&[data-headlessui-state~="selected"] &'
+  ]);
+});
 
 export default {
   content: [
@@ -92,5 +102,6 @@ export default {
         /^(fill-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/
     }
   ],
-  plugins: [require('@headlessui/tailwindcss')]
+  // Keep UI variants available without requiring @headlessui/tailwindcss.
+  plugins: [headlessUiVariantFallback]
 } satisfies Config;

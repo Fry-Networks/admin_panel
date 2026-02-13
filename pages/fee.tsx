@@ -18,7 +18,7 @@ import {
 } from '@tremor/react';
 import TokensTable from '../app/tables/table-tokens';
 import { getSession } from 'next-auth/react';
-import { DateInput, useDateInput } from '@nextui-org/date-input';
+import { DateInput, useDateInput } from '@heroui/date-input';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import FeesTable from '../app/tables/table-fees';
