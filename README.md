@@ -87,15 +87,14 @@ Set these in `.env` (or `.env.local` when running locally):
 
 ## Deployment Notes
 - Production run command: `npm run build && npm run start -p 3008`.
-- PM2 config (`ecosystem.config.js`) starts the compiled build with `NODE_ENV=production` via `npm start`.
+- Docker/Compose is the primary production runtime (`Dockerfile` + `docker-compose.yml`).
 - Ensure environment files include the new `*_REKEY` keys before shipping — refunds will fail otherwise.
 
 ## 1Password Integration
-- Secrets live in the `AdminPanel` vault inside an item also named `AdminPanel`. Fields present: `OP_SERVICE_ACCOUNT_TOKEN`, `NEXTAUTH_SECRET`, `GITHUB_ID`, `GITHUB_SECRET`, `GITHUB_ID_DEV`, `GITHUB_SECRET_DEV`, `MONGO_URI`, `BASE_API_KEY`, `ADMIN_PASSWORD`, `STAKE_MNEMONIC`, `REWARD_MNEMONIC`, `STAKE_REKEY`, `REWARD_REKEY`.
 - Secrets live in the `AdminPanel` vault inside an item also named `AdminPanel`. Fields present: `OP_SERVICE_ACCOUNT_TOKEN`, `NEXTAUTH_SECRET`, `GITHUB_ID`, `GITHUB_SECRET`, `GITHUB_ID_DEV`, `GITHUB_SECRET_DEV`, `MONGO_URI`, `BASE_API_KEY`, `ADMIN_PASSWORD`, `STAKE_MNEMONIC`, `REWARD_MNEMONIC`, `STAKE_REKEY`, `REWARD_REKEY`. Optional: `MAX_REFUND_AMOUNT` (increase or lower the per-transaction refund ceiling; defaults to 500000 if absent).
-- Wrapper scripts `./start-with-1password.sh` and `./build-with-1password.sh` hydrate environment variables from the vault (using the 1Password CLI) and then call `npm start` / `npm run build`.
-- PM2 uses the wrapper automatically—see `ecosystem.config.js`. Export `OP_SERVICE_ACCOUNT_TOKEN` (or sign in with `op signin`) before running `pm2 start ecosystem.config.js`.
-- For manual builds, run `OP_SERVICE_ACCOUNT_TOKEN="$(op read 'op://AdminPanel/AdminPanel/OP_SERVICE_ACCOUNT_TOKEN')" ./build-with-1password.sh` to avoid leaking secrets into `.env`.
+- Docker/Compose runtime injection: the container reads `/run/secrets/op_service_account_token` as root in `docker-entrypoint.sh`, exports `OP_SERVICE_ACCOUNT_TOKEN`, then drops privileges to `appuser` and runs `op run -- npm start`.
+- Create the token file on the host (example path in `docker-compose.yml`): `/etc/opt/adminpanel/op_service_account_token`. Keep it root-only (`root:root`, `0400`).
+- For manual non-container runs, export `OP_SERVICE_ACCOUNT_TOKEN` and execute commands with `op run -- ...` so `op://...` environment references resolve at runtime.
 
 ## Housekeeping
 - Formatting: run Prettier (`npx prettier --write .`) to match the repo config (2-space indent, single quotes).
