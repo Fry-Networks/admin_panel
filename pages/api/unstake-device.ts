@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
-import { authOptions } from './auth/[...nextauth]';
+import { authOptions } from '@/lib/auth-options';
 import clientPromise from '../../lib/mongoclient';
 import algosdk, { Indexer } from 'algosdk';
 

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import clientPromise from "../../lib/mongoclient";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./auth/[...nextauth]";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-options';
 interface Data {
     email: string,
     address: string,
@@ -12,7 +12,7 @@ interface Data {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-    const session = await getServerSession(req,res, authOptions);
+    const session = await getServerSession(req, res, authOptions);
     // Check if user is authenticated
     if (!session || !session.user.admin) {
         res.status(401).json({ message: "Unauthorized" });

@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from '../../lib/mongoclient';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from './auth/[...nextauth]';
-import mongoose from 'mongoose';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-options';
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -39,17 +38,17 @@ export default async function handler(
         });
       }
 
-      await collection.updateOne(
-        { email: data.email },
-        {
-          $push: {
-            licenses: {
-              license: data.license,
-              used: false
-            }
+      // Cast to align with MongoDB driver's generic Document typings.
+      const update = {
+        $push: {
+          licenses: {
+            license: data.license,
+            used: false
           }
         }
-      );
+      } as unknown as Record<string, unknown>;
+
+      await collection.updateOne({ email: data.email }, update);
 
       console.log(
         `License ${data.license} added successfully by ${session.user.email}`
