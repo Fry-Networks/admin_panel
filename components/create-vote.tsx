@@ -80,11 +80,12 @@ export default function ModalCreateVote({isOpen, setIsOpen}: {isOpen: boolean, s
                             <Textarea placeholder="Description" className='mt-2' onValueChange={(value) => setVoteDescription(value)} />
                             <Divider />
                             <Flex className="grid grid-cols-2 gap-4">
-                                {vote_options.map((option: { title: string | undefined; description: string | number | undefined; }, index: Key | null | undefined) => (
+                                {vote_options.map((option: { title: string | undefined; description: string | number | undefined; }, index) => (
                                     <div key={index} className='mr-5'>
 
                                         <h4 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                                            Option {+(index ?? 0) + 1}
+                                            {/* Ensure numeric index for display math. */}
+                                            Option {index + 1}
                                         </h4>
                                         <TextInput placeholder="Option Title" value={option.title} className='mt-2'
                                             onValueChange={(value) => updateOption(index, 'title', value)} />

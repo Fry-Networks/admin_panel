@@ -145,7 +145,8 @@ export default function ModalEditVote({
               ) => (
                 <div key={index} className="mr-5">
                   <h4 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                    Option {+(index ?? 0) + 1}
+                    {/* Ensure numeric index for display math. */}
+                    Option {Number(index) + 1}
                   </h4>
                   <TextInput
                     placeholder="Option Title"

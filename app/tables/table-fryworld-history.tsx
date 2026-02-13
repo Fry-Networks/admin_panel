@@ -19,9 +19,9 @@ import { webUser } from '../../lib/webusers-model';
 import { User } from '../../lib/users-schema';
 import { useEffect, useRef, useState } from 'react';
 import Modal from 'react-modal';
-import { TimeInput } from '@nextui-org/date-input';
+import { TimeInput } from '@heroui/date-input';
 import { Time } from '@internationalized/date';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/router';
 import { Fee } from '../../lib/fee-schema';
@@ -66,7 +66,8 @@ export default function FryWorldHistoryTable({
         </TableHead>
         <TableBody>
           {fryworldPayments.map((fryworldPayment) => (
-            <TableRow key={fryworldPayment._id}>
+            // Ensure a stable string key when MongoDB ObjectId is used.
+            <TableRow key={fryworldPayment._id.toString()}>
               <TableCell>{fryworldPayment.address}</TableCell>
               <TableCell>
                 {getTokenNameById(fryworldPayment.asset_id)}

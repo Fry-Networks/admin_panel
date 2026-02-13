@@ -1,6 +1,4 @@
-import { BlockTxidsResponse } from 'algosdk/dist/types/client/v2/algod/models/types';
-import mongoose, { mongo } from 'mongoose';
-import { object } from 'prop-types';
+import mongoose from 'mongoose';
 export const priceSchema = new mongoose.Schema({
   no: Number,
   project_name: String,

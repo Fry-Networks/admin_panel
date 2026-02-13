@@ -1,6 +1,5 @@
-import { BlockTxidsResponse } from 'algosdk/dist/types/client/v2/algod/models/types';
-import mongoose, { mongo } from 'mongoose';
-import { object } from 'prop-types';
+import mongoose from 'mongoose';
+// Reward boost ledger schema (server-side only).
 export const feeSchema = new mongoose.Schema({
   reward_no: [Number],
   miner_key: String,

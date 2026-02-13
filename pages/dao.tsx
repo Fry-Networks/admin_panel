@@ -11,14 +11,18 @@ import {
   Textarea,
   DatePicker,
   Icon,
-  Callout
+  Callout,
+  Dialog,
+  DialogPanel,
+  Divider,
+  TextInput
 } from '@tremor/react';
 import clientPromise from '../lib/mongoclient';
 import { Key, useEffect, useMemo, useState } from 'react';
 import { getSession } from 'next-auth/react';
 import '../app/css/devices.css';
 import { Vote } from '../lib/vote-schema';
-import { Dialog, DialogPanel, Divider, TextInput } from '@tremor/react';
+// Consolidated tremor imports above to avoid duplicate module resolution.
 
 import {
   RiArrowDownSLine,
@@ -44,12 +48,16 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
   console.log('bla', votes);
   const [voteList, setVoteList] = useState(votes);
   const [isOpen, setIsOpen] = useState(false);
-  const [openModalId, setOpenModalId] = useState(null);
+  // Allow string IDs for modal tracking to avoid ObjectId type conflicts.
+  const [openModalId, setOpenModalId] = useState<string | null>(null);
   const [vote_options, setVoteOptions] = useState([{}] as {
     title: string;
     description: string;
   }[]);
-  const [openStatusModalId, setOpenStatusModalId] = useState(null);
+  // Allow string IDs for modal tracking to avoid ObjectId type conflicts.
+  const [openStatusModalId, setOpenStatusModalId] = useState<string | null>(
+    null
+  );
   const [stakeInfo, setStakeInfo] = useState([]);
   const [voteSelected, setVoteSelected] = useState<Vote | undefined>(undefined);
   const [activationToast, setActivationToast] = useState<ActivationResult | null>(
@@ -83,7 +91,8 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
     if (result.status === 'success' && result.payload) {
       setVoteList((prevVotes) =>
         prevVotes.map((vote) =>
-          vote._id === result.payload!.id
+          // Compare string representations to handle ObjectId vs string.
+          vote._id.toString() === result.payload!.id
             ? ({
                 ...vote,
                 current: true,
@@ -211,7 +220,8 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
           voteList.map((vote, index) => {
             console.log('vote', vote);
             return (
-              <Card key={vote._id} className="ml-4 mr-4 mt-4">
+              // Ensure a stable string key when MongoDB ObjectId is used.
+              <Card key={vote._id.toString()} className="ml-4 mr-4 mt-4">
                 <Flex
                   flexDirection="col"
                   alignItems="center"
@@ -265,7 +275,8 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                     <Button
                       color="amber"
                       className="mr-3"
-                      onClick={(e) => handleStop(vote._id)}
+                      // No event usage needed here.
+                      onClick={() => handleStop(vote._id)}
                     >
                       Stop vote
                     </Button>
@@ -290,25 +301,31 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                 </Flex>
                 <ModalChooseAsCurrent
                   index={index}
-                  key={vote._id}
-                  isOpen={openModalId === vote._id}
+                  // Ensure a stable string key when MongoDB ObjectId is used.
+                  key={vote._id.toString()}
+                  isOpen={openModalId === vote._id.toString()}
                   setIsOpen={(value: boolean) =>
-                    value ? setOpenModalId(vote._id) : handleCloseModal()
+                    value
+                      ? setOpenModalId(vote._id.toString())
+                      : handleCloseModal()
                   }
-                  vote={{ id: vote._id, title: vote.title }}
+                  // Provide a string ID for child component props.
+                  vote={{ id: vote._id.toString(), title: vote.title }}
                   onActivate={handleVoteActivated}
                 />
                 <ModalVoteStatus
-                  isOpen={openStatusModalId === vote._id}
+                  isOpen={openStatusModalId === vote._id.toString()}
                   setIsOpen={handleCloseStatusModal}
                   stakeInfo={stakeInfo}
                 />
                 <ModalEditVote
                   isOpen={voteSelected?._id === vote._id}
                   setIsOpen={handleCloseEditModal}
-                  vote={{ id: vote._id, vote: voteSelected }}
+                  // Provide a string ID for child component props.
+                  vote={{ id: vote._id.toString(), vote: voteSelected }}
                   index={index}
-                  key={vote._id}
+                  // Ensure a stable string key when MongoDB ObjectId is used.
+                  key={vote._id.toString()}
                 />
               </Card>
             );

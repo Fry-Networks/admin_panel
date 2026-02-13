@@ -1,4 +1,5 @@
 'use server';
+import 'server-only';
 import 'dotenv/config';
 import mongoose from 'mongoose';
 export async function connect() {

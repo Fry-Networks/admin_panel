@@ -1,4 +1,5 @@
 'use server'
+import 'server-only';
 import DeviceModel, { Device } from './devices-schema';
 import UserModel, { User } from './users-schema';
 import axios from "axios";

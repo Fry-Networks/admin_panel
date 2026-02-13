@@ -1,5 +1,4 @@
 import { Button, SearchSelect, SearchSelectItem, Text } from "@tremor/react";
-import { getSession } from "next-auth/react";
 import { useState } from "react";
 import clientPromise from "../lib/mongoclient";
 import { User } from "../lib/users-schema";
@@ -15,7 +14,8 @@ export default function RemoveUserForm({ users }: { users: User[] }) {
         
                 <SearchSelect className=" mb-4" placeholder="Select a user" onValueChange={(value) => setSelectedUser(value)} value={selectedUser}>
                     {users.map((user, index) => (
-                        <SearchSelectItem key={index} value={user._id}>
+                        // Ensure value is a string for SearchSelectItem.
+                        <SearchSelectItem key={index} value={user._id.toString()}>
                              {user.name?.full ? `${user.name?.full} (${user.email})` : user.email}
                              </SearchSelectItem>
                     ))}
