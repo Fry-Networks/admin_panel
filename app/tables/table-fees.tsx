@@ -59,12 +59,6 @@ export default function FeesTable({ fees }: { fees: Fee[] }) {
 
 const customStyles = {
   content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
     backgroundColor: 'white', // Example background color
     color: '#6b7280',
     padding: '20px',
