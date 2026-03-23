@@ -14,6 +14,9 @@ interface ProductData {
   node_price?: string;
   stake_one?: string;
   stake_two?: string;
+  // FIP-012: USD amounts for verification stakes
+  stake_one_usd?: string;
+  stake_two_usd?: string;
   stake_token?: string;
   reward_token?: string;
 }
@@ -43,6 +46,8 @@ export default async function handler(
       node_price,
       stake_one,
       stake_two,
+      stake_one_usd,
+      stake_two_usd,
       register_token,
       register_price,
       stake_token,
@@ -79,6 +84,11 @@ export default async function handler(
         updateData['reward.stake.stake_one'] = +stake_one;
       if (stake_two !== undefined)
         updateData['reward.stake.stake_two'] = +stake_two;
+      // FIP-012: USD amounts for verification stakes
+      if (stake_one_usd !== undefined)
+        updateData['reward.stake.stake_one_usd'] = +stake_one_usd;
+      if (stake_two_usd !== undefined)
+        updateData['reward.stake.stake_two_usd'] = +stake_two_usd;
       if (stake_token !== undefined)
         updateData['reward.tokens.stake'] = stake_token;
       if (reward_token !== undefined)

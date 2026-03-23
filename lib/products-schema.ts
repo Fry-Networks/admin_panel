@@ -10,7 +10,10 @@ export const productsSchema = new mongoose.Schema({
       stake_one: { type: Number, default: 0 },
       stake_two: { type: Number, default: 0 },
       register: { type: Number, default: 0 },
-      node: { type: Number, default: 0 }
+      node: { type: Number, default: 0 },
+      // FIP-012: USD amounts for verification stakes
+      stake_one_usd: { type: Number, default: 0 },
+      stake_two_usd: { type: Number, default: 0 }
     },
     tokens: {
       staked: { type: String },
@@ -33,6 +36,9 @@ export interface Product extends mongoose.Document {
       stake_two: number;
       node: number;
       register: number;
+      // FIP-012: USD amounts for verification stakes
+      stake_one_usd?: number;
+      stake_two_usd?: number;
     };
     tokens?: {
       stake: string;

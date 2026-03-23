@@ -39,6 +39,9 @@ export default function StakeProductsTable({
 
   const stakeOneRef = useRef<HTMLInputElement>(null);
   const stakeTwoRef = useRef<HTMLInputElement>(null);
+  // FIP-012: USD amount refs for verification stakes
+  const stakeOneUsdRef = useRef<HTMLInputElement>(null);
+  const stakeTwoUsdRef = useRef<HTMLInputElement>(null);
   const stakeTokenRef = useRef<string | null>(null);
   const nodeStakeTokenRef = useRef<string | null>(null);
   const nodeStakeAmountRef = useRef<HTMLInputElement>(null);
@@ -72,6 +75,9 @@ export default function StakeProductsTable({
     const stakeToken = stakeTokenRef.current ?? 'none';
     const stake_one = stakeOneRef.current?.value;
     const stake_two = stakeTwoRef.current?.value;
+    // FIP-012: USD amounts for verification stakes
+    const stake_one_usd = stakeOneUsdRef.current?.value;
+    const stake_two_usd = stakeTwoUsdRef.current?.value;
 
     // Ensure the values are retrieved
     if (stake_one === undefined || stake_two === undefined) {
@@ -88,6 +94,8 @@ export default function StakeProductsTable({
           node_price: nodeStakeAmount,
           stake_one,
           stake_two,
+          stake_one_usd,
+          stake_two_usd,
           stake_token: stakeToken
         }
       : {
@@ -96,6 +104,8 @@ export default function StakeProductsTable({
           register_price: registerUSD,
           stake_one,
           stake_two,
+          stake_one_usd,
+          stake_two_usd,
           stake_token: stakeToken
         };
 
@@ -181,7 +191,9 @@ export default function StakeProductsTable({
               </>
             )}
             <TableHeaderCell>Verify Stake Token</TableHeaderCell>
-            <TableHeaderCell>Stake Amount</TableHeaderCell>
+            <TableHeaderCell>Stake 1 (USD)</TableHeaderCell>
+            <TableHeaderCell>Stake 2 (USD)</TableHeaderCell>
+            <TableHeaderCell>Legacy Stake (FRY)</TableHeaderCell>
             <TableHeaderCell>Added on </TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableRow>
@@ -228,9 +240,13 @@ export default function StakeProductsTable({
                   : 'None'}
               </TableCell>
               <TableCell>
-                <Text>{`Tier one: ${
-                  product.reward.stake?.stake_one ?? 0
-                } | Tier two: ${product.reward.stake?.stake_two ?? 0}`}</Text>
+                <Text>{`$${product.reward.stake?.stake_one_usd ?? 0}`}</Text>
+              </TableCell>
+              <TableCell>
+                <Text>{`$${product.reward.stake?.stake_two_usd ?? 0}`}</Text>
+              </TableCell>
+              <TableCell>
+                <Text>{`T1: ${product.reward.stake?.stake_one ?? 0} | T2: ${product.reward.stake?.stake_two ?? 0}`}</Text>
               </TableCell>
               <TableCell>
                 <Text>
@@ -344,21 +360,45 @@ export default function StakeProductsTable({
               })}
             </Select>
           </div>
-          <div>
-            <label>Stake Amount Tier 1 ($FRY):</label>
-            <NumberInput
-              ref={stakeOneRef}
-              defaultValue={editingProduct?.reward.stake?.stake_one ?? 0}
-              step={1}
-            />
+          <div className="mt-4 p-3 border border-blue-300 rounded bg-blue-50">
+            <p className="text-sm text-blue-700 mb-2 font-semibold">FIP-012: USD-Pegged Verification Stakes</p>
+            <div>
+              <label>Stake 1 (USD) - 24h Lock:</label>
+              <NumberInput
+                ref={stakeOneUsdRef}
+                defaultValue={editingProduct?.reward.stake?.stake_one_usd ?? 0}
+                step={1}
+                min={0}
+              />
+            </div>
+            <div>
+              <label>Stake 2 (USD) - 6 Month Lock:</label>
+              <NumberInput
+                ref={stakeTwoUsdRef}
+                defaultValue={editingProduct?.reward.stake?.stake_two_usd ?? 0}
+                step={1}
+                min={0}
+              />
+            </div>
           </div>
-          <div>
-            <label>Stake Amount Tier 2 ($FRY):</label>
-            <NumberInput
-              ref={stakeTwoRef}
-              defaultValue={editingProduct?.reward.stake?.stake_two ?? 0}
-              step={1}
-            />
+          <div className="mt-4 p-3 border border-gray-300 rounded bg-gray-50">
+            <p className="text-sm text-gray-500 mb-2">Legacy FRY Token Amounts (fallback if USD not set)</p>
+            <div>
+              <label>Stake Amount Tier 1 ($FRY):</label>
+              <NumberInput
+                ref={stakeOneRef}
+                defaultValue={editingProduct?.reward.stake?.stake_one ?? 0}
+                step={1}
+              />
+            </div>
+            <div>
+              <label>Stake Amount Tier 2 ($FRY):</label>
+              <NumberInput
+                ref={stakeTwoRef}
+                defaultValue={editingProduct?.reward.stake?.stake_two ?? 0}
+                step={1}
+              />
+            </div>
           </div>
 
           <div className="mb-4 mt-4">
