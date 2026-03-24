@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const collection = db.collection('users');
 
-    console.log("user_id", user_id);
+    // console.log("user_id", user_id);
     
     const existingUser = await collection.findOne({
         _id: new mongoose.Types.ObjectId(user_id)
@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         res.status(200).json({ message: "ok" });
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({ message: "error" });
     }
 

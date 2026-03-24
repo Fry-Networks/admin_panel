@@ -1,38 +1,27 @@
 import {
   Card,
-  Metric,
   Text,
   Title,
   Button,
   Flex,
-  Grid,
-  MultiSelect,
-  MultiSelectItem,
-  Textarea,
-  DatePicker,
   Icon,
   Callout,
-  Dialog,
-  DialogPanel,
-  Divider,
-  TextInput
+  Divider
 } from '@tremor/react';
 import clientPromise from '../lib/mongoclient';
-import { Key, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getSession } from 'next-auth/react';
 import '../app/css/devices.css';
 import { Vote } from '../lib/vote-schema';
-// Consolidated tremor imports above to avoid duplicate module resolution.
 
 import {
-  RiArrowDownSLine,
-  RiCheckboxCircleFill,
-  RiCloseLine
+  RiCheckboxCircleFill
 } from '@remixicon/react';
 import ModalCreateVote from '../components/create-vote';
 import ModalChooseAsCurrent from '../components/choose-vote';
 import ModalVoteStatus from '../components/vote-status';
 import ModalEditVote from '../components/edit-vote';
+
 type ActivationResult = {
   status: 'success' | 'error';
   message: string;
@@ -45,24 +34,13 @@ type ActivationResult = {
 };
 
 export default function DaoPage({ votes }: { votes: Vote[] }) {
-  console.log('bla', votes);
   const [voteList, setVoteList] = useState(votes);
   const [isOpen, setIsOpen] = useState(false);
-  // Allow string IDs for modal tracking to avoid ObjectId type conflicts.
   const [openModalId, setOpenModalId] = useState<string | null>(null);
-  const [vote_options, setVoteOptions] = useState([{}] as {
-    title: string;
-    description: string;
-  }[]);
-  // Allow string IDs for modal tracking to avoid ObjectId type conflicts.
-  const [openStatusModalId, setOpenStatusModalId] = useState<string | null>(
-    null
-  );
+  const [openStatusModalId, setOpenStatusModalId] = useState<string | null>(null);
   const [stakeInfo, setStakeInfo] = useState([]);
   const [voteSelected, setVoteSelected] = useState<Vote | undefined>(undefined);
-  const [activationToast, setActivationToast] = useState<ActivationResult | null>(
-    null
-  );
+  const [activationToast, setActivationToast] = useState<ActivationResult | null>(null);
 
   useEffect(() => {
     if (!activationToast) return;
@@ -91,7 +69,6 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
     if (result.status === 'success' && result.payload) {
       setVoteList((prevVotes) =>
         prevVotes.map((vote) =>
-          // Compare string representations to handle ObjectId vs string.
           vote._id.toString() === result.payload!.id
             ? ({
                 ...vote,
@@ -108,15 +85,10 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
   };
 
   const handleStop = async (id: any) => {
-    const updateData = {
-      id: id
-    };
+    const updateData = { id: id };
     const response = await fetch('/api/stop-vote', {
-      // Replace with your actual API endpoint
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updateData)
     });
 
@@ -124,22 +96,14 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const result = await response.json();
-    console.log('Updated product:', result);
-    //reload page
     window.location.reload();
   };
 
   const handleDelete = async (id: any) => {
-    const updateData = {
-      id: id
-    };
+    const updateData = { id: id };
     const response = await fetch('/api/delete-vote', {
-      // Replace with your actual API endpoint
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updateData)
     });
 
@@ -147,31 +111,21 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const result = await response.json();
-    console.log('Updated product:', result);
-    //reload page
     window.location.reload();
   };
 
   const handleState = async (id: any) => {
-    const updateState = {
-      id: id
-    };
+    const updateState = { id: id };
 
     const response = await fetch('/api/get-vote-status', {
-      // Replace with your actual API endpoint
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updateState)
     });
 
     const result = await response.json();
     if (!response.ok) {
-      throw new Error(
-        `HTTP error! Status: ${response.status} Error: ${result.message}`
-      );
+      throw new Error(`HTTP error! Status: ${response.status} Error: ${result.message}`);
     }
 
     const stakeInformation = result.data;
@@ -180,18 +134,18 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
   };
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-8xl">
+    <main className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
       <Flex
         alignItems="start"
         justifyContent="start"
         flexDirection="row"
         className="mt-6"
       >
-        <Title>Votes</Title>
+        <Title className="text-white">Votes</Title>
 
         <button
           type="button"
-          className="whitespace-nowrap rounded-tremor-default bg-tremor-brand px-4 py-2 ml-4 text-center text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-tremor-brand-emphasis dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis"
+          className="whitespace-nowrap rounded-tremor-default bg-red-500 px-4 py-2 ml-4 text-center text-tremor-default font-medium text-white shadow-tremor-input hover:bg-red-600"
           onClick={() => setIsOpen(true)}
         >
           Create Vote
@@ -200,7 +154,7 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
           <ModalCreateVote isOpen={isOpen} setIsOpen={setIsOpen} />
         </div>
       </Flex>
-      <Divider />
+      <Divider className="border-gray-700" />
       {activationToast && (
         <Callout
           className="mt-4"
@@ -213,15 +167,13 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
       <Flex
         alignItems="start"
         justifyContent="start"
-        flexDirection="row"
+        flexDirection="col"
         className="mt-6"
       >
         {voteList ? (
           voteList.map((vote, index) => {
-            console.log('vote', vote);
             return (
-              // Ensure a stable string key when MongoDB ObjectId is used.
-              <Card key={vote._id.toString()} className="ml-4 mr-4 mt-4">
+              <Card key={vote._id.toString()} className="mb-4 mx-4 bg-gray-900 border-gray-700">
                 <Flex
                   flexDirection="col"
                   alignItems="center"
@@ -239,22 +191,20 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                         icon={RiCheckboxCircleFill}
                       />
                     ) : null}
-                    <Title style={{ fontSize: '25px' }} className="mb-2">
+                    <Title className="mb-2 text-white text-2xl">
                       {vote.title}
                     </Title>
                   </Flex>
-                  <Text className="mb-5">{vote.description}</Text>
+                  <Text className="mb-5 text-gray-300">{vote.description}</Text>
                 </Flex>
 
                 {vote.votes.map((option, index) => (
                   <div key={option.id || index}>
-                    {' '}
-                    {/* Assuming each option has a unique 'id' */}
-                    <Title style={{ fontSize: '15px' }}>
+                    <Title className="text-base text-gray-200">
                       {index + 1}.{option.title}
                     </Title>
-                    <Text>{option.description}</Text>
-                    <Text>Votes: {option.votes}</Text>
+                    <Text className="text-gray-400">{option.description}</Text>
+                    <Text className="text-gray-400">Votes: {option.votes}</Text>
                   </div>
                 ))}
                 <Flex
@@ -275,7 +225,6 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                     <Button
                       color="amber"
                       className="mr-3"
-                      // No event usage needed here.
                       onClick={() => handleStop(vote._id)}
                     >
                       Stop vote
@@ -301,7 +250,6 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                 </Flex>
                 <ModalChooseAsCurrent
                   index={index}
-                  // Ensure a stable string key when MongoDB ObjectId is used.
                   key={vote._id.toString()}
                   isOpen={openModalId === vote._id.toString()}
                   setIsOpen={(value: boolean) =>
@@ -309,7 +257,6 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                       ? setOpenModalId(vote._id.toString())
                       : handleCloseModal()
                   }
-                  // Provide a string ID for child component props.
                   vote={{ id: vote._id.toString(), title: vote.title }}
                   onActivate={handleVoteActivated}
                 />
@@ -321,17 +268,15 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                 <ModalEditVote
                   isOpen={voteSelected?._id === vote._id}
                   setIsOpen={handleCloseEditModal}
-                  // Provide a string ID for child component props.
                   vote={{ id: vote._id.toString(), vote: voteSelected }}
                   index={index}
-                  // Ensure a stable string key when MongoDB ObjectId is used.
                   key={vote._id.toString()}
                 />
               </Card>
             );
           })
         ) : (
-          <Text>No votes found</Text>
+          <Text className="text-gray-400">No votes found</Text>
         )}
       </Flex>
     </main>
@@ -340,11 +285,6 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
 
 export async function getServerSideProps(context: any) {
   const session = await getSession(context);
-  /*if (!session || !session.user?.admin) {
-        return {
-            props: { error: 'Unauthorized access' },
-        };
-    }*/
 
   const testMode = process.env.NEXT_PUBLIC_DAO_TEST === 'true' ? true : false;
 

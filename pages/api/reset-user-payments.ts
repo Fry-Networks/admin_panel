@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             await collection.updateOne({ email: data.email }, { $set: { "algo": false, "fry": false } });
             res.status(200).json({ message: "User updated successfully" });
-            console.log(`User ${data.email} updated successfully by ${session.user.email}`);
+            // console.log(`User ${data.email} updated successfully by ${session.user.email}`);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Error updating user" });

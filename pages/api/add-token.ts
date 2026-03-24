@@ -30,7 +30,7 @@ export default async function handler(
 
     if (!collectionExists) {
       await db.createCollection('tokens');
-      console.log('Created the tokens collection in database');
+      // console.log('Created the tokens collection in database');
     }
 
     const collection = db.collection('tokens');
@@ -48,8 +48,8 @@ export default async function handler(
     }
 
     const { name, asset_id } = req.body as TokenData;
-    console.log('Token Name: ' + name);
-    console.log('Token Asset Id: ', asset_id);
+    // console.log('Token Name: ' + name);
+    // console.log('Token Asset Id: ', asset_id);
 
     const result = await collection.insertOne({ name, asset_id });
     if (!result) {

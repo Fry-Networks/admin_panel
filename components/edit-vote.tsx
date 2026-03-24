@@ -43,8 +43,8 @@ export default function ModalEditVote({
   useEffect(() => {
     if (vote === undefined || vote.vote === undefined) return;
 
-    console.log('Use effect');
-    console.log(vote.vote);
+    // console.log('Use effect');
+    // console.log(vote.vote);
     setVoteTitle(vote.vote.title);
     setVoteDescription(vote.vote.description);
     setVoteEndDate(vote.vote.end_date);
@@ -83,7 +83,7 @@ export default function ModalEditVote({
     }
 
     const result = await response.json();
-    console.log('Updated product:', result);
+    // console.log('Updated product:', result);
     setIsOpen(false);
     window.location.reload();
   };
@@ -186,13 +186,6 @@ export default function ModalEditVote({
                 size="xl"
                 onClick={(e) => {
                   e.preventDefault();
-                  console.log(
-                    vote_title,
-                    vote_description,
-                    vote_options,
-                    vote_end_date
-                  );
-                  handleSubmit(e);
                 }}
               >
                 Submit

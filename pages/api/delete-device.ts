@@ -49,7 +49,7 @@ export default async function handler(
       .json({ success: true, message: 'Success to delete the device' });
     return;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).json({ message: 'Internal server error' });
     return;
   }

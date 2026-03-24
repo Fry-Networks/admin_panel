@@ -54,7 +54,7 @@ export default async function handler(
       reward_token
     } = data;
 
-    console.log('Updating product', productId);
+    // console.log('Updating product', productId);
 
     const existingProduct = await collection.findOne({
       wix_id: productId

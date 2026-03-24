@@ -23,9 +23,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const client = await clientPromise;
     const db = client.db("main");
     const {email, id, order, byod} = req.body;
-    console.log(email, id, order, byod);
+    // console.log(email, id, order, byod);
     const product = await db.collection("products").findOne({ _id: new ObjectId(id) });
-    console.log(product);
+    // console.log(product);
     if(!product) {
         res.status(400).json({ message: "Invalid product id" });
         return
@@ -47,7 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await db.collection("devices").insertOne({ miner_key, email, name: product.name, created_at: new Date(), is_registered: false,  order, byod });
         res.status(200).json({ message: "ok" });
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({ message: "error" });
     }
 };

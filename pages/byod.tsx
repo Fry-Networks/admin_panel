@@ -1,24 +1,20 @@
 import {
   Card,
-  Metric,
   Text,
   Title,
   Button,
-  Flex,
-  Grid,
-  MultiSelect,
-  MultiSelectItem
+  Flex
 } from '@tremor/react';
 import clientPromise from '../lib/mongoclient';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getSession } from 'next-auth/react';
 import '../app/css/devices.css';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import { ByodUser } from '../lib/byod-schema';
 import ByodTable from '../app/tables/table-byod';
-// Use pages-router search component for pages directory.
 import Search from '../components/search';
 import { base32 } from '@scure/base';
+
 export default function DevicesPage({
   byodUsers,
   currentPage,
@@ -30,17 +26,13 @@ export default function DevicesPage({
   currentPage: number;
   pageSize: number;
 }) {
-  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
+  const [sortOrder, setSortOrder] = useState('asc');
 
-  // Function to toggle sorting order
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
-  // Function to sort devices
-  console.log(searchParams);
   const searchTerm = searchParams?.q || '';
-  // eslint-disable-next-line react-hooks/exhaustive-deps
 
   const [filtered, setFiltered] = useState<ByodUser[]>(byodUsers);
 
@@ -62,13 +54,11 @@ export default function DevicesPage({
         : byodUsers;
 
     setFiltered(filteredUsers);
-    console.log('Filtered Users:', filteredUsers);
   }, [searchTerm, byodUsers]);
-  //@ts-ignore
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-max">
-      <Title>Byod Users</Title>
+    <main className="p-4 md:p-10 mx-auto max-w-max bg-gray-950">
+      <Title className="text-white">Byod Users</Title>
 
       <TabGroup>
         <TabList className="mt-8">
@@ -78,11 +68,11 @@ export default function DevicesPage({
           <TabPanel>
             <Flex alignItems="end" flexDirection="row" className="mt-6">
               <Search />
-              <Text className="mt-4">
+              <Text className="mt-4 ml-4 text-gray-300">
                 {filtered?.length} byod users matching your search
               </Text>
             </Flex>
-            <Card className="mt-6">
+            <Card className="mt-6 bg-gray-900 border-gray-700">
               <ByodTable byods={filtered} />
             </Card>
           </TabPanel>
@@ -106,9 +96,6 @@ export async function getServerSideProps(context: any) {
     const searchParams = context.query;
     const searchTerm = searchParams.q || '';
 
-    console.log('SearchParam: ', searchTerm);
-
-    // Build query based on search term
     const query =
       searchTerm.length > 0
         ? {
@@ -131,7 +118,6 @@ export async function getServerSideProps(context: any) {
         .map((num: string) => parseInt(num, 10));
       const bytes = new Uint8Array(numberArray);
 
-      // Encode to base32
       const address = base32.encode(bytes).split('=')[0];
       byod.address = address;
     });

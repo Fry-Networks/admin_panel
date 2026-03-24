@@ -54,7 +54,7 @@ export default async function handler(
       .json({ success: true, message: 'Success to blacklist the device' });
     return;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).json({ message: 'Internal server error' });
     return;
   }

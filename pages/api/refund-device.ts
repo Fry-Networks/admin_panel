@@ -26,7 +26,7 @@ const getAssetDecimals = async (assetId: number): Promise<number | null> => {
   try {
     const assetInfo = await indexer.lookupAssetByID(assetId).do();
     const decimals = assetInfo.asset.params.decimals;
-    console.log(`Asset ID: ${assetId}, Decimals: ${decimals}`);
+    // console.log(`Asset ID: ${assetId}, Decimals: ${decimals}`);
     return decimals;
   } catch (error) {
     console.error(`Failed to fetch asset info for Asset ID ${assetId}:`, error);
@@ -52,7 +52,7 @@ export default async function handler(
 
   const { address, amount, refundFrom, assetId, miner_key } = req.body;
 
-  console.log(address, amount, refundFrom, assetId, miner_key);
+  // console.log(address, amount, refundFrom, assetId, miner_key);
 
   const normalizedAmount = Number(amount);
   if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
@@ -134,7 +134,7 @@ export default async function handler(
       suggestedParams
     });
 
-    console.log(normalizedAmount * Math.pow(10, decimal));
+    // console.log(normalizedAmount * Math.pow(10, decimal));
 
     if (!txn) {
       res.status(403).json({ message: 'Failed to make refund transaction' });

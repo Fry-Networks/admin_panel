@@ -23,7 +23,7 @@ export default async function handler(
       email: string;
     } = req.body;
 
-    console.log(data);
+    // console.log(data);
 
     try {
       const existOne = await collection.findOne({ email: data.email });
@@ -49,10 +49,6 @@ export default async function handler(
       } as unknown as Record<string, unknown>;
 
       await collection.updateOne({ email: data.email }, update);
-
-      console.log(
-        `License ${data.license} added successfully by ${session.user.email}`
-      );
       res.status(200).json({ message: 'License added successfully' });
     } catch (error) {
       console.error(error);

@@ -20,7 +20,7 @@ export default function WeatherDevicesTable({
 
   useEffect(() => {
     // Log the new data
-    console.log('Updated devicesData:', devicesData);
+    // console.log('Updated devicesData:', devicesData);
     // Update the state to trigger re-render
     setDisplayData(devicesData);
   }, [devicesData]);

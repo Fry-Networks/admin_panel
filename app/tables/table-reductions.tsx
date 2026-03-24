@@ -48,13 +48,13 @@ export default function ReductionsTable({
   };
 
   const handleCloseDeleteModal = () => {
-    console.log('Selected Index: ' + selectedIndex);
+    // console.log('Selected Index: ' + selectedIndex);
     setOpenDeleteModal(false);
     // window.location.reload();
   };
 
   const handleCloseDeleteAllModal = () => {
-    console.log('Selected Index: ' + selectedIndex);
+    // console.log('Selected Index: ' + selectedIndex);
     setOpenDeleteAllModal(false);
     // window.location.reload();
   };
@@ -77,7 +77,7 @@ export default function ReductionsTable({
       addMaxDeviceCount === undefined ||
       addReduction === undefined
     ) {
-      console.log('There is an error in form data of Add Redudction');
+      // console.log('There is an error in form data of Add Redudction');
       return;
     }
 
@@ -88,7 +88,7 @@ export default function ReductionsTable({
     };
 
     try {
-      console.log('Add Reduction: ', addReductionData);
+      // console.log('Add Reduction: ', addReductionData);
 
       const response = await fetch('/api/add-reduction', {
         method: 'PUT',
@@ -104,7 +104,7 @@ export default function ReductionsTable({
       }
 
       const result = await response.json();
-      console.log(`Add Reduction: ${result}`);
+      // console.log(`Add Reduction: ${result}`);
       setUpdateSuccess('added reduction');
       setTimeout(() => {
         setUpdateSuccess('');
@@ -119,7 +119,7 @@ export default function ReductionsTable({
       ];
       setReductions(updateReductions);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
     handleCloseAddModal();
   };
@@ -138,7 +138,7 @@ export default function ReductionsTable({
       updateMinDeviceCount === undefined ||
       updateReduction === undefined
     ) {
-      console.log('There is an error in form data of Add Redudction');
+      // console.log('There is an error in form data of Add Redudction');
       return;
     }
 
@@ -152,7 +152,7 @@ export default function ReductionsTable({
     };
 
     try {
-      console.log('Update Reduction: ' + updateReductionData);
+      // console.log('Update Reduction: ' + updateReductionData);
 
       const response = await fetch('/api/update-reduction', {
         method: 'PUT',
@@ -199,13 +199,13 @@ export default function ReductionsTable({
       }
       setReductions(updatedReductions);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
     handleCloseUpdateModal();
   };
 
   const handleDeleteReduction = async () => {
-    console.log(`Delete ${selectedIndex} reduction!`);
+    // console.log(`Delete ${selectedIndex} reduction!`);
 
     try {
       const response = await fetch('/api/delete-reduction', {
@@ -243,13 +243,13 @@ export default function ReductionsTable({
       setSelectedIndex(0);
     } catch (error) {
       setUpdateSuccess('error');
-      console.log('Error: ' + error);
+      // console.log('Error: ' + error);
     }
     handleCloseDeleteModal();
   };
 
   const handleDeleteAllReduction = async () => {
-    console.log(`Delete all reductions!`);
+    // console.log(`Delete all reductions!`);
 
     try {
       const response = await fetch('/api/delete-all-reductions', {
@@ -274,7 +274,7 @@ export default function ReductionsTable({
       setSelectedIndex(0);
     } catch (error) {
       setUpdateSuccess('error');
-      console.log('Error: ' + error);
+      // console.log('Error: ' + error);
     }
     handleCloseDeleteAllModal();
   };
@@ -573,7 +573,7 @@ export function getTotalReduction(
     totalReduction =
       totalReduction +
       Math.floor(((100 - totalReduction) * reductions[i].reduction) / 100);
-    console.log(totalReduction);
+    // console.log(totalReduction);
   }
 
   return totalReduction;

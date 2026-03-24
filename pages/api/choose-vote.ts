@@ -33,7 +33,7 @@ export default async function handler(
     const { id, end_date, super_majority, hidden } = data;
     const toDate = new Date(end_date);
 
-    console.log('Selecting vote', id);
+    // console.log('Selecting vote', id);
 
     try {
       // const previousVote = await collection.findOne({ current: true });
@@ -45,7 +45,7 @@ export default async function handler(
         { $set: { current: true, end_date: toDate, super_majority, hidden } }
       );
 
-      console.log(`Vote successfully selected by ${session?.user.email}`);
+      // console.log(`Vote successfully selected by ${session?.user.email}`);
       res.status(200).json({ message: 'Vote added successfully' });
     } catch (error) {
       console.error(error);

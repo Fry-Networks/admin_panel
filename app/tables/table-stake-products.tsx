@@ -32,7 +32,7 @@ export default function StakeProductsTable({
   tokens: FryToken[];
   node: boolean;
 }) {
-  console.log('Node ' + node);
+  // console.log('Node ' + node);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [globalMultiplier, setGlobalMultiplier] = useState(1);
   const [updateSuccess, setUpdateSuccess] = useState(''); // State to track update success
@@ -110,7 +110,7 @@ export default function StakeProductsTable({
         };
 
     try {
-      console.log('Updating product:', editingProduct);
+      // console.log('Updating product:', editingProduct);
 
       const response = await fetch('/api/edit-product', {
         // Replace with your actual API endpoint
@@ -127,7 +127,7 @@ export default function StakeProductsTable({
       }
 
       const result = await response.json();
-      console.log('Updated product:', result);
+      // console.log('Updated product:', result);
       setUpdateSuccess(editingProduct.name); // Set success state to true
       setTimeout(() => {
         window.location.reload();
@@ -381,8 +381,8 @@ export default function StakeProductsTable({
               />
             </div>
           </div>
-          <div className="mt-4 p-3 border border-gray-300 rounded bg-gray-50">
-            <p className="text-sm text-gray-500 mb-2">Legacy FRY Token Amounts (fallback if USD not set)</p>
+          <div className="mt-4 p-3 border border-gray-600 rounded bg-gray-800">
+            <p className="text-sm text-gray-400 mb-2">Legacy FRY Token Amounts (fallback if USD not set)</p>
             <div>
               <label>Stake Amount Tier 1 ($FRY):</label>
               <NumberInput

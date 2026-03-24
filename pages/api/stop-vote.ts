@@ -22,8 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { id } = data;
 
 
-        console.log("Stopping vote", id);
-        console.log(`Vote successfully stopped by ${session?.user.email}`);
+        // console.log("Stopping vote", id);
+        // console.log(`Vote successfully stopped by ${session?.user.email}`);
         try {
             await collection.updateOne({ _id: new mongoose.Types.ObjectId(id) }, { $set: { end_date: new Date(), current: false } });
 

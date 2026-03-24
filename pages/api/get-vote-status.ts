@@ -32,7 +32,7 @@ export default async function handler(
     const data: { id: string } = req.body;
     const { id } = data;
 
-    console.log('Get vote Data', id);
+    // console.log('Get vote Data', id);
     try {
       const vote = (await collection.findOne({
         _id: new mongoose.Types.ObjectId(id)
@@ -49,7 +49,7 @@ export default async function handler(
 
       for (let i = 0; i < votes.length; i++) {
         const different_people = votes[i].different_people;
-        console.log(different_people);
+        // console.log(different_people);
         for (const one of different_people) {
           const stakeForOne = await stakeCollection.findOne({
             voteTitle: voteTitle,

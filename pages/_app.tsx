@@ -12,13 +12,13 @@ interface MyAppProps extends AppProps {
 
 interface ProtectedComponentProps {
   Component: NextPage;
-  pageProps: any; // If you have a specific type for your pageProps, you can replace `any` with that.
+  pageProps: any;
 }
 
 export default function MyApp({ Component, pageProps }: MyAppProps) {
   return (
     <SessionProvider session={pageProps.session}>
-      <div id="main">
+      <div id="main" className="dark bg-gray-950 text-white min-h-screen">
         <ProtectedComponent Component={Component} pageProps={pageProps} />
       </div>
     </SessionProvider>
@@ -34,11 +34,7 @@ const ProtectedComponent: React.FC<ProtectedComponentProps> = ({
   const router = useRouter();
   const showInfo = (text: string) => {
     return (
-      <p
-        style={{
-          margin: '50px'
-        }}
-      >
+      <p className="m-12 text-gray-300">
         {text}
       </p>
     );
@@ -60,7 +56,7 @@ const ProtectedComponent: React.FC<ProtectedComponentProps> = ({
   if (isLoading) return showInfo('Loading...');
   if (process.env.NODE_ENV !== 'development') {
     if (!session) {
-      return showInfo('User is not logged in!'); // Guard while redirecting to login.
+      return showInfo('User is not logged in!');
     }
 
     if (!session.user?.admin) {
@@ -69,12 +65,10 @@ const ProtectedComponent: React.FC<ProtectedComponentProps> = ({
     if (router.pathname === '/dao' && !session.user?.owner) {
       return showInfo('Sorry guys, only owners can access this page!');
     }
-    //if the user is at /rewards and is not an owner, return a message
   }
 
   return (
     <>
-      {/* Only show navigation when an authenticated admin is present. */}
       {session?.user?.admin ? <Navbar /> : null}
       <Component {...pageProps} />
     </>

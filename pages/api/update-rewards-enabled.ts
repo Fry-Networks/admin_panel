@@ -22,8 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { enabled } = data;
 
 
-        console.log("Updating rewards to ", enabled);
-        //console.log(`Mult updated successfully by ${session.user.email}`);
+        // console.log("Updating rewards to ", enabled);
+        //// console.log(`Mult updated successfully by ${session.user.email}`);
         try {
             await collection.updateOne({ name: "rewards" }, { $set: { enabled: enabled } });
 

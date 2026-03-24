@@ -70,8 +70,8 @@ export async function addDevice({ email, device_type }: { email: string, device_
         device_name: device_name,
         api_key: process.env.BASE_API_KEY,
     }).then((res) => {
-        console.log(`statusCode: ${res.status}`);
-        console.log(res);
+        // console.log(`statusCode: ${res.status}`);
+        // console.log(res);
         return true
     }
     ).catch((error) => {

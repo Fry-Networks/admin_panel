@@ -66,7 +66,7 @@ export default function RewardProductsTable({
     };
 
     try {
-      console.log('Updating product:', editingProduct);
+      // console.log('Updating product:', editingProduct);
 
       const response = await fetch('/api/edit-product', {
         // Replace with your actual API endpoint
@@ -83,7 +83,7 @@ export default function RewardProductsTable({
       }
 
       const result = await response.json();
-      console.log('Updated product:', result);
+      // console.log('Updated product:', result);
       setUpdateSuccess(editingProduct.name); // Set success state to true
       setTimeout(() => {
         window.location.reload();
@@ -115,7 +115,7 @@ export default function RewardProductsTable({
       }
 
       const result = await response.json();
-      console.log('Updated multiplier:', result);
+      // console.log('Updated multiplier:', result);
       0;
 
       setUpdateSuccess('multiplier'); // Set success state to true

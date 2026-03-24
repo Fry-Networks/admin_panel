@@ -43,7 +43,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
       }
 
       const result = await response.json();
-      console.log('Updated license use:', result);
+      // console.log('Updated license use:', result);
       setUpdateSuccess("license"); // Set success state to true
       setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
       return result.used;
@@ -67,7 +67,7 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
       }
 
       const result = await response.json();
-      console.log('Added license:', result);
+      // console.log('Added license:', result);
       setUpdateSuccess("license"); // Set success state to true
       setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
     } catch (err) {
@@ -90,14 +90,14 @@ export default function ByodTable({ byods }: { byods: ByodUser[] }) {
       }
 
       const result = await response.json();
-      console.log('Reset payments:', result);
+      // console.log('Reset payments:', result);
       setUpdateSuccess("payments"); // Set success state to true
       setTimeout(() => setUpdateSuccess(""), 3000); // Reset success state after 3 seconds
     } catch (err) {
       console.error('Error resetting payments:', err);
     }
   }
-  console.log(byods);
+  // console.log(byods);
   return (
 
 

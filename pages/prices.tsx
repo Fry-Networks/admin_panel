@@ -55,7 +55,6 @@ export default function PricesPage({
   const handleAddPrice = async () => {
     let message = '';
     if (!assetId || !projectName || !price) {
-      console.log('Invalid Input');
       return;
     }
 
@@ -93,18 +92,17 @@ export default function PricesPage({
   };
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-8xl">
-      <Title>Fry Service Prices</Title>
+    <main className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
+      <Title className="text-white">Fry Service Prices</Title>
       <TabGroup className="mt-3">
         <TabPanels>
           <TabPanel>
-            <Card>
+            <Card className="bg-gray-900 border-gray-700">
               <Flex
                 flexDirection="row"
-                className="gap-3"
-                style={{ marginBottom: '2px' }}
+                className="gap-3 mb-1"
               >
-                <Button onClick={onAddButton}>Add Price</Button>
+                <Button className="bg-red-500 hover:bg-red-600 border-0" onClick={onAddButton}>Add Price</Button>
               </Flex>
 
               {updateSuccess != '' && updateSuccess != 'error' && (
@@ -141,45 +139,46 @@ export default function PricesPage({
         contentLabel="Delete Reduction"
       >
         <Flex justifyContent="center">
-          <Title>Add Price Modal</Title>
+          <Title className="text-white">Add Price Modal</Title>
         </Flex>
         <div className="w-full mt-4">
-          <label>Project Name</label>
+          <label className="text-gray-300">Project Name</label>
           <TextInput
             placeholder="Please input project name"
-            className="mt-2"
+            className="mt-2 bg-gray-800 border-gray-600 text-white"
             onValueChange={(e) => setProjectName(e)}
           />
         </div>
         <div className="w-full mt-4">
-          <label>Price</label>
+          <label className="text-gray-300">Price</label>
           <NumberInput
             placeholder="Please input the price"
-            className="mt-2"
+            className="mt-2 bg-gray-800 border-gray-600 text-white"
             onValueChange={(e) => setPrice(e)}
           />
         </div>
         <div className="w-full mt-4">
-          <label>Price Measure</label>
+          <label className="text-gray-300">Price Measure</label>
           <Select
             defaultValue="usd"
+            className="bg-gray-800 border-gray-600"
             onValueChange={(e) => {
-              console.log(e);
               setIsUSD(e === 'usd');
             }}
           >
             <SelectItem key={0} value={'usd'}>
               USD
             </SelectItem>
-            <SelectItem key={0} value={'token'}>
+            <SelectItem key={1} value={'token'}>
               Token
             </SelectItem>
           </Select>
         </div>
         <div className="w-full mt-4">
-          <label>Asset Id</label>
+          <label className="text-gray-300">Asset Id</label>
           <Select
             defaultValue="11111111111"
+            className="bg-gray-800 border-gray-600"
             onValueChange={(e) => setAssetId(e)}
           >
             <SelectItem key={0} value={'11111111111'}>
@@ -196,8 +195,8 @@ export default function PricesPage({
           </Select>
         </div>
         <Flex justifyContent="center" className="gap-3 mt-4">
-          <Button onClick={handleAddPrice}>Add Price</Button>
-          <Button onClick={() => setOpenAddModal(false)}>Close</Button>
+          <Button className="bg-red-500 hover:bg-red-600 border-0" onClick={handleAddPrice}>Add Price</Button>
+          <Button className="bg-gray-700 hover:bg-gray-600 border-0" onClick={() => setOpenAddModal(false)}>Close</Button>
         </Flex>
       </Modal>
     </main>
@@ -242,14 +241,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const customStyles = {
   content: {
-    backgroundColor: 'white', // Example background color
-    color: '#6b7280',
+    backgroundColor: '#111827',
+    color: '#e5e7eb',
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-    minWidth: '320px'
+    minWidth: '320px',
+    border: '1px solid #374151'
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
+    backgroundColor: 'rgba(0, 0, 0, 0.75)'
   }
 };

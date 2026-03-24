@@ -142,7 +142,7 @@ export default function DevicesTable({
     });
 
     if (!response.ok) {
-      console.log('Failed to update data');
+      // console.log('Failed to update data');
       setUpdateSuccess('error');
       setTimeout(() => {
         setUpdateSuccess('');
@@ -152,7 +152,7 @@ export default function DevicesTable({
       setTimeout(() => {
         setUpdateSuccess('');
       }, 3_000);
-      console.log('Success to update data');
+      // console.log('Success to update data');
     }
   };
 
@@ -297,7 +297,7 @@ export default function DevicesTable({
     });
 
     if (!response.ok) {
-      console.log('Failed to update data');
+      // console.log('Failed to update data');
       setUpdateSuccess('error');
       setTimeout(() => {
         setUpdateSuccess('');
@@ -307,7 +307,7 @@ export default function DevicesTable({
       setTimeout(() => {
         setUpdateSuccess('');
       }, 3_000);
-      console.log('Success to update data');
+      // console.log('Success to update data');
     }
   };
 
@@ -321,14 +321,6 @@ export default function DevicesTable({
       }, 3_000);
       return;
     }
-
-    console.log(
-      aimDevice.address,
-      refundTermValue,
-      assetId,
-      refundAmount,
-      aimDevice.miner_key
-    );
 
     const response = await fetch('api/refund-device', {
       method: 'POST',
@@ -508,7 +500,7 @@ export default function DevicesTable({
                     {(session.user.owner || session.user.mods) && (
                       <Button
                         variant="secondary"
-                        className="text-gray-700 border-gray-700 hover:bg-gray-50 hover:text-gray-700 ml-1"
+                        className="text-gray-200 border-gray-700 hover:bg-gray-800 hover:text-gray-200 ml-1"
                         onClick={() => {
                           setSelectedDevice(device);
                           setShowBlacklistModal(true);
@@ -598,7 +590,7 @@ export default function DevicesTable({
                   <Select
                     defaultValue={assetId}
                     onValueChange={(value) => {
-                      console.log(value);
+                      // console.log(value);
                       setAssetId(value);
                     }}
                   >

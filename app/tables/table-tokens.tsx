@@ -56,7 +56,7 @@ export default function TokensTable({
     const addTokenName = addTokenNameRef.current?.value;
     const addTokenAssetId = addTokenAssetIdRef.current?.value;
 
-    console.log(`Name: ${addTokenName}, AssetId: ${addTokenAssetId}`);
+    // console.log(`Name: ${addTokenName}, AssetId: ${addTokenAssetId}`);
 
     const existingTokens =
       tokens && tokens.length > 0
@@ -217,7 +217,7 @@ export default function TokensTable({
       }
 
       const result = await response.json();
-      console.log(result);
+      // console.log(result);
       if (result.success === true) {
         setUpdateSuccess(result.message);
         setTimeout(() => {

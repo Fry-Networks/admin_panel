@@ -39,12 +39,12 @@ export default function ReductionPage({
   };
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-8xl">
-      <Title>Reduction</Title>
+    <main className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
+      <Title className="text-white">Reduction</Title>
       <TabGroup>
         <TabPanels>
           <TabPanel>
-            <Card>
+            <Card className="bg-gray-900 border-gray-700">
               <ReductionsTable
                 reductions={localReductions}
                 count={count}
@@ -56,11 +56,11 @@ export default function ReductionPage({
         </TabPanels>
       </TabGroup>
 
-      <Title className="mt-10">Reducted Products</Title>
+      <Title className="mt-10 text-white">Reducted Products</Title>
       <TabGroup>
         <TabPanels>
           <TabPanel>
-            <Card>
+            <Card className="bg-gray-900 border-gray-700">
               <ReductionProductTable
                 products={products}
                 index={showIndex}
@@ -86,7 +86,6 @@ export async function getServerSideProps(context: any) {
       .collection('devices')
       .countDocuments({ is_registered: true });
 
-    console.log('Registered Device Count: ', registeredDevicesCount);
     return {
       props: {
         reductions: JSON.parse(JSON.stringify(reductions)),

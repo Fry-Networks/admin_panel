@@ -646,7 +646,7 @@ export default function AnnouncementsPage({
             {sortedAnnouncements.length === 0 && (
               <TableRow>
                 <TableCell colSpan={8}>
-                  <Text className="text-center text-gray-500 py-6">
+                  <Text className="text-center text-gray-400 py-6">
                     No announcements match the current filters.
                   </Text>
                 </TableCell>
@@ -659,7 +659,7 @@ export default function AnnouncementsPage({
                     <Text className="font-semibold">
                       {announcement.title}
                     </Text>
-                    <Text className="text-sm text-gray-500 line-clamp-2">
+                    <Text className="text-sm text-gray-400 line-clamp-2">
                       {announcement.body}
                     </Text>
                   </div>
@@ -857,7 +857,7 @@ export default function AnnouncementsPage({
                       }))
                     }
                   />
-                  <label htmlFor="schedule" className="text-sm text-gray-600">
+                  <label htmlFor="schedule" className="text-sm text-gray-300">
                     Schedule publish for later
                   </label>
                 </div>
@@ -875,7 +875,7 @@ export default function AnnouncementsPage({
                       publishAt: event.target.value
                     }))
                   }
-                  className="w-full rounded-tremor-default border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded-tremor-default border border-gray-600 px-3 py-2 text-sm"
                 />
               </div>
             )}
@@ -892,7 +892,7 @@ export default function AnnouncementsPage({
                   }))
                 }
               />
-              <label htmlFor="expires" className="text-sm text-gray-600">
+              <label htmlFor="expires" className="text-sm text-gray-300">
                 Set expiry
               </label>
             </div>
@@ -908,7 +908,7 @@ export default function AnnouncementsPage({
                       expiresAt: event.target.value
                     }))
                   }
-                  className="w-full rounded-tremor-default border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded-tremor-default border border-gray-600 px-3 py-2 text-sm"
                 />
               </div>
             )}
@@ -932,7 +932,7 @@ export default function AnnouncementsPage({
               ? 'Update publish window'
               : 'Publish announcement'}
           </Title>
-          <Text className="text-sm text-gray-600 mb-4">
+          <Text className="text-sm text-gray-300 mb-4">
             Publishing will push updates to the dashboard within a few
             minutes. Use scheduling to delay the go-live time.
           </Text>
@@ -943,7 +943,7 @@ export default function AnnouncementsPage({
                 type="datetime-local"
                 value={publishAtInput}
                 onChange={(event) => setPublishAtInput(event.target.value)}
-                className="w-full rounded-tremor-default border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-tremor-default border border-gray-600 px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -954,7 +954,7 @@ export default function AnnouncementsPage({
                 onChange={(event) =>
                   setPublishExpiryInput(event.target.value)
                 }
-                className="w-full rounded-tremor-default border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-tremor-default border border-gray-600 px-3 py-2 text-sm"
               />
             </div>
             {requiresPublishConfirmation && (
@@ -990,7 +990,7 @@ export default function AnnouncementsPage({
       <Dialog open={archiveOpen} onClose={closeArchiveDialog} static={true}>
         <DialogPanel className="sm:max-w-md">
           <Title className="mb-2">Archive announcement</Title>
-          <Text className="text-sm text-gray-600 mb-4">
+          <Text className="text-sm text-gray-300 mb-4">
             Archiving immediately removes the banner from view. Continue?
           </Text>
           <Divider className="my-4" />

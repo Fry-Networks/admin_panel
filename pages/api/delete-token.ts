@@ -20,7 +20,7 @@ export default async function handler(
   }
 
   const { asset_id } = req.body;
-  console.log(`Delete token ${asset_id}`);
+  // console.log(`Delete token ${asset_id}`);
   if (typeof asset_id !== 'string' || asset_id.length <= 0) {
     res.status(400).json({ message: `Invalid token information` });
     return;

@@ -23,7 +23,7 @@ export default async function handler(
   }
 
   const { index, updatedData } = req.body;
-  console.log(`Update ${index} reduction request accepted`);
+  // console.log(`Update ${index} reduction request accepted`);
   if (typeof index !== 'number' || index < 0 || !updatedData) {
     res.status(400).json({ success: false, message: 'Invalid index value' });
     return;
@@ -42,14 +42,14 @@ export default async function handler(
       .limit(1)
       .toArray();
 
-    console.log(targetDocument);
+    // console.log(targetDocument);
 
     if (targetDocument.length === 0) {
       res.status(404).json({
         success: false,
         message: `No document found at index: ${index}`
       });
-      console.log(`Error status 404 No document found at index: ${index}`);
+      // console.log(`Error status 404 No document found at index: ${index}`);
       return;
     }
 
@@ -72,10 +72,10 @@ export default async function handler(
       return;
     }
 
-    console.log('Target updated');
+    // console.log('Target updated');
 
     if (index > 0) {
-      console.log('Update previous reduction');
+      // console.log('Update previous reduction');
       const prevDocument = await collection
         .find()
         .sort({ _id: 1 })
@@ -88,10 +88,6 @@ export default async function handler(
           success: false,
           message: `No document found at index: ${index - 1}`
         });
-        console.log(
-          `Error status 404 No document found at index: ${index - 1}`
-        );
-        return;
       }
 
       if (updatedData.minDeviceCount != prevDocument[0].maxDeviceCount) {
@@ -112,7 +108,7 @@ export default async function handler(
           return;
         }
 
-        console.log('Previous reduction updated');
+        // console.log('Previous reduction updated');
       }
     }
 
@@ -130,10 +126,6 @@ export default async function handler(
           success: false,
           message: `No document found at index: ${index - 1}`
         });
-        console.log(
-          `Error status 404 No document found at index: ${index - 1}`
-        );
-        return;
       }
 
       if (nextDocument[0].minDeviceCount !== updatedData.maxDeviceCount) {

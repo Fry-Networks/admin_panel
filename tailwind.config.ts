@@ -11,6 +11,7 @@ const headlessUiVariantFallback = plugin(({ addVariant }) => {
 });
 
 export default {
+  darkMode: 'class',
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -50,7 +51,34 @@ export default {
             strong: '#111827', // gray-900
             inverted: '#ffffff' // white
           }
-        }
+        },
+        // dark mode
+        'dark-tremor': {
+          brand: {
+            faint: '#0B1229',
+            muted: '#172554',
+            subtle: '#1e40af',
+            DEFAULT: '#e74c3c',  // Red accent
+            emphasis: '#c0392b',
+            inverted: '#ffffff'
+          },
+          background: {
+            muted: '#131A2B',
+            subtle: '#1f2937',
+            DEFAULT: '#0a0a0f',
+            emphasis: '#d1d5db'
+          },
+          border: { DEFAULT: '#374151' },
+          ring: { DEFAULT: '#e74c3c' },
+          content: {
+            subtle: '#6b7280',
+            DEFAULT: '#9ca3af',
+            emphasis: '#e5e7eb',
+            strong: '#f9fafb',
+            inverted: '#000000'
+          }
+        },
+        accent: { DEFAULT: '#e74c3c', hover: '#c0392b', light: '#ff6b5a' }
       },
       boxShadow: {
         // light

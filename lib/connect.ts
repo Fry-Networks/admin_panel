@@ -9,13 +9,13 @@ export async function connect() {
     if (!uri) {
         throw new Error('MONGO_URI not set!');
     }
-    console.log('Connecting to MongoDB...');
+    // console.log('Connecting to MongoDB...');
     await mongoose.connect(uri);
-    console.log('Connected to MongoDB!');
+    // console.log('Connected to MongoDB!');
     mongoose.connection.useDb('main');
 
     mongoose.connection.on('connected', () => {
-        console.log('Connected to MongoDB!');
+        // console.log('Connected to MongoDB!');
     });
 
     mongoose.connection.on('error', (err) => {
@@ -23,6 +23,6 @@ export async function connect() {
     });
 
     mongoose.connection.on('disconnected', () => {
-        console.log('Disconnected from MongoDB!');
+        // console.log('Disconnected from MongoDB!');
     });
 }

@@ -46,7 +46,7 @@ export default function ModalCreateVote({isOpen, setIsOpen}: {isOpen: boolean, s
         }
 
         const result = await response.json();
-        console.log('Updated product:', result);
+        // console.log('Updated product:', result);
     };
     return (
 <Dialog
@@ -105,7 +105,7 @@ export default function ModalCreateVote({isOpen, setIsOpen}: {isOpen: boolean, s
                                         size='xl'
                                         onClick={(e) => {
                                             e.preventDefault(); 
-                                            console.log(vote_title, vote_description, vote_options, vote_end_date);
+                                            // console.log(vote_title, vote_description, vote_options, vote_end_date);
                                             handleSubmit(e);
                                             window.location.reload();
                                             setIsOpen(false);

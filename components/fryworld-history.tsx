@@ -49,7 +49,7 @@ export default function FryWorldHistory({ tokens }: { tokens: FryToken[] }) {
     if (response.ok) {
       const result = await response.json();
 
-      console.log(result);
+      // console.log(result);
       if (result.success) {
         setFryWorldPayments(result.fryworldPayments);
         setTotalCount(result.totalCount);

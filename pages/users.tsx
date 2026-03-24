@@ -1,23 +1,16 @@
 import {
   Card,
-  Metric,
   Text,
   Title,
-  BarList,
   Flex,
-  Grid,
-  MultiSelect,
-  MultiSelectItem,
   TabPanel,
   TabPanels,
   TabGroup,
   TabList,
   Tab
 } from '@tremor/react';
-// Use pages-router search component for pages directory.
 import Search from '../components/search';
 import clientPromise from '../lib/mongoclient';
-import { useState } from 'react';
 import { User } from '../lib/users-schema';
 import UsersTable from '../app/tables/table';
 import { getSession } from 'next-auth/react';
@@ -48,11 +41,10 @@ export default function UsersPage({
           );
         })
       : users;
-  //(VPN|OGPS|IGPS|IDB|ODB)
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-7xl">
-      <Title>Users</Title>
+    <main className="p-4 md:p-10 mx-auto max-w-7xl bg-gray-950">
+      <Title className="text-white">Users</Title>
       <TabGroup>
         <TabList className="mt-8">
           <Tab>List</Tab>
@@ -64,11 +56,11 @@ export default function UsersPage({
             <Flex alignItems="end" flexDirection="row" className="mt-6">
               <Search />
             </Flex>
-            <div style={{ marginTop: '20px' }}>
-              <Text>{filtered.length} users matching your search</Text>
+            <div className="mt-5">
+              <Text className="text-gray-300">{filtered.length} users matching your search</Text>
             </div>
 
-            <Card className="mt-6">
+            <Card className="mt-6 bg-gray-900 border-gray-700">
               <UsersTable users={filtered} />
             </Card>
           </TabPanel>

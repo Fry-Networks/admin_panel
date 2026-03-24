@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { GetServerSideProps } from 'next';
 import clientPromise from '../lib/mongoclient';
-import { Fee, feeSchema } from '../lib/fee-schema';
+import { Fee } from '../lib/fee-schema';
 import {
   Button,
   Card,
@@ -16,9 +16,7 @@ import {
   TabList,
   Tab
 } from '@tremor/react';
-import TokensTable from '../app/tables/table-tokens';
 import { getSession } from 'next-auth/react';
-import { DateInput, useDateInput } from '@heroui/date-input';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import FeesTable from '../app/tables/table-fees';
@@ -47,38 +45,33 @@ export default function FeePage({
   const onFilterClicked = () => {
     const queryParams: Record<string, any> = {};
 
-    if (startDate) queryParams.startDate = startDate.toISOString(); // Convert to ISO string
+    if (startDate) queryParams.startDate = startDate.toISOString();
     if (endDate) queryParams.endDate = endDate.toISOString();
     if (minerKey) queryParams.minerKey = minerKey;
 
     queryParams.page = 1;
 
-    // Update the URL with new query parameters
     router.push({
-      pathname: '/fee', // Adjust the path if necessary
+      pathname: '/fee',
       query: queryParams
     });
   };
 
-  // Handle Page Change
   const onPageChange = (newPage: number) => {
     router.push({
       pathname: '/fee',
       query: {
-        ...router.query, // Keep other filters
+        ...router.query,
         page: newPage
       }
     });
   };
 
-  // Pagination logic
-  const totalPages = Math.ceil(totalCount / 20); // Assuming 10 items per page
-  console.log('totalCount: ' + totalCount);
-  console.log('totalPage: ' + totalPages);
+  const totalPages = Math.ceil(totalCount / 20);
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-8xl">
-      <Title>Crypto Income</Title>
+    <main className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
+      <Title className="text-white">Crypto Income</Title>
       <TabGroup className="mt-3">
         <TabList>
           <Tab>Reward</Tab>
@@ -87,32 +80,32 @@ export default function FeePage({
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Card>
+            <Card className="bg-gray-900 border-gray-700">
               <Flex
                 flexDirection="row"
-                className="gap-3"
-                style={{ marginBottom: '2px' }}
+                className="gap-3 mb-1"
               >
                 <Flex flexDirection="row" className="gap-2">
-                  <Text className="no-wrap-text">Start&nbsp;Date:</Text>
+                  <Text className="no-wrap-text text-gray-300">Start&nbsp;Date:</Text>
                   <DatePicker onValueChange={(value) => setStartDate(value)} />
                 </Flex>
 
                 <Flex flexDirection="row" className="gap-2">
-                  <Text>End&nbsp;Date: </Text>
+                  <Text className="text-gray-300">End&nbsp;Date: </Text>
                   <DatePicker onValueChange={(value) => setEndDate(value)} />
                 </Flex>
 
                 <TextInput
                   placeholder="Please input miner key to filter"
                   value={minerKey}
+                  className="bg-gray-800 border-gray-600 text-white"
                   onValueChange={(value) => setMinerKey(value)}
                 />
-                <Button onClick={onFilterClicked}>Filter</Button>
+                <Button className="bg-red-500 hover:bg-red-600 border-0" onClick={onFilterClicked}>Filter</Button>
               </Flex>
 
               <Flex justifyContent="center" className="mt-5">
-                <Title>{`Calculated Fee: $${Number(totalFee).toLocaleString(
+                <Title className="text-white">{`Calculated Fee: $${Number(totalFee).toLocaleString(
                   'en-US',
                   { minimumFractionDigits: 2, maximumFractionDigits: 2 }
                 )} (USD)`}</Title>
@@ -120,20 +113,19 @@ export default function FeePage({
               <FeesTable fees={fees} />
             </Card>
 
-            {/* Display filtered and paginated data */}
-
-            {/* Pagination controls */}
             <Flex justifyContent="center" className="mt-4">
               <Button
+                className="bg-gray-700 hover:bg-gray-600 border-0"
                 disabled={currentPage <= 1}
                 onClick={() => onPageChange(currentPage - 1)}
               >
                 Previous
               </Button>
-              <Text className="mx-2">
+              <Text className="mx-2 text-gray-300">
                 {currentPage} of {totalPages}
               </Text>
               <Button
+                className="bg-gray-700 hover:bg-gray-600 border-0"
                 disabled={currentPage >= totalPages}
                 onClick={() => onPageChange(currentPage + 1)}
               >
@@ -154,8 +146,8 @@ export default function FeePage({
 }
 
 const getNextDay = (endDate: Date): Date => {
-  const nextDay = new Date(endDate); // Create a new Date object based on the endDate
-  nextDay.setDate(nextDay.getDate() + 1); // Add 1 day to the current date
+  const nextDay = new Date(endDate);
+  nextDay.setDate(nextDay.getDate() + 1);
   return nextDay;
 };
 
@@ -217,21 +209,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const totalCount = await collection.countDocuments({ ...query });
 
-  // 2. Calculate total fee for all documents matching the filters
   const totalFeeResult = await collection
     .aggregate([
-      { $match: { ...query } }, // Apply filters
+      { $match: { ...query } },
       {
         $project: {
-          totalValue: { $multiply: ['$fee_amount', '$price'] } // Calculate fee * price for each document
+          totalValue: { $multiply: ['$fee_amount', '$price'] }
         }
       },
-      { $group: { _id: null, totalFee: { $sum: '$totalValue' } } } // Sum the total value
+      { $group: { _id: null, totalFee: { $sum: '$totalValue' } } }
     ])
     .toArray();
 
   const totalFee = totalFeeResult.length > 0 ? totalFeeResult[0].totalFee : 0;
-  console.log(totalFee);
 
   const rewards = await collection
     .find(query)
@@ -246,7 +236,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       fees: JSON.parse(JSON.stringify(rewards)),
       totalFee,
       totalCount,
-      currentPage: Number(page), // Return the current page
+      currentPage: Number(page),
       tokens: JSON.parse(JSON.stringify(tokens))
     }
   };

@@ -32,8 +32,8 @@ export default async function handler(
     } = req.body;
     const { title, description, options } = data;
 
-    console.log('Adding vote', title);
-    console.log(`Vote successfully added by ${session?.user.email}`);
+    // console.log('Adding vote', title);
+    // console.log(`Vote successfully added by ${session?.user.email}`);
     try {
       await collection.insertOne({
         title: title,

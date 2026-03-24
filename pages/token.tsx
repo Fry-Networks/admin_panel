@@ -16,12 +16,12 @@ export default function TokenPage({ tokens }: { tokens: FryToken[] }) {
     setLocalTokens(tokens);
   };
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-8xl">
-      <Title>Fry tokens</Title>
+    <main className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
+      <Title className="text-white">Fry tokens</Title>
       <TabGroup>
         <TabPanels>
           <TabPanel>
-            <Card>
+            <Card className="bg-gray-900 border-gray-700">
               <TokensTable tokens={localTokens} setTokens={setTokens} />
             </Card>
           </TabPanel>
@@ -46,8 +46,6 @@ export async function getServerSideProps(context: any) {
     const db = client.db('main');
 
     const tokens = await db.collection('tokens').find({}).toArray();
-
-    console.log(tokens);
 
     if (!tokens) {
       return {

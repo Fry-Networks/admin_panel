@@ -1,50 +1,38 @@
 import {
   Card,
-  Metric,
   Text,
   Title,
   Button,
   Flex,
-  Grid,
-  MultiSelect,
-  MultiSelectItem
+  TabPanel,
+  TabPanels,
+  TabGroup
 } from '@tremor/react';
-// Use pages-router search component for pages directory.
 import Search from '../components/search';
 import clientPromise from '../lib/mongoclient';
-import DevicesTable from '../app/tables/table-device';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Device } from '../lib/devices-schema';
 import { getSession } from 'next-auth/react';
-import { CSSTransition } from 'react-transition-group';
-import '../app/css/devices.css';
-import DeviceForm from '../components/form-device';
-import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
-import { User } from '../lib/users-schema';
-import ChangeDeviceForm from '../components/change-device';
-import { useRouter } from 'next/router';
 import { FryToken } from '../lib/tokens-schema';
 import BlacklistTable from '../app/tables/table-blacklist';
 
 export default function BlackList({
-  devices = [], // Default to an empty array if devices is undefined
+  devices = [],
   products,
   tokens = [],
-  searchParams = {} // Default to an empty object if searchParams is undefined
+  searchParams = {}
 }: {
   devices: Device[];
   searchParams: any;
   tokens: FryToken[];
   products: any[];
 }) {
-  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
+  const [sortOrder, setSortOrder] = useState('asc');
 
-  // Function to toggle sorting order
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
-  // Function to sort devices
   const sortDevices = (devices: Device[]) => {
     return devices.sort((a, b) => {
       const dateA = new Date(a.created_at).getTime();
@@ -53,25 +41,14 @@ export default function BlackList({
     });
   };
 
-  const searchTerm = searchParams.q || '';
-  const [selectValue, setSelectValue] = useState([
-    'VPN',
-    'OGPS',
-    'IGPS',
-    'IDB',
-    'ODB',
-    'registered',
-    'unregistered'
-  ]);
-
   const sortedDevices = useMemo(
     () => sortDevices(devices),
     [devices, sortOrder]
   );
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-8xl">
-      <Title>Devices</Title>
+    <main className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
+      <Title className="text-white">Devices</Title>
 
       <TabGroup>
         <TabPanels>
@@ -79,13 +56,13 @@ export default function BlackList({
             <Flex alignItems="end" flexDirection="row" className="mt-6">
               <Search />
             </Flex>
-            <Button className="mt-4" onClick={toggleSortOrder}>
+            <Button className="mt-4 bg-red-500 hover:bg-red-600 border-0" onClick={toggleSortOrder}>
               Toggle Sort Order
             </Button>
-            <Text className="mt-4">
+            <Text className="mt-4 text-gray-300">
               {sortedDevices.length} devices matching your search
             </Text>
-            <Card className="mt-6">
+            <Card className="mt-6 bg-gray-900 border-gray-700">
               <BlacklistTable devices={sortedDevices} tokens={tokens} />
             </Card>
           </TabPanel>
@@ -103,7 +80,6 @@ export async function getServerSideProps(context: any) {
     };
   }
 
-  //TODO: A enelver
   try {
     const client = await clientPromise;
     let products;
@@ -124,13 +100,11 @@ export async function getServerSideProps(context: any) {
           }
         : {};
 
-    console.log('Query:', query);
     const devices = await db
       .collection('blacklist-devices')
       .find(query)
       .limit(100)
       .toArray();
-    console.log('Devices:', devices.length);
     const tokens = await db.collection('tokens').find({}).toArray();
     if (!products) {
       products = await db.collection('products').find({}).toArray();

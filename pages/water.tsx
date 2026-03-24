@@ -91,7 +91,7 @@ export async function getServerSideProps(context: any) {
                 account.show = account.iopool_id
                 return account;
             });
-            console.log(ecowitt_accounts)
+            // console.log(ecowitt_accounts)
         const accounts = ecowitt_accounts.concat(iopool_accounts);
 
         const searchParams = context.query;

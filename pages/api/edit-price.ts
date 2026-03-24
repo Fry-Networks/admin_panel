@@ -33,7 +33,7 @@ export default async function handler(
 
     if (!collectionExists) {
       await db.createCollection('prices');
-      console.log('Created the prices collection in database');
+      // console.log('Created the prices collection in database');
     }
 
     const collection = db.collection('prices');

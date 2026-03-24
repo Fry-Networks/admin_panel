@@ -69,7 +69,7 @@ export default function PriceTable({
   const handleEditPrice = async () => {
     let message = '';
     if (!assetId || !projectName || !price) {
-      console.log('Invalid Input');
+      // console.log('Invalid Input');
       return;
     }
 
