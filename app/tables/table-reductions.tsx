@@ -13,6 +13,7 @@ import {
 } from '@tremor/react';
 import { Reduction } from '../../lib/reductions-schema';
 import Modal from 'react-modal';
+import { modalStyles } from '../../lib/modal-styles';
 import { useRef, useState } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import EditReductionModal from '../../components/form-edit-reduction';
@@ -426,7 +427,7 @@ export default function ReductionsTable({
       <Modal
         isOpen={openAddModal}
         closeTimeoutMS={500}
-        style={customStyles}
+        style={modalStyles}
         contentLabel="Add Reduction"
       >
         <Flex flexDirection="col">
@@ -493,7 +494,7 @@ export default function ReductionsTable({
       <Modal
         isOpen={openDeleteModal}
         closeTimeoutMS={500}
-        style={customStyles}
+        style={modalStyles}
         contentLabel="Delete Reduction"
       >
         <Flex flexDirection="col" className="gap-2">
@@ -518,7 +519,7 @@ export default function ReductionsTable({
       <Modal
         isOpen={openDeleteAllModal}
         closeTimeoutMS={500}
-        style={customStyles}
+        style={modalStyles}
         contentLabel="Delete Reduction"
       >
         <Flex flexDirection="col" className="gap-2">
@@ -548,7 +549,7 @@ export default function ReductionsTable({
           openEditModal={openEditModal}
           handleEditSubmit={handleEditSubmit}
           handleCloseUpdateModal={handleCloseUpdateModal}
-          customStyles={customStyles}
+          customStyles={modalStyles}
         />
       )}
     </div>
@@ -579,15 +580,3 @@ export function getTotalReduction(
   return totalReduction;
 }
 
-const customStyles = {
-  content: {
-    backgroundColor: 'white', // Example background color
-    color: '#6b7280',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)'
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
-  }
-};

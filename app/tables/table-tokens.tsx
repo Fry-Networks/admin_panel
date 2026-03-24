@@ -14,6 +14,7 @@ import {
 import { FryToken } from '../../lib/tokens-schema';
 import { useRef, useState } from 'react';
 import Modal from 'react-modal';
+import { modalStyles } from '../../lib/modal-styles';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 
 export default function TokensTable({
@@ -363,7 +364,7 @@ export default function TokensTable({
       <Modal
         isOpen={openAddModal}
         closeTimeoutMS={500}
-        style={customStyles}
+        style={modalStyles}
         contentLabel="Add Token"
       >
         <Flex flexDirection="col">
@@ -403,7 +404,7 @@ export default function TokensTable({
       <Modal
         isOpen={openDeleteAllModal}
         closeTimeoutMS={500}
-        style={customStyles}
+        style={modalStyles}
         contentLabel="Delete all tokens"
       >
         <Flex flexDirection="col" className="gap-2">
@@ -428,7 +429,7 @@ export default function TokensTable({
       <Modal
         isOpen={openDeleteModal}
         closeTimeoutMS={500}
-        style={customStyles}
+        style={modalStyles}
         contentLabel="Delete Token"
       >
         <Flex flexDirection="col" className="gap-2">
@@ -454,7 +455,7 @@ export default function TokensTable({
         <Modal
           isOpen={openEditModal}
           closeTimeoutMS={500}
-          style={customStyles}
+          style={modalStyles}
           contentLabel="Edit Token"
         >
           <form onSubmit={handleEditSubmit}>
@@ -493,15 +494,3 @@ export default function TokensTable({
   );
 }
 
-const customStyles = {
-  content: {
-    backgroundColor: 'white', // Example background color
-    color: '#6b7280',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)'
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
-  }
-};

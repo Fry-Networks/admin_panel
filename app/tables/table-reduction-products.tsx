@@ -14,6 +14,7 @@ import {
 } from '@tremor/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import Modal from 'react-modal';
+import { modalStyles } from '../../lib/modal-styles';
 import { webUser } from '../../lib/webusers-model';
 import { Product, ProductModel } from '../../lib/products-schema';
 import { useRef, useState } from 'react';
@@ -90,15 +91,3 @@ export default function ReductionProductTable({
   );
 }
 
-const customStyles = {
-  content: {
-    backgroundColor: 'white', // Example background color
-    color: '#6b7280',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)'
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
-  }
-};

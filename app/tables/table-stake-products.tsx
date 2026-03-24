@@ -17,6 +17,7 @@ import {
 } from '@tremor/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import Modal from 'react-modal';
+import { modalStyles } from '../../lib/modal-styles';
 import { webUser } from '../../lib/webusers-model';
 import { Product, ProductModel } from '../../lib/products-schema';
 import { useRef, useState } from 'react';
@@ -271,7 +272,7 @@ export default function StakeProductsTable({
         isOpen={!!editingProduct}
         onRequestClose={closeModal}
         closeTimeoutMS={500}
-        style={customStyles}
+        style={modalStyles}
         contentLabel="Edit Product"
       >
         <h2 className="mb-4">
@@ -360,8 +361,8 @@ export default function StakeProductsTable({
               })}
             </Select>
           </div>
-          <div className="mt-4 p-3 border border-blue-300 rounded bg-blue-50">
-            <p className="text-sm text-blue-700 mb-2 font-semibold">FIP-012: USD-Pegged Verification Stakes</p>
+          <div className="mt-4 p-3 border border-blue-600 rounded bg-blue-900/50">
+            <p className="text-sm text-blue-300 mb-2 font-semibold">FIP-012: USD-Pegged Verification Stakes</p>
             <div>
               <label>Stake 1 (USD) - 24h Lock:</label>
               <NumberInput
@@ -415,15 +416,3 @@ export default function StakeProductsTable({
   );
 }
 
-const customStyles = {
-  content: {
-    backgroundColor: 'white', // Example background color
-    color: '#6b7280',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)'
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
-  }
-};

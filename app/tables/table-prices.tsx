@@ -21,6 +21,7 @@ import { Price } from '../../lib/price-schema';
 import { FryToken } from '../../lib/tokens-schema';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
+import { modalStylesWithMinWidth } from '../../lib/modal-styles';
 import { useRouter } from 'next/router';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 
@@ -156,7 +157,7 @@ export default function PriceTable({
       <Modal
         isOpen={openEditModal}
         closeTimeoutMS={500}
-        style={customStyles}
+        style={modalStylesWithMinWidth}
         contentLabel="Delete Reduction"
       >
         <Flex justifyContent="center">
@@ -208,16 +209,3 @@ export default function PriceTable({
   );
 }
 
-const customStyles = {
-  content: {
-    backgroundColor: 'white', // Example background color
-    color: '#6b7280',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-    minWidth: '320px'
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
-  }
-};

@@ -20,6 +20,7 @@ import { User } from '../../lib/users-schema';
 import { Device } from '../../lib/devices-schema';
 import { useEffect, useRef, useState } from 'react';
 import Modal from 'react-modal';
+import { modalStylesWithMinWidth } from '../../lib/modal-styles';
 import { FryToken } from '../../lib/tokens-schema';
 import { TimeInput } from '@heroui/date-input';
 import { Time } from '@internationalized/date';
@@ -162,16 +163,3 @@ export default function BlacklistTable({
   );
 }
 
-const customStyles = {
-  content: {
-    backgroundColor: 'white', // Example background color
-    color: '#6b7280',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-    minWidth: '320px'
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
-  }
-};

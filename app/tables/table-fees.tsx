@@ -19,6 +19,7 @@ import { webUser } from '../../lib/webusers-model';
 import { User } from '../../lib/users-schema';
 import { useEffect, useRef, useState } from 'react';
 import Modal from 'react-modal';
+import { modalStylesWithMinWidth } from '../../lib/modal-styles';
 import { TimeInput } from '@heroui/date-input';
 import { Time } from '@internationalized/date';
 import { useSession } from 'next-auth/react';
@@ -57,16 +58,3 @@ export default function FeesTable({ fees }: { fees: Fee[] }) {
   );
 }
 
-const customStyles = {
-  content: {
-    backgroundColor: 'white', // Example background color
-    color: '#6b7280',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-    minWidth: '320px'
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)' // Example overlay color
-  }
-};
