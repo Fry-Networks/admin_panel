@@ -16,6 +16,7 @@ services:
       - 8.8.8.8
       - 1.1.1.1
     environment:
+      MONGO_CA_CERT_PATH: "/etc/ssl/mongo/mongo-ca.crt"
       NODE_ENV: production
       PORT: "3008"
       NEXTAUTH_URL: "https://admin.frynetworks.com/"
@@ -59,7 +60,7 @@ services:
       - /home/appuser/.config:uid=1001,gid=1001,mode=0700
     # Mount the MongoDB CA bundle so tlsCAFile is available inside the container.
     volumes:
-      - ${MONGO_CA_CERT_PATH}:/etc/ssl/mongo/mongo-ca.crt:ro
+      - /etc/ssl/mongo/mongo-ca.crt:/etc/ssl/mongo/mongo-ca.crt:ro
     secrets:
       - op_service_account_token
     security_opt:
