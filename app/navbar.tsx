@@ -1,28 +1,49 @@
 'use client';
 
-import { Fragment } from 'react';
+import { Fragment, useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Disclosure, Menu, Transition, Popover } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import { logoLight } from '../components/logos';
+import { useSession } from 'next-auth/react';
 
 type NavItem = { name: string; href: string; disabled?: boolean };
 
-const navigation: NavItem[] = [
-  { name: 'Devices', href: '/devices' },
-  { name: 'Byod', href: '/byod' },
-  { name: 'DAO', href: '/dao' },
-  { name: 'Announcements', href: '/announcements' },
-  { name: 'Users', href: '/users' },
-  { name: 'Blacklist', href: '/blacklist' },
-  { name: 'Stakes', href: '/stakes' },
-  { name: 'Prices', href: '/prices' },
-  { name: 'Fry Tokens', href: '/token' },
-  { name: 'Rewards', href: '/rewards' },
-  { name: 'Income', href: '/fee' },
-  { name: 'Reduction', href: '/reduction' }
+type NavGroup = {
+  name: string;
+  items: NavItem[];
+};
+
+const navGroups: NavGroup[] = [
+  {
+    name: 'Network',
+    items: [
+      { name: 'Devices', href: '/devices' },
+      { name: 'BYOD', href: '/byod' },
+      { name: 'Users', href: '/users' },
+      { name: 'Blacklist', href: '/blacklist' }
+    ]
+  },
+  {
+    name: 'Governance',
+    items: [
+      { name: 'DAO', href: '/dao' },
+      { name: 'Announcements', href: '/announcements' }
+    ]
+  },
+  {
+    name: 'Economy',
+    items: [
+      { name: 'Stakes', href: '/stakes' },
+      { name: 'Prices', href: '/prices' },
+      { name: 'Fry Tokens', href: '/token' },
+      { name: 'Rewards', href: '/rewards' },
+      { name: 'Income', href: '/fee' },
+      { name: 'Reduction', href: '/reduction' }
+    ]
+  }
 ];
 
 const disabledNavigation: NavItem[] = [
@@ -37,12 +58,106 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-import { useSession } from 'next-auth/react';
+function NavDropdown({ group, pathname }: { group: NavGroup; pathname: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const isGroupActive = group.items.some((item) => pathname === item.href);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 150);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <Popover className="relative">
+      {() => (
+        <div
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <Popover.Button
+            ref={buttonRef}
+            className={classNames(
+              isGroupActive
+                ? 'border-red-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-white hover:border-gray-500',
+              'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium tracking-wide focus:outline-none'
+            )}
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {group.name}
+            <ChevronDownIcon
+              className={classNames(
+                'ml-1 h-4 w-4 transition-transform',
+                isOpen ? 'rotate-180' : ''
+              )}
+            />
+          </Popover.Button>
+
+          <Transition
+            show={isOpen}
+            as={Fragment}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 translate-y-1"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-1"
+          >
+            <Popover.Panel
+              static
+              className="absolute left-0 z-10 mt-3 w-48 origin-top-left rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            >
+              <div className="py-1">
+                {group.items.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      className={classNames(
+                        isActive
+                          ? 'bg-gray-700 text-white'
+                          : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                        'block px-4 py-2 text-sm'
+                      )}
+                    >
+                      {item.name}
+                    </a>
+                  );
+                })}
+              </div>
+            </Popover.Panel>
+          </Transition>
+        </div>
+      )}
+    </Popover>
+  );
+}
 
 export default function Navbar() {
   const { data: session, status } = useSession();
   const isLoading = status === 'loading';
   const { pathname } = useRouter();
+
   if (isLoading) return <div className="text-gray-400 p-4">Loading...</div>;
 
   return (
@@ -56,33 +171,23 @@ export default function Navbar() {
             <div className="flex h-16 justify-between">
               <div className="flex">
                 <div className="flex flex-shrink-0 items-center">
-                  <img
-                    src={logoLight}
-                    alt="Fry Networks"
-                    width={32}
-                    height={32}
-                    className="h-8 w-auto"
-                  />
+                  <a href="/">
+                    <img
+                      src={logoLight}
+                      alt="Fry Networks"
+                      width={32}
+                      height={32}
+                      className="h-8 w-auto"
+                    />
+                  </a>
                 </div>
                 <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:items-center sm:space-x-6">
-                  {navigation.map((item) => {
-                    const isActive = pathname === item.href;
-                    return (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className={classNames(
-                          isActive
-                            ? 'border-red-500 text-white'
-                            : 'border-transparent text-gray-400 hover:text-white hover:border-gray-500',
-                          'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium tracking-wide'
-                        )}
-                        aria-current={isActive ? 'page' : undefined}
-                      >
-                        {item.name}
-                      </a>
-                    );
-                  })}
+                  {/* Grouped Navigation Dropdowns */}
+                  {navGroups.map((group) => (
+                    <NavDropdown key={group.name} group={group} pathname={pathname} />
+                  ))}
+
+                  {/* Disabled Section */}
                   <div className="flex items-center gap-2">
                     <span className="h-5 w-px bg-gray-700" />
                     <span className="text-[11px] uppercase tracking-widest text-gray-500">
@@ -188,27 +293,42 @@ export default function Navbar() {
             </div>
           </div>
 
+          {/* Mobile Menu */}
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pt-2 pb-3">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Disclosure.Button
-                    key={item.name}
-                    as="a"
-                    href={item.href}
-                    className={classNames(
-                      isActive
-                        ? 'bg-gray-800 border-red-500 text-white'
-                        : 'border-transparent text-gray-400 hover:bg-gray-800 hover:border-gray-500 hover:text-white',
-                      'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
-                    )}
-                    aria-current={isActive ? 'page' : undefined}
-                  >
-                    {item.name}
-                  </Disclosure.Button>
-                );
-              })}
+              {/* Grouped Navigation for Mobile */}
+              {navGroups.map((group) => (
+                <div key={group.name}>
+                  <div className="px-3 pt-4 pb-2">
+                    <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-gray-400 font-semibold">
+                      <span className="h-px flex-1 bg-gray-700" />
+                      <span>{group.name}</span>
+                      <span className="h-px flex-1 bg-gray-700" />
+                    </div>
+                  </div>
+                  {group.items.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <Disclosure.Button
+                        key={item.name}
+                        as="a"
+                        href={item.href}
+                        className={classNames(
+                          isActive
+                            ? 'bg-gray-800 border-red-500 text-white'
+                            : 'border-transparent text-gray-400 hover:bg-gray-800 hover:border-gray-500 hover:text-white',
+                          'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+                        )}
+                        aria-current={isActive ? 'page' : undefined}
+                      >
+                        {item.name}
+                      </Disclosure.Button>
+                    );
+                  })}
+                </div>
+              ))}
+
+              {/* Disabled Section for Mobile */}
               <div className="px-3 pt-4 pb-2">
                 <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-gray-500">
                   <span className="h-px flex-1 bg-gray-700" />
