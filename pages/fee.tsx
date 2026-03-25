@@ -76,7 +76,7 @@ export default function FeePage({
         <TabList>
           <Tab>Reward</Tab>
           <Tab>Byod</Tab>
-          <Tab>Fry World</Tab>
+          <Tab>fry.farm</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -137,7 +137,7 @@ export default function FeePage({
             <ByodHistory />
           </TabPanel>
           <TabPanel>
-            <FryWorldHistory tokens={tokens} />
+            <FryWorldHistory />
           </TabPanel>
         </TabPanels>
       </TabGroup>

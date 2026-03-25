@@ -1,19 +1,16 @@
-import { FryToken } from '../lib/tokens-schema';
-import { FryWrold } from '../lib/fryworld-schema';
-import FryWorldHistoryTable from '../app/tables/table-fryworld-history';
+import { GasFee } from '../lib/gasfee-schema';
+import GasFeeTable from '../app/tables/table-gasfee';
 import HistoryFilter from './history-filter';
 
-export default function FryWorldHistory({ tokens }: { tokens: FryToken[] }) {
+export default function FryWorldHistory() {
   return (
-    <HistoryFilter<FryWrold>
-      apiEndpoint="/api/fryworld-history"
+    <HistoryFilter<GasFee>
+      apiEndpoint="/api/gasfee-history"
       pageSize={20}
-      responseDataKey="fryworldPayments"
+      responseDataKey="gasFees"
       showTotalIncome
     >
-      {(payments) => (
-        <FryWorldHistoryTable fryworldPayments={payments} tokens={tokens} />
-      )}
+      {(gasFees) => <GasFeeTable gasFees={gasFees} />}
     </HistoryFilter>
   );
 }
