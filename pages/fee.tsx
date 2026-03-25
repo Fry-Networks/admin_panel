@@ -110,7 +110,7 @@ export default function FeePage({
                   { minimumFractionDigits: 2, maximumFractionDigits: 2 }
                 )} (USD)`}</Title>
               </Flex>
-              <FeesTable fees={fees} />
+              <FeesTable fees={fees} tokens={tokens} />
             </Card>
 
             <Flex justifyContent="center" className="mt-4">

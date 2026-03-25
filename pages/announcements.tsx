@@ -18,7 +18,8 @@ import {
   Textarea,
   Title,
   Dialog,
-  DialogPanel
+  DialogPanel,
+  NumberInput
 } from '@tremor/react';
 import { useMemo, useState } from 'react';
 import { getSession } from 'next-auth/react';
@@ -798,22 +799,29 @@ export default function AnnouncementsPage({
               </div>
               <div>
                 <Text className="mb-1">Priority ({formValues.priority})</Text>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={formValues.priority}
-                  className="w-full"
-                  onChange={(event) =>
-                    setFormValues((prev) => ({
-                      ...prev,
-                      priority: Number(event.target.value)
-                    }))
-                  }
-                  disabled={
-                    formMode === 'edit' && formTarget?.status === 'published'
-                  }
-                />
+                <Flex className="items-center gap-3">
+                  <NumberInput
+                    value={formValues.priority}
+                    onValueChange={(v) =>
+                      setFormValues((prev) => ({
+                        ...prev,
+                        priority: v || 0
+                      }))
+                    }
+                    min={0}
+                    max={100}
+                    className="w-24"
+                    disabled={
+                      formMode === 'edit' && formTarget?.status === 'published'
+                    }
+                  />
+                  <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-red-500 transition-all"
+                      style={{ width: `${formValues.priority}%` }}
+                    />
+                  </div>
+                </Flex>
               </div>
               <div>
                 <Text className="mb-1">CTA label</Text>
@@ -848,7 +856,7 @@ export default function AnnouncementsPage({
                   <input
                     id="schedule"
                     type="checkbox"
-                    className="h-4 w-4"
+                    className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-red-500 focus:ring-red-500"
                     checked={formValues.schedule}
                     onChange={(event) =>
                       setFormValues((prev) => ({
@@ -875,7 +883,7 @@ export default function AnnouncementsPage({
                       publishAt: event.target.value
                     }))
                   }
-                  className="w-full rounded-tremor-default border border-gray-600 px-3 py-2 text-sm"
+                  className="w-full rounded-tremor-default border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white"
                 />
               </div>
             )}
@@ -883,7 +891,7 @@ export default function AnnouncementsPage({
               <input
                 id="expires"
                 type="checkbox"
-                className="h-4 w-4"
+                className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-red-500 focus:ring-red-500"
                 checked={formValues.expiresEnabled}
                 onChange={(event) =>
                   setFormValues((prev) => ({
@@ -908,7 +916,7 @@ export default function AnnouncementsPage({
                       expiresAt: event.target.value
                     }))
                   }
-                  className="w-full rounded-tremor-default border border-gray-600 px-3 py-2 text-sm"
+                  className="w-full rounded-tremor-default border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white"
                 />
               </div>
             )}
@@ -943,7 +951,7 @@ export default function AnnouncementsPage({
                 type="datetime-local"
                 value={publishAtInput}
                 onChange={(event) => setPublishAtInput(event.target.value)}
-                className="w-full rounded-tremor-default border border-gray-600 px-3 py-2 text-sm"
+                className="w-full rounded-tremor-default border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white"
               />
             </div>
             <div>
@@ -954,7 +962,7 @@ export default function AnnouncementsPage({
                 onChange={(event) =>
                   setPublishExpiryInput(event.target.value)
                 }
-                className="w-full rounded-tremor-default border border-gray-600 px-3 py-2 text-sm"
+                className="w-full rounded-tremor-default border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white"
               />
             </div>
             {requiresPublishConfirmation && (
@@ -962,7 +970,7 @@ export default function AnnouncementsPage({
                 <input
                   id="confirm-publish"
                   type="checkbox"
-                  className="h-4 w-4"
+                  className="h-4 w-4 rounded border-amber-400 bg-amber-100 text-amber-600 focus:ring-amber-500"
                   checked={publishConfirm}
                   onChange={(event) => setPublishConfirm(event.target.checked)}
                 />
