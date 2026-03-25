@@ -13,7 +13,8 @@ import {
   Flex,
   Select,
   SelectItem,
-  Title
+  Title,
+  Badge
 } from '@tremor/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import Modal from 'react-modal';
@@ -37,6 +38,7 @@ export default function StakeProductsTable({
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [globalMultiplier, setGlobalMultiplier] = useState(1);
   const [updateSuccess, setUpdateSuccess] = useState(''); // State to track update success
+  const [stakeMode, setStakeMode] = useState<'usd' | 'token'>('usd');
 
   const stakeOneRef = useRef<HTMLInputElement>(null);
   const stakeTwoRef = useRef<HTMLInputElement>(null);
@@ -52,6 +54,9 @@ export default function StakeProductsTable({
   const openEditModal = (product: Product) => {
     stakeTokenRef.current = product.reward.tokens?.stake ?? 'none';
     registerTokenRef.current = product.reward.tokens?.reward ?? 'none';
+    // Auto-detect mode based on existing data
+    const hasUsdValues = (product.reward.stake?.stake_one_usd ?? 0) > 0;
+    setStakeMode(hasUsdValues ? 'usd' : 'token');
     setEditingProduct(product);
   };
   const closeModal = () => {
@@ -74,16 +79,25 @@ export default function StakeProductsTable({
     const nodeStakeToken = nodeStakeTokenRef.current ?? 'none';
 
     const stakeToken = stakeTokenRef.current ?? 'none';
-    const stake_one = stakeOneRef.current?.value;
-    const stake_two = stakeTwoRef.current?.value;
-    // FIP-012: USD amounts for verification stakes
-    const stake_one_usd = stakeOneUsdRef.current?.value;
-    const stake_two_usd = stakeTwoUsdRef.current?.value;
+    
+    // Get values based on current mode, clear the inactive mode
+    let stake_one: string | number;
+    let stake_two: string | number;
+    let stake_one_usd: string | number;
+    let stake_two_usd: string | number;
 
-    // Ensure the values are retrieved
-    if (stake_one === undefined || stake_two === undefined) {
-      console.error('Form elements are missing');
-      return;
+    if (stakeMode === 'usd') {
+      // USD mode: keep USD values, clear token values
+      stake_one_usd = stakeOneUsdRef.current?.value ?? 0;
+      stake_two_usd = stakeTwoUsdRef.current?.value ?? 0;
+      stake_one = 0;
+      stake_two = 0;
+    } else {
+      // Token mode: keep token values, clear USD values
+      stake_one = stakeOneRef.current?.value ?? 0;
+      stake_two = stakeTwoRef.current?.value ?? 0;
+      stake_one_usd = 0;
+      stake_two_usd = 0;
     }
 
     const updateData = node
@@ -154,6 +168,26 @@ export default function StakeProductsTable({
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
 
+  // Helper to format stake value for display
+  const formatStakeValue = (product: Product, tier: 'one' | 'two') => {
+    const usdValue = tier === 'one' 
+      ? product.reward.stake?.stake_one_usd ?? 0
+      : product.reward.stake?.stake_two_usd ?? 0;
+    const tokenValue = tier === 'one'
+      ? product.reward.stake?.stake_one ?? 0
+      : product.reward.stake?.stake_two ?? 0;
+    
+    if (usdValue > 0) {
+      return `$${usdValue.toLocaleString()}`;
+    }
+    return `${tokenValue.toLocaleString()} FRY`;
+  };
+
+  // Helper to determine product's stake mode
+  const getProductStakeMode = (product: Product): 'usd' | 'token' => {
+    return (product.reward.stake?.stake_one_usd ?? 0) > 0 ? 'usd' : 'token';
+  };
+
   return (
     <div>
       {updateSuccess != '' && updateSuccess != 'error' && (
@@ -192,9 +226,9 @@ export default function StakeProductsTable({
               </>
             )}
             <TableHeaderCell>Verify Stake Token</TableHeaderCell>
-            <TableHeaderCell>Stake 1 (USD)</TableHeaderCell>
-            <TableHeaderCell>Stake 2 (USD)</TableHeaderCell>
-            <TableHeaderCell>Legacy Stake (FRY)</TableHeaderCell>
+            <TableHeaderCell>1.5x Verify (24h)</TableHeaderCell>
+            <TableHeaderCell>3x Verify (6mo)</TableHeaderCell>
+            <TableHeaderCell>Mode</TableHeaderCell>
             <TableHeaderCell>Added on </TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableRow>
@@ -241,13 +275,15 @@ export default function StakeProductsTable({
                   : 'None'}
               </TableCell>
               <TableCell>
-                <Text>{`$${product.reward.stake?.stake_one_usd ?? 0}`}</Text>
+                <Text>{formatStakeValue(product, 'one')}</Text>
               </TableCell>
               <TableCell>
-                <Text>{`$${product.reward.stake?.stake_two_usd ?? 0}`}</Text>
+                <Text>{formatStakeValue(product, 'two')}</Text>
               </TableCell>
               <TableCell>
-                <Text>{`T1: ${product.reward.stake?.stake_one ?? 0} | T2: ${product.reward.stake?.stake_two ?? 0}`}</Text>
+                <Badge color={getProductStakeMode(product) === 'usd' ? 'green' : 'gray'}>
+                  {getProductStakeMode(product) === 'usd' ? 'USD' : 'Token'}
+                </Badge>
               </TableCell>
               <TableCell>
                 <Text>
@@ -361,46 +397,80 @@ export default function StakeProductsTable({
               })}
             </Select>
           </div>
-          <div className="mt-4 p-3 border border-blue-600 rounded bg-blue-900/50">
-            <p className="text-sm text-blue-300 mb-2 font-semibold">FIP-012: USD-Pegged Verification Stakes</p>
-            <div>
-              <label>Stake 1 (USD) - 24h Lock:</label>
-              <NumberInput
-                ref={stakeOneUsdRef}
-                defaultValue={editingProduct?.reward.stake?.stake_one_usd ?? 0}
-                step={1}
-                min={0}
-              />
-            </div>
-            <div>
-              <label>Stake 2 (USD) - 6 Month Lock:</label>
-              <NumberInput
-                ref={stakeTwoUsdRef}
-                defaultValue={editingProduct?.reward.stake?.stake_two_usd ?? 0}
-                step={1}
-                min={0}
-              />
-            </div>
+
+          {/* Stake Mode Toggle */}
+          <div className="flex gap-1 mt-4 mb-4">
+            <button
+              type="button"
+              onClick={() => setStakeMode('usd')}
+              className={`px-4 py-2 rounded-l-md text-sm font-medium ${
+                stakeMode === 'usd'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+              }`}
+            >
+              USD Peg
+            </button>
+            <button
+              type="button"
+              onClick={() => setStakeMode('token')}
+              className={`px-4 py-2 rounded-r-md text-sm font-medium ${
+                stakeMode === 'token'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+              }`}
+            >
+              Fixed Token
+            </button>
           </div>
-          <div className="mt-4 p-3 border border-gray-600 rounded bg-gray-800">
-            <p className="text-sm text-gray-400 mb-2">Legacy FRY Token Amounts (fallback if USD not set)</p>
-            <div>
-              <label>Stake Amount Tier 1 ($FRY):</label>
-              <NumberInput
-                ref={stakeOneRef}
-                defaultValue={editingProduct?.reward.stake?.stake_one ?? 0}
-                step={1}
-              />
+
+          {/* USD Mode Inputs */}
+          {stakeMode === 'usd' && (
+            <div className="p-3 border border-green-600 rounded bg-green-900/30">
+              <p className="text-sm text-green-300 mb-2 font-semibold">USD-Pegged Stakes</p>
+              <div>
+                <label>1.5x Verify Stake (USD) - 24h Lock:</label>
+                <NumberInput
+                  ref={stakeOneUsdRef}
+                  defaultValue={editingProduct?.reward.stake?.stake_one_usd ?? 0}
+                  step={1}
+                  min={0}
+                />
+              </div>
+              <div>
+                <label>3x Verify Stake (USD) - 6 Month Lock:</label>
+                <NumberInput
+                  ref={stakeTwoUsdRef}
+                  defaultValue={editingProduct?.reward.stake?.stake_two_usd ?? 0}
+                  step={1}
+                  min={0}
+                />
+              </div>
             </div>
-            <div>
-              <label>Stake Amount Tier 2 ($FRY):</label>
-              <NumberInput
-                ref={stakeTwoRef}
-                defaultValue={editingProduct?.reward.stake?.stake_two ?? 0}
-                step={1}
-              />
+          )}
+
+          {/* Token Mode Inputs */}
+          {stakeMode === 'token' && (
+            <div className="p-3 border border-gray-600 rounded bg-gray-800">
+              <p className="text-sm text-gray-400 mb-2 font-semibold">Fixed Token Stakes</p>
+              <div>
+                <label>1.5x Verify Stake ($FRY) - 24h Lock:</label>
+                <NumberInput
+                  ref={stakeOneRef}
+                  defaultValue={editingProduct?.reward.stake?.stake_one ?? 0}
+                  step={1}
+                />
+              </div>
+              <div>
+                <label>3x Verify Stake ($FRY) - 6 Month Lock:</label>
+                <NumberInput
+                  ref={stakeTwoRef}
+                  defaultValue={editingProduct?.reward.stake?.stake_two ?? 0}
+                  step={1}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mb-4 mt-4">
             <Button type="submit" className="mr-2" variant="primary">
@@ -415,4 +485,3 @@ export default function StakeProductsTable({
     </div>
   );
 }
-
