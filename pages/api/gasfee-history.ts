@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import clientPromise from '../../lib/mongoclient';
 
+const FRY_DECIMALS = 6;
+const MICRO_DIVISOR = Math.pow(10, FRY_DECIMALS); // 1,000,000
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -18,6 +21,14 @@ export default async function handler(
     const client = await clientPromise;
     const db = client.db('frystaking');
     const collection = db.collection('gasFee');
+
+    // Fetch FRY 2.0 price from main database (asset_id: 2485314946)
+    const FRY2_ASSET_ID = '2485314946';
+    const mainDb = client.db('main');
+    const priceDoc = await mainDb.collection('prices').findOne({
+      asset_id: FRY2_ASSET_ID
+    });
+    const fryPrice = priceDoc?.price || 0;
 
     const { startDate, endDate, filterString, page = 1, limit = 20 } = req.body;
 
@@ -54,14 +65,15 @@ export default async function handler(
         {
           $group: {
             _id: null,
-            totalSum: { $sum: '$usdValue' }
+            totalGasAmount: { $sum: '$gasAmount' }
           }
         }
       ])
       .toArray();
 
-    const totalPaymentSum =
-      totalSumResult.length > 0 ? totalSumResult[0].totalSum : 0;
+    const totalGasAmountMicro = totalSumResult.length > 0 ? totalSumResult[0].totalGasAmount : 0;
+    const totalFeesFry = totalGasAmountMicro / MICRO_DIVISOR;
+    const totalFeesUsd = totalFeesFry * fryPrice;
 
     const gasFees = await collection
       .find(query)
@@ -73,7 +85,10 @@ export default async function handler(
     res.status(200).json({
       success: true,
       totalCount,
-      totalPaymentSum,
+      totalPaymentSum: totalFeesUsd,  // Keep for backwards compat with history-filter
+      totalFeesFry,
+      totalFeesUsd,
+      fryPrice,
       gasFees: JSON.parse(JSON.stringify(gasFees))
     });
   } catch (error) {
