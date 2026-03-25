@@ -126,7 +126,7 @@ export default function ModalChooseAsCurrent({
             <DialogPanel onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-            }} className="sm:max-w-5xl">
+            }} className="sm:max-w-5xl bg-gray-900 border border-gray-700">
                 <div className="absolute right-0 top-0 pr-3 pt-3">
                     <button
                         type="button"

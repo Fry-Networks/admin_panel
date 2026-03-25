@@ -55,7 +55,7 @@ export default function ModalCreateVote({isOpen, setIsOpen}: {isOpen: boolean, s
                     static={true}
                     className="z-[100]"
                 >
-                    <DialogPanel className="sm:max-w-5xl">
+                    <DialogPanel className="sm:max-w-5xl bg-gray-900 border border-gray-700">
                         <div className="absolute right-0 top-0 pr-3 pt-3">
                             <button
                                 type="button"

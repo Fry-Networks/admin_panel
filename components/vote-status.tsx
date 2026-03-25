@@ -114,8 +114,8 @@ export default function ModalVoteStatus({
 
 const customStyles = {
   content: {
-    backgroundColor: 'white', // Example background color
-    color: '#6b7280',
+    backgroundColor: '#111827', // Example background color
+    color: '#f9fafb', borderColor: '#374151',
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',

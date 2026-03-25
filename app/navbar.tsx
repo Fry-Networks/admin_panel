@@ -6,7 +6,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
-import { logoDark } from '../components/logos';
+import { logoLight } from '../components/logos';
 
 type NavItem = { name: string; href: string; disabled?: boolean };
 
@@ -57,11 +57,11 @@ export default function Navbar() {
               <div className="flex">
                 <div className="flex flex-shrink-0 items-center">
                   <img
-                    src={logoDark}
+                    src={logoLight}
                     alt="Fry Networks"
                     width={32}
                     height={32}
-                    className="h-8 w-8"
+                    className="h-8 w-auto"
                   />
                 </div>
                 <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:items-center sm:space-x-6">

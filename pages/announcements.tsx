@@ -726,7 +726,7 @@ export default function AnnouncementsPage({
       </Card>
 
       <Dialog open={formOpen} onClose={closeForm} static={true}>
-        <DialogPanel className="sm:max-w-3xl">
+        <DialogPanel className="sm:max-w-3xl bg-gray-900 border border-gray-700">
           <Flex justifyContent="between" alignItems="center" className="mb-4">
             <Title>
               {formMode === 'create'
@@ -926,7 +926,7 @@ export default function AnnouncementsPage({
       </Dialog>
 
       <Dialog open={publishOpen} onClose={closePublishDialog} static={true}>
-        <DialogPanel className="sm:max-w-lg">
+        <DialogPanel className="sm:max-w-lg bg-gray-900 border border-gray-700">
           <Title className="mb-2">
             {publishTarget?.status === 'published'
               ? 'Update publish window'
@@ -988,7 +988,7 @@ export default function AnnouncementsPage({
       </Dialog>
 
       <Dialog open={archiveOpen} onClose={closeArchiveDialog} static={true}>
-        <DialogPanel className="sm:max-w-md">
+        <DialogPanel className="sm:max-w-md bg-gray-900 border border-gray-700">
           <Title className="mb-2">Archive announcement</Title>
           <Text className="text-sm text-gray-300 mb-4">
             Archiving immediately removes the banner from view. Continue?

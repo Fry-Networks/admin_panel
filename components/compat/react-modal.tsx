@@ -66,7 +66,7 @@ export default function Modal({
             >
               <Dialog.Panel
                 aria-label={contentLabel}
-                className="w-full max-w-3xl rounded-lg bg-white shadow-xl"
+                className="w-full max-w-3xl rounded-lg bg-gray-900 border border-gray-700 shadow-xl"
                 style={{ ...style?.content, transitionDuration: `${duration}ms` }}
               >
                 {children}
