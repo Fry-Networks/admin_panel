@@ -71,6 +71,7 @@ export default async function handler(
     const skip = (Number(page) - 1) * pageSize;
     const rewards = await collection
       .find(query)
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(pageSize)
       .toArray();

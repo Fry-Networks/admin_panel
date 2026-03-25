@@ -77,6 +77,7 @@ export default async function handler(
             }
           ],
           results: [
+            { $sort: { 'payments.date': -1 } },
             { $skip: skip }, // Pagination - skip previous pages
             { $limit: limitNumber } // Limit results per page
           ]

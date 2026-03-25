@@ -225,6 +225,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const rewards = await collection
     .find(query)
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(pageSize)
     .toArray();

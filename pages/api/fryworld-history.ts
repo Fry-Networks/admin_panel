@@ -87,6 +87,7 @@ export default async function handler(
 
     const fryworldPayments = await collection
       .find(query)
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(pageSize)
       .toArray();
