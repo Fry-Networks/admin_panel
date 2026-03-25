@@ -606,6 +606,7 @@ export default function AnnouncementsPage({
           <div className="w-full md:w-1/3">
             <Text className="mb-2">Search</Text>
             <TextInput
+              className="bg-gray-800 border-gray-600 text-white"
               placeholder="Search title or body..."
               value={searchTerm}
               onValueChange={setSearchTerm}
@@ -614,6 +615,7 @@ export default function AnnouncementsPage({
           <div className="w-full md:w-1/3">
             <Text className="mb-2">Status</Text>
             <Select
+              className="bg-gray-800 border-gray-600 text-white"
               value={statusFilter}
               onValueChange={(value) =>
                 setStatusFilter(value as AnnouncementStatus | 'all')
@@ -753,6 +755,7 @@ export default function AnnouncementsPage({
             <div>
               <Text className="mb-1">Title</Text>
               <TextInput
+                className="bg-gray-800 border-gray-600 text-white"
                 value={formValues.title}
                 onValueChange={(value) =>
                   setFormValues((prev) => ({ ...prev, title: value }))
@@ -766,6 +769,7 @@ export default function AnnouncementsPage({
             <div>
               <Text className="mb-1">Body</Text>
               <Textarea
+                className="bg-gray-800 border-gray-600 text-white"
                 value={formValues.body}
                 onValueChange={(value) =>
                   setFormValues((prev) => ({ ...prev, body: value }))
@@ -778,6 +782,7 @@ export default function AnnouncementsPage({
               <div>
                 <Text className="mb-1">Variant</Text>
                 <Select
+                  className="bg-gray-800 border-gray-600 text-white"
                   value={formValues.variant}
                   onValueChange={(value) =>
                     setFormValues((prev) => ({
@@ -826,6 +831,7 @@ export default function AnnouncementsPage({
               <div>
                 <Text className="mb-1">CTA label</Text>
                 <TextInput
+                  className="bg-gray-800 border-gray-600 text-white"
                   value={formValues.ctaLabel}
                   onValueChange={(value) =>
                     setFormValues((prev) => ({
@@ -841,6 +847,7 @@ export default function AnnouncementsPage({
               <div>
                 <Text className="mb-1">CTA link (https://)</Text>
                 <TextInput
+                  className="bg-gray-800 border-gray-600 text-white"
                   value={formValues.ctaHref}
                   onValueChange={(value) =>
                     setFormValues((prev) => ({
