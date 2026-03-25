@@ -40,6 +40,19 @@ export default function StakeProductsTable({
   const [updateSuccess, setUpdateSuccess] = useState(''); // State to track update success
   const [stakeMode, setStakeMode] = useState<'usd' | 'token'>('usd');
 
+  // Bulk edit state
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
+  const [bulkStakeMode, setBulkStakeMode] = useState<'usd' | 'token'>('usd');
+  const bulkStakeOneRef = useRef<HTMLInputElement>(null);
+  const bulkStakeTwoRef = useRef<HTMLInputElement>(null);
+  const bulkStakeOneUsdRef = useRef<HTMLInputElement>(null);
+  const bulkStakeTwoUsdRef = useRef<HTMLInputElement>(null);
+
+  const bulkRegisterTokenRef = useRef<string | null>(null);
+  const bulkRegisterUsdRef = useRef<HTMLInputElement>(null);
+
   const stakeOneRef = useRef<HTMLInputElement>(null);
   const stakeTwoRef = useRef<HTMLInputElement>(null);
   // FIP-012: USD amount refs for verification stakes
@@ -51,9 +64,50 @@ export default function StakeProductsTable({
   const registerTokenRef = useRef<string | null>(null);
   const registerUSDRef = useRef<HTMLInputElement>(null);
 
+  // Helper to detect if a product is a node
+  const isNodeProduct = (key: string) => ['SVN', 'SDN', 'RDN', 'CN'].some(n => key.includes(n));
+
+  // Selection handlers
+  const toggleProductSelection = (wixId: string) => {
+    setSelectedProducts(prev => 
+      prev.includes(wixId) 
+        ? prev.filter(id => id !== wixId)
+        : [...prev, wixId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedProducts.length === products.length) {
+      setSelectedProducts([]);
+    } else {
+      setSelectedProducts(products.map(p => p.wix_id));
+    }
+  };
+
+  const selectMiners = () => {
+    const minerIds = products
+      .filter(p => !isNodeProduct(p.key))
+      .map(p => p.wix_id);
+    setSelectedProducts(minerIds);
+  };
+
+  const selectNodes = () => {
+    const nodeIds = products
+      .filter(p => isNodeProduct(p.key))
+      .map(p => p.wix_id);
+    setSelectedProducts(nodeIds);
+  };
+
+  // Get checkbox state for header
+  const getHeaderCheckboxState = () => {
+    if (selectedProducts.length === 0) return 'unchecked';
+    if (selectedProducts.length === products.length) return 'checked';
+    return 'indeterminate';
+  };
+
   const openEditModal = (product: Product) => {
     stakeTokenRef.current = product.reward.tokens?.stake ?? 'none';
-    registerTokenRef.current = product.reward.tokens?.reward ?? 'none';
+    registerTokenRef.current = product.reward.tokens?.register ?? 'none';
     // Auto-detect mode based on existing data
     const hasUsdValues = (product.reward.stake?.stake_one_usd ?? 0) > 0;
     setStakeMode(hasUsdValues ? 'usd' : 'token');
@@ -61,6 +115,119 @@ export default function StakeProductsTable({
   };
   const closeModal = () => {
     setEditingProduct(null);
+  };
+
+  // Bulk edit handlers
+  const openBulkEditModal = () => {
+    setBulkStakeMode('usd');
+    setBulkEditOpen(true);
+  };
+
+  const closeBulkEditModal = () => {
+    setBulkEditOpen(false);
+    setBulkProgress({ current: 0, total: 0 });
+  };
+
+  const handleBulkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const total = selectedProducts.length;
+    setBulkProgress({ current: 0, total });
+    const failedProducts: string[] = [];
+
+    // Get values based on current mode
+    let stake_one: number;
+    let stake_two: number;
+    let stake_one_usd: number;
+    let stake_two_usd: number;
+
+    if (bulkStakeMode === 'usd') {
+      stake_one_usd = Number(bulkStakeOneUsdRef.current?.value ?? 0);
+      stake_two_usd = Number(bulkStakeTwoUsdRef.current?.value ?? 0);
+      stake_one = 0;
+      stake_two = 0;
+    } else {
+      stake_one = Number(bulkStakeOneRef.current?.value ?? 0);
+      stake_two = Number(bulkStakeTwoRef.current?.value ?? 0);
+      stake_one_usd = 0;
+      stake_two_usd = 0;
+    }
+
+    for (let i = 0; i < selectedProducts.length; i++) {
+      const productId = selectedProducts[i];
+      const product = products.find(p => p.wix_id === productId);
+      
+      if (!product) continue;
+
+      const updateData = node
+        ? {
+            productId,
+            register_token: bulkRegisterTokenRef.current !== null
+              ? bulkRegisterTokenRef.current
+              : product.reward.tokens?.register ?? 'none',
+            register_price: bulkRegisterUsdRef.current?.value !== ''
+              ? Number(bulkRegisterUsdRef.current?.value)
+              : product.reward.stake?.register ?? 0,
+            node_token: product.reward.tokens?.node ?? 'none',
+            node_price: product.reward.stake?.node ?? 0,
+            stake_one,
+            stake_two,
+            stake_one_usd,
+            stake_two_usd,
+            stake_token: product.reward.tokens?.stake ?? 'none'
+          }
+        : {
+            productId,
+            register_token: bulkRegisterTokenRef.current !== null
+              ? bulkRegisterTokenRef.current
+              : product.reward.tokens?.register ?? 'none',
+            register_price: bulkRegisterUsdRef.current?.value !== ''
+              ? Number(bulkRegisterUsdRef.current?.value)
+              : product.reward.stake?.register ?? 0,
+            stake_one,
+            stake_two,
+            stake_one_usd,
+            stake_two_usd,
+            stake_token: product.reward.tokens?.stake ?? 'none'
+          };
+
+      try {
+        const response = await fetch('/api/edit-product', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updateData)
+        });
+
+        if (!response.ok) {
+          failedProducts.push(product.name);
+          console.error(`Failed to update ${product.name}: HTTP ${response.status}`);
+        }
+      } catch (err) {
+        failedProducts.push(product.name);
+        console.error(`Error updating ${product.name}:`, err);
+      }
+
+      setBulkProgress({ current: i + 1, total });
+    }
+
+    // Show result
+    if (failedProducts.length > 0) {
+      setUpdateSuccess('error');
+      console.error('Failed products:', failedProducts);
+    } else {
+      setUpdateSuccess(`${total} products`);
+    }
+
+    // Cleanup and refresh
+    setBulkEditOpen(false);
+    setSelectedProducts([]);
+    setBulkProgress({ current: 0, total: 0 });
+    
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   const handleSubmit = async (e: any) => {
@@ -188,6 +355,13 @@ export default function StakeProductsTable({
     return (product.reward.stake?.stake_one_usd ?? 0) > 0 ? 'usd' : 'token';
   };
 
+  // Get selected product names for bulk edit modal
+  const getSelectedProductNames = () => {
+    return products
+      .filter(p => selectedProducts.includes(p.wix_id))
+      .map(p => p.name);
+  };
+
   return (
     <div>
       {updateSuccess != '' && updateSuccess != 'error' && (
@@ -212,9 +386,61 @@ export default function StakeProductsTable({
       )}
       <Title>{node === true ? 'Fry Nodes' : 'Fry miners'}</Title>
 
-      <Table className="mt-6">
+      {/* Bulk Selection Controls */}
+      <div className="flex items-center gap-3 mt-4 mb-2">
+        <Button
+          variant="secondary"
+          size="xs"
+          onClick={selectMiners}
+        >
+          Select Miners
+        </Button>
+        <Button
+          variant="secondary"
+          size="xs"
+          onClick={selectNodes}
+        >
+          Select Nodes
+        </Button>
+        {selectedProducts.length > 0 && (
+          <>
+            <span className="text-sm text-gray-400">
+              {selectedProducts.length} selected
+            </span>
+            <Button
+              variant="primary"
+              size="xs"
+              onClick={() => setSelectedProducts([])}
+            >
+              Clear
+            </Button>
+            <Button
+              size="xs"
+              onClick={openBulkEditModal}
+              className="bg-red-500 text-white hover:bg-red-600"
+            >
+              Edit {selectedProducts.length} products
+            </Button>
+          </>
+        )}
+      </div>
+
+      <Table className="mt-2">
         <TableHead>
           <TableRow>
+            <TableHeaderCell>
+              <input
+                type="checkbox"
+                checked={getHeaderCheckboxState() === 'checked'}
+                ref={(el) => {
+                  if (el) {
+                    el.indeterminate = getHeaderCheckboxState() === 'indeterminate';
+                  }
+                }}
+                onChange={toggleSelectAll}
+                className="w-4 h-4 cursor-pointer"
+              />
+            </TableHeaderCell>
             <TableHeaderCell>Name</TableHeaderCell>
             <TableHeaderCell>Key</TableHeaderCell>
             <TableHeaderCell>Register Token</TableHeaderCell>
@@ -236,6 +462,14 @@ export default function StakeProductsTable({
         <TableBody>
           {products?.map((product) => (
             <TableRow key={product.wix_id}>
+              <TableCell>
+                <input
+                  type="checkbox"
+                  checked={selectedProducts.includes(product.wix_id)}
+                  onChange={() => toggleProductSelection(product.wix_id)}
+                  className="w-4 h-4 cursor-pointer"
+                />
+              </TableCell>
               <TableCell>{product.name}</TableCell>
               <TableCell>
                 <Text>{product.key}</Text>
@@ -304,6 +538,8 @@ export default function StakeProductsTable({
           ))}
         </TableBody>
       </Table>
+
+      {/* Single Edit Modal */}
       <Modal
         isOpen={!!editingProduct}
         onRequestClose={closeModal}
@@ -477,6 +713,173 @@ export default function StakeProductsTable({
               Update
             </Button>
             <Button onClick={closeModal} variant="secondary">
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Bulk Edit Modal */}
+      <Modal
+        isOpen={bulkEditOpen}
+        onRequestClose={closeBulkEditModal}
+        closeTimeoutMS={500}
+        style={modalStyles}
+        contentLabel="Bulk Edit Products"
+      >
+        <h2 className="mb-4">
+          <strong>Bulk Edit</strong> - {selectedProducts.length} products
+        </h2>
+        
+        {/* Selected products list */}
+        <div className="mb-4 p-2 bg-gray-800 rounded max-h-32 overflow-y-auto">
+          <p className="text-sm text-gray-400 mb-1">Selected products:</p>
+          <div className="flex flex-wrap gap-1">
+            {getSelectedProductNames().map((name, idx) => (
+              <span key={idx} className="text-xs bg-gray-700 px-2 py-1 rounded">
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Progress indicator */}
+        {bulkProgress.total > 0 && (
+          <div className="mb-4 p-3 bg-blue-900/30 border border-blue-600 rounded">
+            <p className="text-sm text-blue-300">
+              Updating {bulkProgress.current} of {bulkProgress.total} products...
+            </p>
+            <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+              <div 
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(bulkProgress.current / bulkProgress.total) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleBulkSubmit}>
+
+          {/* Register Fields */}
+          <div className="mb-4">
+            <label>Register Token:</label>
+            <Select
+              defaultValue="__nochange__"
+              onValueChange={(value) => {
+                bulkRegisterTokenRef.current = value === '__nochange__' ? null : value;
+              }}
+            >
+              <SelectItem key="nochange" value="__nochange__">
+                No change
+              </SelectItem>
+              <SelectItem key="none" value="none">
+                None
+              </SelectItem>
+              {tokens?.map((token, index) => (
+                <SelectItem key={index + 2} value={token.asset_id}>
+                  {token.name}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+          <div className="mb-4">
+            <label>Register Price (USD):</label>
+            <NumberInput
+              ref={bulkRegisterUsdRef}
+              placeholder="Leave empty for no change"
+              step={1}
+              min={0}
+            />
+          </div>
+
+          {/* Stake Mode Toggle */}
+          <div className="flex gap-1 mt-4 mb-4">
+            <button
+              type="button"
+              onClick={() => setBulkStakeMode('usd')}
+              className={`px-4 py-2 rounded-l-md text-sm font-medium ${
+                bulkStakeMode === 'usd'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+              }`}
+            >
+              USD Peg
+            </button>
+            <button
+              type="button"
+              onClick={() => setBulkStakeMode('token')}
+              className={`px-4 py-2 rounded-r-md text-sm font-medium ${
+                bulkStakeMode === 'token'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+              }`}
+            >
+              Fixed Token
+            </button>
+          </div>
+
+          {/* USD Mode Inputs */}
+          {bulkStakeMode === 'usd' && (
+            <div className="p-3 border border-green-600 rounded bg-green-900/30">
+              <p className="text-sm text-green-300 mb-2 font-semibold">USD-Pegged Stakes</p>
+              <div>
+                <label>1.5x Verify Stake (USD) - 24h Lock:</label>
+                <NumberInput
+                  ref={bulkStakeOneUsdRef}
+                  defaultValue={0}
+                  step={1}
+                  min={0}
+                />
+              </div>
+              <div>
+                <label>3x Verify Stake (USD) - 6 Month Lock:</label>
+                <NumberInput
+                  ref={bulkStakeTwoUsdRef}
+                  defaultValue={0}
+                  step={1}
+                  min={0}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Token Mode Inputs */}
+          {bulkStakeMode === 'token' && (
+            <div className="p-3 border border-gray-600 rounded bg-gray-800">
+              <p className="text-sm text-gray-400 mb-2 font-semibold">Fixed Token Stakes</p>
+              <div>
+                <label>1.5x Verify Stake ($FRY) - 24h Lock:</label>
+                <NumberInput
+                  ref={bulkStakeOneRef}
+                  defaultValue={0}
+                  step={1}
+                />
+              </div>
+              <div>
+                <label>3x Verify Stake ($FRY) - 6 Month Lock:</label>
+                <NumberInput
+                  ref={bulkStakeTwoRef}
+                  defaultValue={0}
+                  step={1}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="mb-4 mt-4">
+            <Button 
+              type="submit" 
+              className="mr-2 bg-red-500 hover:bg-red-600" 
+              variant="primary"
+              disabled={bulkProgress.total > 0}
+            >
+              Apply to All
+            </Button>
+            <Button 
+              onClick={closeBulkEditModal} 
+              variant="secondary"
+              disabled={bulkProgress.total > 0}
+            >
               Cancel
             </Button>
           </div>
