@@ -21,7 +21,6 @@ export default async function handler(
   }
 
   const data = req.body;
-  // console.log('Reward History: ', data);
 
   const { startDate, endDate, filterString, page = 1 } = data;
 
@@ -80,7 +79,6 @@ export default async function handler(
       .status(200)
       .json({ success: true, rewards: rewards, totalCount: totalCount });
   } catch (error) {
-    // console.log('Reward History: ', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 }

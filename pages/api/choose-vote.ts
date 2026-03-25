@@ -33,25 +33,5 @@ export default async function handler(
     const { id, end_date, super_majority, hidden } = data;
     const toDate = new Date(end_date);
 
-    // console.log('Selecting vote', id);
 
     try {
-      // const previousVote = await collection.findOne({ current: true });
-      // if (previousVote) {
-      //     await collection.updateOne({ _id: previousVote._id }, { $set: { current: false } });
-      // }
-      await collection.updateOne(
-        { _id: new mongoose.Types.ObjectId(id) },
-        { $set: { current: true, end_date: toDate, super_majority, hidden } }
-      );
-
-      // console.log(`Vote successfully selected by ${session?.user.email}`);
-      res.status(200).json({ message: 'Vote added successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error adding vote' });
-    }
-  } else {
-    res.status(405).json({ message: 'Method Not Allowed' });
-  }
-}

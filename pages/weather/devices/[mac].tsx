@@ -27,7 +27,6 @@ export default function WeatherDataPage({
   const searchTerm = searchParams.q || '';
   const weathers = weather_data.map((weather: any) => weather).flat();
 
-  // console.log(weathers, 'waether data');
 
   //   const filtered =
   //     searchTerm.length > 0
@@ -69,7 +68,6 @@ export async function getServerSideProps(context: any) {
     };
   }
 
-  // console.log(context.query?.mac, 'mac');
 
   try {
     const client = await clientPromise;

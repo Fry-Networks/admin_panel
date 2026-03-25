@@ -23,7 +23,6 @@ export default async function handler(
   }
 
   const { index } = req.body;
-  // console.log(`Delete ${index} reduction request accepted`);
   if (typeof index !== 'number' || index < 0) {
     res.status(400).json({ success: false, message: 'Invalid index value' });
     return;
@@ -47,7 +46,6 @@ export default async function handler(
         success: false,
         message: `No document found at index: ${index}`
       });
-      // console.log(`Error status 404 No document found at index: ${index}`);
       return;
     }
 
@@ -62,7 +60,6 @@ export default async function handler(
       return;
     }
 
-    // console.log(`Deleted document at index: ${index}`);
 
     const documentCount = await collection.countDocuments({});
     if (documentCount > 0) {
@@ -74,8 +71,6 @@ export default async function handler(
         .toArray();
       if (nextDocument.length > 0) {
         const updateMinDeviceCount = minDeviceCount;
-        // console.log(updateMinDeviceCount);
-        // console.log(nextDocument);
         const updateResult = await collection.updateOne(
           { _id: nextDocument[0]._id },
           { $set: { minDeviceCount: updateMinDeviceCount } }

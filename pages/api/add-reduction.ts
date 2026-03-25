@@ -31,13 +31,11 @@ export default async function handler(
 
     if (!collectionExists) {
       await db.createCollection('reductions');
-      // console.log('Create `reductions` collection.');
     }
 
     const collection = db.collection('reductions');
 
     if (req.method === 'PUT') {
-      // console.log('Request Body:', req.body);
       if (typeof req.body !== 'object' || req.body === null) {
         res.status(400).json({ message: 'Invalid request body format' });
         return;
@@ -45,15 +43,11 @@ export default async function handler(
       const { minDeviceCount, maxDeviceCount, reduction } =
         req.body as RedcutionData;
 
-      // console.log('minDeviceCountType: ', typeof minDeviceCount);
-      // console.log('maxDeviceCountType: ', typeof maxDeviceCount);
-      // console.log('reduction: ', typeof reduction);
       if (
         typeof minDeviceCount !== 'number' ||
         typeof maxDeviceCount !== 'number' ||
         typeof reduction !== 'number'
       ) {
-        // console.log('Invalid data input');
         res.status(400).json({ message: 'Invalid input data' });
         return;
       }

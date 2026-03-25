@@ -14,14 +14,14 @@ export default async function handler(
     !session.user ||
     (!session.user.owner && !session.user.mods)
   ) {
-    res.status(400).json({ message: 'Unauthorized try' });
+    res.status(401).json({ message: 'Unauthorized' });
     return;
   }
 
   const { miner_key } = req.body;
 
   if (!miner_key) {
-    res.status(401).json({ message: 'Invalid parameter inputed' });
+    res.status(400).json({ message: 'Missing miner_key parameter' });
     return;
   }
 
@@ -32,7 +32,7 @@ export default async function handler(
 
     const blacklistDevice = await collection.findOne({ miner_key: miner_key });
     if (!blacklistDevice) {
-      res.status(402).json({ mesasge: 'Device is not found' });
+      res.status(404).json({ message: 'Device not found' });
       return;
     }
 
@@ -49,7 +49,6 @@ export default async function handler(
       .json({ success: true, message: 'Success to delete the device' });
     return;
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: 'Internal server error' });
     return;
   }

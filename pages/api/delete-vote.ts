@@ -22,8 +22,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { id } = data;
 
 
-        // console.log("Deleting vote", id);
-        // console.log(`Vote successfully added by ${session?.user.email}`);
         try {
             await collection.updateOne({ _id: new mongoose.Types.ObjectId(id) }, { $set: { deleted: true, current: false } });
 

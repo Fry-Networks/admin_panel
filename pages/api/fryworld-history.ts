@@ -27,7 +27,6 @@ export default async function handler(
 
     const { startDate, endDate, filterString, page = 1, limit = 20 } = req.body;
 
-    // console.log('Filters:', startDate, endDate, filterString, page, limit);
 
     const pageSize = 20;
     const skip = (Number(page) - 1) * pageSize;
@@ -71,7 +70,6 @@ export default async function handler(
 
     const totalCount = await collection.countDocuments({ ...query });
 
-    // console.log('Total Count: ', totalCount);
 
     // 2. Calculate total fee for all documents matching the filters
     const totalFeeResult = await collection
@@ -83,7 +81,6 @@ export default async function handler(
 
     const totalPaymentSum =
       totalFeeResult.length > 0 ? totalFeeResult[0].totalFee : 0;
-    // console.log(totalPaymentSum);
 
     const fryworldPayments = await collection
       .find(query)

@@ -25,7 +25,6 @@ export const getTxCompletedDate = async (
 
     const txDate = new Date(timestamp * 1000);
 
-    // console.log(`[GetTxCompleteDate] {ReturnTime: ${txDate}}`);
     return new Date(timestamp * 1000);
   } catch (error) {
     console.error('Error fetching transaction: ', error);
@@ -96,7 +95,6 @@ export default async function handler(
     }
 
     if (!result || result.matchedCount === 0) {
-      // console.log(`[Stake Api Hanlder] {Error: Update database failed}`);
       res.status(501).json({ message: 'Failed to update database' });
       return;
     }

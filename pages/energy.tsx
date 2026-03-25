@@ -91,7 +91,6 @@ export async function getServerSideProps(context: any) {
                 account.show = account.address
                 return account;
             });
-            // console.log(ecowitt_accounts)
         const accounts = ecowitt_accounts.concat(shelly_accounts);
 
         const searchParams = context.query;

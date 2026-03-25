@@ -33,16 +33,12 @@ export default async function handler(
     } = req.body;
     const { id, title, description, options } = data;
 
-    // console.log(id, title, description, options);
 
-    // console.log('Update vote', title);
-    // console.log(`Vote successfully update by ${session?.user.email}`);
     try {
       let updatingVote = (await collection.findOne({
         _id: new mongoose.Types.ObjectId(id)
       })) as Vote;
 
-      // console.log(updatingVote);
 
       updatingVote.title = title;
       updatingVote.description = description;
@@ -51,7 +47,6 @@ export default async function handler(
         updatingVote.votes[i].description = options[i].description;
       }
 
-      // console.log(updatingVote);
 
       const result = await collection.updateOne(
         { _id: new mongoose.Types.ObjectId(id) },

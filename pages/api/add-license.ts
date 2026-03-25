@@ -23,7 +23,6 @@ export default async function handler(
       email: string;
     } = req.body;
 
-    // console.log(data);
 
     try {
       const existOne = await collection.findOne({ email: data.email });

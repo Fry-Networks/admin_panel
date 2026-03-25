@@ -26,7 +26,6 @@ export default async function handler(
   }
 
   const { asset_id, update_name, update_assetId } = req.body as updateTokenData;
-  // console.log(asset_id, update_name, update_assetId);
 
   const client = await clientPromise;
 
