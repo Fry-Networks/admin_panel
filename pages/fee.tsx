@@ -211,7 +211,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const totalFeeResult = await collection
     .aggregate([
-      { $match: { ...query, asset_id: { $ne: '2681521901' }, price: { $gt: 0 } } },
+      {
+        $match: {
+          ...query,
+          asset_id: { $ne: '2681521901' },
+          price: { $gt: 0 },
+          // Exclude NaN fee_amount values (NaN fails all numeric comparisons)
+          $or: [{ fee_amount: { $gte: 0 } }, { fee_amount: { $lt: 0 } }]
+        }
+      },
       {
         $project: {
           totalValue: { $multiply: ['$fee_amount', '$price'] }
