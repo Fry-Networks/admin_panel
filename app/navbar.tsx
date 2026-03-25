@@ -21,7 +21,7 @@ const navigation: NavItem[] = [
   { name: 'Prices', href: '/prices' },
   { name: 'Fry Tokens', href: '/token' },
   { name: 'Rewards', href: '/rewards' },
-  { name: 'Crypto Income', href: '/fee' },
+  { name: 'Income', href: '/fee' },
   { name: 'Reduction', href: '/reduction' }
 ];
 

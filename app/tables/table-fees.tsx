@@ -47,7 +47,7 @@ export default function FeesTable({ fees }: { fees: Fee[] }) {
               <TableCell>{fee.miner_key}</TableCell>
               <TableCell>{fee.address}</TableCell>
               <TableCell>{fee.fee_amount}</TableCell>
-              <TableCell>{fee.price}</TableCell>
+              <TableCell>{fee.asset_id === '2681521901' ? 'N/A' : fee.price}</TableCell>
               <TableCell>{new Date(fee.createdAt).toDateString()}</TableCell>
               <TableCell>{fee.txID}</TableCell>
             </TableRow>

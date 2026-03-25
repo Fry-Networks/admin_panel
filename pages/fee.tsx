@@ -71,7 +71,7 @@ export default function FeePage({
 
   return (
     <main className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
-      <Title className="text-white">Crypto Income</Title>
+      <Title className="text-white">Income</Title>
       <TabGroup className="mt-3">
         <TabList>
           <Tab>Reward</Tab>
@@ -211,7 +211,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const totalFeeResult = await collection
     .aggregate([
-      { $match: { ...query } },
+      { $match: { ...query, asset_id: { $ne: '2681521901' } } },
       {
         $project: {
           totalValue: { $multiply: ['$fee_amount', '$price'] }
