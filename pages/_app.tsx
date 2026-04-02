@@ -2,6 +2,7 @@ import { NextPage } from 'next';
 import { AppProps } from 'next/app';
 import '../app/globals.css';
 import { useSession, SessionProvider } from 'next-auth/react';
+import { WalletProvider, useInitializeProviders, PROVIDER_ID } from '../lib/use-wallet-compat';
 import Navbar from '../app/navbar';
 
 import { useRouter } from 'next/router';
@@ -16,11 +17,17 @@ interface ProtectedComponentProps {
 }
 
 export default function MyApp({ Component, pageProps }: MyAppProps) {
+  const providers = useInitializeProviders({
+    providers: [{ id: PROVIDER_ID.PERA }]
+  });
+
   return (
     <SessionProvider session={pageProps.session}>
-      <div id="main" className="dark bg-gray-950 text-white min-h-screen">
-        <ProtectedComponent Component={Component} pageProps={pageProps} />
-      </div>
+      <WalletProvider value={providers}>
+        <div id="main" className="dark bg-gray-950 text-white min-h-screen">
+          <ProtectedComponent Component={Component} pageProps={pageProps} />
+        </div>
+      </WalletProvider>
     </SessionProvider>
   );
 }

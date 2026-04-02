@@ -19,6 +19,11 @@ export interface Vote extends mongoose.Document {
       different_people: string[];
     }
   ];
+  // Contract vote fields
+  contractVoteId?: string;  // hex-encoded 32-byte vote ID
+  contractTxId?: string;    // Algorand transaction ID
+  startDate?: Date;         // Vote start date (MongoDB only, not on-chain)
+  confirmedRound?: number;  // Algorand confirmed round
 }
 
 export const voteSchema = new mongoose.Schema({
@@ -38,5 +43,10 @@ export const voteSchema = new mongoose.Schema({
       votes: { type: Number, default: 0 },
       different_people: { type: [String], default: [] }
     }
-  ]
+  ],
+  // Contract vote fields
+  contractVoteId: { type: String, default: undefined },
+  contractTxId: { type: String, default: undefined },
+  startDate: { type: Date, default: undefined },
+  confirmedRound: { type: Number, default: undefined }
 });

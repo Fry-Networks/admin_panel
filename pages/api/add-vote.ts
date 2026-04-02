@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from '../../lib/mongoclient';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
-import mongoose from 'mongoose';
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,10 +28,23 @@ export default async function handler(
       title: string;
       description: string;
       options: { title: string; description: string }[];
+      category?: string;
+      discussion_days?: number;
     } = req.body;
-    const { title, description, options } = data;
+    const { title, description, options, category, discussion_days } = data;
 
     try {
+      // Get the next sequence number
+      const maxSequence = await collection
+        .find({ sequence_number: { $exists: true } })
+        .sort({ sequence_number: -1 })
+        .limit(1)
+        .toArray();
+      
+      const nextSequenceNumber = maxSequence.length > 0 
+        ? (maxSequence[0].sequence_number || 0) + 1 
+        : 1;
+
       await collection.insertOne({
         title: title,
         total_votes: 0,
@@ -47,7 +59,14 @@ export default async function handler(
             votes: 0,
             different_people: []
           };
-        })
+        }),
+        // New governance fields
+        category: category || 'governance',
+        discussion_days: discussion_days || 30,
+        type: 'fip',
+        status: 'draft',
+        vote_version: 'v1',
+        sequence_number: nextSequenceNumber
       });
 
       res.status(200).json({ message: 'Vote added successfully' });

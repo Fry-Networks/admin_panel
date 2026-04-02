@@ -6,7 +6,11 @@ import {
   Flex,
   Icon,
   Callout,
-  Divider
+  Divider,
+  Badge,
+  Select,
+  SelectItem,
+  Textarea
 } from '@tremor/react';
 import clientPromise from '../lib/mongoclient';
 import { useEffect, useState } from 'react';
@@ -15,12 +19,19 @@ import '../app/css/devices.css';
 import { Vote } from '../lib/vote-schema';
 
 import {
-  RiCheckboxCircleFill
+  RiCheckboxCircleFill,
+  RiDiscordFill,
+  RiTimeLine,
+  RiArrowRightLine,
+  RiWallet3Line,
+  RiLink
 } from '@remixicon/react';
 import ModalCreateVote from '../components/create-vote';
 import ModalChooseAsCurrent from '../components/choose-vote';
 import ModalVoteStatus from '../components/vote-status';
 import ModalEditVote from '../components/edit-vote';
+import CreateContractVoteModal from '../components/create-contract-vote';
+import { useWallet } from '../lib/use-wallet-compat';
 
 type ActivationResult = {
   status: 'success' | 'error';
@@ -33,20 +44,98 @@ type ActivationResult = {
   };
 };
 
-export default function DaoPage({ votes }: { votes: Vote[] }) {
+interface ExtendedVote extends Vote {
+  discussion_thread_id?: string;
+  discussion_start?: Date;
+  discussion_end?: Date;
+  status?: string;
+  category?: string;
+  type?: string;
+  implementation_status?: string;
+  implementation_notes?: string;
+  sequence_number?: number;
+  contractVoteId?: string;
+  contractTxId?: string;
+}
+
+interface CFIPReview {
+  _id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  sequence_number?: number;
+}
+
+const IMPLEMENTATION_STATUSES = [
+  { value: 'queued', label: 'Queued' },
+  { value: 'in_progress', label: 'In Progress' },
+  { value: 'implemented', label: 'Implemented' },
+  { value: 'verified', label: 'Verified' }
+];
+
+// Helper functions that accept a reference time to avoid hydration mismatch
+function getDaysRemaining(endDate: Date | string | undefined, now: Date | null): number {
+  if (!endDate || !now) return 0;
+  const end = new Date(endDate);
+  const diff = end.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+function isDiscussionEnded(endDate: Date | string | undefined, now: Date | null): boolean {
+  if (!endDate || !now) return false;
+  return new Date(endDate) <= now;
+}
+
+export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote[], cfipsForReview: CFIPReview[] }) {
+  const { providers, activeAddress } = useWallet();
+  const peraProvider = providers.find(p => p.metadata.id === 'pera');
+  
   const [voteList, setVoteList] = useState(votes);
+  const [cfipList, setCfipList] = useState(cfipsForReview);
   const [isOpen, setIsOpen] = useState(false);
   const [openModalId, setOpenModalId] = useState<string | null>(null);
   const [openStatusModalId, setOpenStatusModalId] = useState<string | null>(null);
+  const [openContractVoteModalId, setOpenContractVoteModalId] = useState<string | null>(null);
   const [stakeInfo, setStakeInfo] = useState([]);
   const [voteSelected, setVoteSelected] = useState<Vote | undefined>(undefined);
   const [activationToast, setActivationToast] = useState<ActivationResult | null>(null);
+  const [implementationState, setImplementationState] = useState<{[key: string]: {status: string, notes: string}}>({});
+  const [founderDecisionReason, setFounderDecisionReason] = useState<{[key: string]: string}>({});
+  
+  // Client-side time state to avoid hydration mismatch
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+
+  // Initialize time only on client to prevent hydration mismatch
+  useEffect(() => {
+    setCurrentTime(new Date());
+  }, []);
 
   useEffect(() => {
     if (!activationToast) return;
     const timer = setTimeout(() => setActivationToast(null), 4000);
     return () => clearTimeout(timer);
   }, [activationToast]);
+
+  const handleWalletConnect = async () => {
+    if (peraProvider) {
+      try {
+        await peraProvider.connect();
+      } catch (err) {
+        console.error('Wallet connect error:', err);
+      }
+    }
+  };
+
+  const handleWalletDisconnect = async () => {
+    if (peraProvider) {
+      try {
+        await peraProvider.disconnect();
+      } catch (err) {
+        console.error('Wallet disconnect error:', err);
+      }
+    }
+  };
 
   const handleOpenModal = (id: any) => {
     setOpenModalId(id);
@@ -76,7 +165,7 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                 end_date: result.payload!.end_date,
                 super_majority: result.payload!.super_majority,
                 hidden: result.payload!.hidden
-              } as unknown as Vote)
+              } as unknown as ExtendedVote)
             : vote
         )
       );
@@ -133,8 +222,245 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
     setOpenStatusModalId(id);
   };
 
+  const handlePostToDiscord = async (voteId: string) => {
+    if (!confirm('Post this vote to Discord? This will start the discussion period.')) {
+      return;
+    }
+
+    try {
+      console.log('[Discord] Starting fetch for vote:', voteId);
+      const response = await fetch('/api/governance/post-to-discord', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vote_id: voteId })
+      });
+      console.log('[Discord] Response status:', response.status);
+
+      const result = await response.json();
+      console.log('[Discord] Response body:', result);
+
+      if (!response.ok) {
+        setActivationToast({ status: 'error', message: result.message || 'Failed to post to Discord' });
+        return;
+      }
+
+      setActivationToast({ status: 'success', message: 'Successfully posted to Discord' });
+      window.location.reload();
+    } catch (error) {
+      console.error('[Discord] Error:', error);
+      setActivationToast({ status: 'error', message: 'Error posting to Discord' });
+    }
+  };
+
+  const handleAdvanceToVote = async (voteId: string) => {
+    if (!confirm('Advance this proposal to voting phase? This will open voting.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/governance/advance-to-vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vote_id: voteId })
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        setActivationToast({ status: 'error', message: result.message || 'Failed to advance to vote' });
+        return;
+      }
+
+      setActivationToast({ status: 'success', message: 'Successfully advanced to voting phase' });
+      window.location.reload();
+    } catch (error) {
+      setActivationToast({ status: 'error', message: 'Error advancing to vote' });
+    }
+  };
+
+  const handleUpdateImplementation = async (voteId: string) => {
+    const state = implementationState[voteId];
+    if (!state?.status) {
+      setActivationToast({ status: 'error', message: 'Please select a status' });
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/governance/update-implementation', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vote_id: voteId,
+          implementation_status: state.status,
+          implementation_notes: state.notes || ''
+        })
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        setActivationToast({ status: 'error', message: result.message || 'Failed to update implementation' });
+        return;
+      }
+
+      setActivationToast({ status: 'success', message: 'Implementation status updated' });
+      window.location.reload();
+    } catch (error) {
+      setActivationToast({ status: 'error', message: 'Error updating implementation' });
+    }
+  };
+
+  const handleFounderDecision = async (cfipId: string, decision: 'approved' | 'vetoed' | 'returned') => {
+    const reason = founderDecisionReason[cfipId] || '';
+    
+    const actionText = {
+      approved: 'approve',
+      vetoed: 'veto',
+      returned: 'return for revision'
+    }[decision];
+
+    if (!confirm(`Are you sure you want to ${actionText} this cFIP?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/governance/founder-decision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cfip_id: cfipId,
+          decision: decision,
+          reason: reason
+        })
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        setActivationToast({ status: 'error', message: result.message || 'Failed to process decision' });
+        return;
+      }
+
+      setActivationToast({ status: 'success', message: `cFIP ${decision} successfully` });
+      window.location.reload();
+    } catch (error) {
+      setActivationToast({ status: 'error', message: 'Error processing decision' });
+    }
+  };
+
+  const handleContractVoteSuccess = () => {
+    window.location.reload();
+  };
+
   return (
     <main className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
+      {/* Wallet Connection Header */}
+      <Flex justifyContent="end" className="mb-4">
+        {!activeAddress ? (
+          <Button
+            color="blue"
+            onClick={handleWalletConnect}
+            icon={RiWallet3Line}
+            size="sm"
+          >
+            Connect Pera Wallet
+          </Button>
+        ) : (
+          <Flex className="gap-2" alignItems="center">
+            <Badge color="green" className="font-mono">
+              {activeAddress.slice(0, 6)}...{activeAddress.slice(-4)}
+            </Badge>
+            <Button
+              color="gray"
+              onClick={handleWalletDisconnect}
+              size="xs"
+            >
+              Disconnect
+            </Button>
+          </Flex>
+        )}
+      </Flex>
+
+      {/* cFIP Review Queue Section */}
+      {cfipList && cfipList.length > 0 && (
+        <>
+          <Flex
+            alignItems="start"
+            justifyContent="start"
+            flexDirection="row"
+            className="mt-6"
+          >
+            <Title className="text-white">cFIP Founder Review Queue</Title>
+          </Flex>
+          <Divider className="border-gray-700" />
+          <Flex
+            alignItems="start"
+            justifyContent="start"
+            flexDirection="col"
+            className="mt-4 mb-8"
+          >
+            {cfipList.map((cfip) => (
+              <Card key={cfip._id} className="mb-4 mx-4 bg-gray-800 border-amber-600 border-2">
+                <Flex flexDirection="col" alignItems="start">
+                  <Flex flexDirection="row" alignItems="center" className="mb-2">
+                    <Badge color="amber" className="mr-2">cFIP</Badge>
+                    {cfip.sequence_number && (
+                      <Badge color="gray" className="mr-2">#{cfip.sequence_number}</Badge>
+                    )}
+                    <Title className="text-white">{cfip.title}</Title>
+                  </Flex>
+                  <Text className="text-gray-300 mb-4">{cfip.description}</Text>
+                  
+                  <div className="w-full mb-4">
+                    <label className="text-sm text-gray-400 mb-1 block">Decision Reason (optional)</label>
+                    <Textarea
+                      placeholder="Reason for decision..."
+                      value={founderDecisionReason[cfip._id] || ''}
+                      onValueChange={(value) => setFounderDecisionReason(prev => ({...prev, [cfip._id]: value}))}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <Flex flexDirection="row" justifyContent="start" className="gap-2">
+                    <Button
+                      color="green"
+                      onClick={() => handleFounderDecision(cfip._id, 'approved')}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      color="red"
+                      onClick={() => handleFounderDecision(cfip._id, 'vetoed')}
+                    >
+                      Veto
+                    </Button>
+                    <Button
+                      color="amber"
+                      onClick={() => handleFounderDecision(cfip._id, 'returned')}
+                    >
+                      Return for Revision
+                    </Button>
+                  </Flex>
+                </Flex>
+              </Card>
+            ))}
+          </Flex>
+        </>
+      )}
+
+      {cfipList && cfipList.length === 0 && (
+        <>
+          <Flex
+            alignItems="start"
+            justifyContent="start"
+            flexDirection="row"
+            className="mt-6"
+          >
+            <Title className="text-white">cFIP Founder Review Queue</Title>
+          </Flex>
+          <Divider className="border-gray-700" />
+          <Text className="text-gray-400 mt-4 mb-8 mx-4">No cFIPs awaiting review</Text>
+        </>
+      )}
+
+      {/* Main Votes Section */}
       <Flex
         alignItems="start"
         justifyContent="start"
@@ -172,6 +498,11 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
       >
         {voteList ? (
           voteList.map((vote, index) => {
+            const daysRemaining = getDaysRemaining(vote.discussion_end, currentTime);
+            const discussionEnded = isDiscussionEnded(vote.discussion_end, currentTime);
+            const isCompleted = !vote.current && vote.total_votes > 0;
+            const hasContractVote = !!vote.contractVoteId;
+            
             return (
               <Card key={vote._id.toString()} className="mb-4 mx-4 bg-gray-900 border-gray-700">
                 <Flex
@@ -183,6 +514,7 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                     flexDirection="row"
                     alignItems="center"
                     justifyContent="center"
+                    className="flex-wrap gap-2"
                   >
                     {vote.current ? (
                       <Icon
@@ -191,32 +523,131 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                         icon={RiCheckboxCircleFill}
                       />
                     ) : null}
+                    
+                    {/* Status Badges */}
+                    {vote.status && (
+                      <Badge color={
+                        vote.status === 'draft' ? 'gray' :
+                        vote.status === 'discussion' ? 'blue' :
+                        vote.status === 'vote' ? 'green' :
+                        vote.status === 'approved' ? 'emerald' :
+                        vote.status === 'vetoed' ? 'red' : 'gray'
+                      }>
+                        {vote.status}
+                      </Badge>
+                    )}
+                    
+                    {/* On-Chain Badge */}
+                    {hasContractVote && (
+                      <Badge color="cyan">
+                        <Flex alignItems="center" className="gap-1">
+                          <Icon icon={RiLink} size="xs" />
+                          On-Chain
+                        </Flex>
+                      </Badge>
+                    )}
+                    
+                    {vote.category && (
+                      <Badge color="purple">{vote.category}</Badge>
+                    )}
+                    
+                    {vote.sequence_number && (
+                      <Badge color="gray">#{vote.sequence_number}</Badge>
+                    )}
+                    
                     <Title className="mb-2 text-white text-2xl">
                       {vote.title}
                     </Title>
                   </Flex>
                   <Text className="mb-5 text-gray-300">{vote.description}</Text>
+                  
+                  {/* Discussion Period Display */}
+                  {vote.discussion_thread_id && vote.status === 'discussion' && (
+                    <Flex className="mb-4 gap-2" alignItems="center">
+                      <Badge color="blue">
+                        <Flex alignItems="center" className="gap-1">
+                          <Icon icon={RiTimeLine} size="sm" />
+                          {currentTime ? (discussionEnded ? 'Discussion ended' : `${daysRemaining} days remaining`) : 'Loading...'}
+                        </Flex>
+                      </Badge>
+                      <Badge color="indigo">Discussion Active</Badge>
+                    </Flex>
+                  )}
+                  
+                  {/* Contract Vote Info */}
+                  {hasContractVote && vote.contractTxId && (
+                    <div className="mb-4 text-center">
+                      <a
+                        href={`https://allo.info/tx/${vote.contractTxId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-cyan-400 hover:text-cyan-300 underline"
+                      >
+                        View on Allo.info
+                      </a>
+                    </div>
+                  )}
                 </Flex>
 
-                {vote.votes.map((option, index) => (
-                  <div key={option.id || index}>
+                {vote.votes.map((option, optIdx) => (
+                  <div key={option.id || optIdx}>
                     <Title className="text-base text-gray-200">
-                      {index + 1}.{option.title}
+                      {optIdx + 1}.{option.title}
                     </Title>
                     <Text className="text-gray-400">{option.description}</Text>
                     <Text className="text-gray-400">Votes: {option.votes}</Text>
                   </div>
                 ))}
-                <Flex
-                  className="mt-3"
-                  flexDirection="row"
-                  justifyContent="center"
-                  alignItems="center"
-                >
+                
+                <div className="mt-3 flex flex-row flex-wrap justify-center items-center">
+                  {/* Create Contract Vote Button - only shown when no contractVoteId */}
+                  {!hasContractVote && (
+                    <Button
+                      color="cyan"
+                      className="mr-3 mb-2"
+                      onClick={() => setOpenContractVoteModalId(vote._id.toString())}
+                      disabled={!activeAddress}
+                      title={!activeAddress ? 'Connect wallet first' : undefined}
+                      icon={RiLink}
+                    >
+                      Create Contract Vote
+                    </Button>
+                  )}
+                  
+                  {/* Post to Discord Button */}
+                  {!vote.discussion_thread_id && (
+                    <Button
+                      color="red"
+                      className="mr-3 mb-2"
+                      onClick={() => {
+                        console.log('[Discord] Button clicked, vote._id:', vote._id);
+                        handlePostToDiscord(vote._id.toString()).catch(err => {
+                          console.error('[Discord] Unhandled error:', err);
+                          setActivationToast({ status: 'error', message: 'Error posting to Discord' });
+                        });
+                      }}
+                      icon={RiDiscordFill}
+                    >
+                      Post to Discord
+                    </Button>
+                  )}
+                  
+                  {/* Advance to Vote Button */}
+                  {vote.status === 'discussion' && discussionEnded && (
+                    <Button
+                      color="blue"
+                      className="mr-3 mb-2"
+                      onClick={() => handleAdvanceToVote(vote._id.toString())}
+                      icon={RiArrowRightLine}
+                    >
+                      Advance to Vote
+                    </Button>
+                  )}
+                  
                   {!vote.current ? (
                     <Button
                       color="green"
-                      className="mr-3"
+                      className="mr-3 mb-2"
                       onClick={() => handleOpenModal(vote._id)}
                     >
                       Activate vote
@@ -224,7 +655,7 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                   ) : (
                     <Button
                       color="amber"
-                      className="mr-3"
+                      className="mr-3 mb-2"
                       onClick={() => handleStop(vote._id)}
                     >
                       Stop vote
@@ -232,22 +663,83 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                   )}
                   <Button
                     color="red"
-                    className="mr-3"
+                    className="mr-3 mb-2"
                     onClick={() => handleDelete(vote._id)}
                   >
                     Delete
                   </Button>
                   <Button
                     color="green"
-                    className="mr-3"
+                    className="mr-3 mb-2"
                     onClick={() => handleState(vote._id)}
                   >
                     View State
                   </Button>
-                  <Button color="purple" onClick={() => setVoteSelected(vote)}>
+                  <Button color="purple" className="mb-2" onClick={() => setVoteSelected(vote)}>
                     Edit
                   </Button>
-                </Flex>
+                </div>
+                
+                {/* Implementation Status Controls for completed votes */}
+                {isCompleted && (
+                  <div className="mt-4 pt-4 border-t border-gray-700">
+                    <Title className="text-sm text-gray-400 mb-2">Implementation Status</Title>
+                    <Flex className="gap-4" flexDirection="row" alignItems="end">
+                      <div className="flex-1">
+                        <Select
+                          value={implementationState[vote._id.toString()]?.status || vote.implementation_status || ''}
+                          onValueChange={(value) => setImplementationState(prev => ({
+                            ...prev,
+                            [vote._id.toString()]: { 
+                              ...prev[vote._id.toString()], 
+                              status: value 
+                            }
+                          }))}
+                          placeholder="Select status"
+                        >
+                          {IMPLEMENTATION_STATUSES.map((status) => (
+                            <SelectItem key={status.value} value={status.value}>
+                              {status.label}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+                      <div className="flex-1">
+                        <Textarea
+                          placeholder="Implementation notes..."
+                          value={implementationState[vote._id.toString()]?.notes || vote.implementation_notes || ''}
+                          onValueChange={(value) => setImplementationState(prev => ({
+                            ...prev,
+                            [vote._id.toString()]: { 
+                              ...prev[vote._id.toString()], 
+                              notes: value 
+                            }
+                          }))}
+                          className="h-10"
+                        />
+                      </div>
+                      <Button
+                        color="blue"
+                        onClick={() => handleUpdateImplementation(vote._id.toString())}
+                      >
+                        Update
+                      </Button>
+                    </Flex>
+                    {vote.implementation_status && (
+                      <Badge 
+                        color={
+                          vote.implementation_status === 'verified' ? 'green' :
+                          vote.implementation_status === 'implemented' ? 'emerald' :
+                          vote.implementation_status === 'in_progress' ? 'blue' : 'gray'
+                        }
+                        className="mt-2"
+                      >
+                        Current: {vote.implementation_status}
+                      </Badge>
+                    )}
+                  </div>
+                )}
+                
                 <ModalChooseAsCurrent
                   index={index}
                   key={vote._id.toString()}
@@ -272,6 +764,17 @@ export default function DaoPage({ votes }: { votes: Vote[] }) {
                   index={index}
                   key={vote._id.toString()}
                 />
+                <CreateContractVoteModal
+                  isOpen={openContractVoteModalId === vote._id.toString()}
+                  setIsOpen={(open) => setOpenContractVoteModalId(open ? vote._id.toString() : null)}
+                  vote={{
+                    id: vote._id.toString(),
+                    title: vote.title,
+                    description: vote.description,
+                    optionsCount: vote.votes?.length || 2
+                  }}
+                  onSuccess={handleContractVoteSuccess}
+                />
               </Card>
             );
           })
@@ -291,15 +794,36 @@ export async function getServerSideProps(context: any) {
   try {
     const client = await clientPromise;
     const db = client.db('main');
+    const collectionName = testMode ? 'test-dao' : 'dao';
 
     const votes = await db
-      .collection(testMode ? 'test-dao' : 'dao')
+      .collection(collectionName)
       .find({ deleted: { $ne: true } })
       .toArray();
+
+    // Query for cFIPs awaiting founder review
+    const cfipsForReview = await db
+      .collection(collectionName)
+      .find({ 
+        type: 'cfip', 
+        status: 'founder_review',
+        deleted: { $ne: true }
+      })
+      .toArray();
+
     return {
-      props: { votes: JSON.parse(JSON.stringify(votes)) }
+      props: { 
+        votes: JSON.parse(JSON.stringify(votes)),
+        cfipsForReview: JSON.parse(JSON.stringify(cfipsForReview))
+      }
     };
   } catch (e) {
     console.error(e);
+    return {
+      props: { 
+        votes: [],
+        cfipsForReview: []
+      }
+    };
   }
 }

@@ -14,6 +14,7 @@ interface HistoryFilterProps<T> {
   pageSize: number;
   responseDataKey: string;
   showTotalIncome?: boolean;
+  onDataLoaded?: (result: any) => void;
   children: (data: T[]) => ReactNode;
 }
 
@@ -22,6 +23,7 @@ export default function HistoryFilter<T>({
   pageSize,
   responseDataKey,
   showTotalIncome = false,
+  onDataLoaded,
   children
 }: HistoryFilterProps<T>) {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -61,6 +63,9 @@ export default function HistoryFilter<T>({
         setTotalCount(result.totalCount);
         if (showTotalIncome && result.totalPaymentSum !== undefined) {
           setTotal(result.totalPaymentSum);
+        }
+        if (onDataLoaded) {
+          onDataLoaded(result);
         }
       }
     }
