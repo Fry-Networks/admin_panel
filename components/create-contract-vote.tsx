@@ -20,6 +20,7 @@ import {
   checkVoteExistsOnChain,
   makeVoteId,
   voteIdToHex,
+  submitRawTransactions,
   waitForConfirmationJson,
   GOVERNANCE_ADMIN_ADDRESS,
   VOTE_TYPE
@@ -49,7 +50,7 @@ export default function CreateContractVoteModal({
   vote,
   onSuccess
 }: CreateContractVoteProps) {
-  const { providers, activeAddress, signTransactions, sendTransactions } = useWallet();
+  const { providers, activeAddress, signTransactions } = useWallet();
   const peraProvider = providers.find(p => p.metadata.id === 'pera');
   
   // Form state
@@ -175,12 +176,12 @@ export default function CreateContractVoteModal({
       const encodedTxns = txns.map(txn => algosdk.encodeUnsignedTransaction(txn));
       const signedTxns = await signTransactions(encodedTxns);
 
-      setStatus('Submitting transaction...');
-      const { id } = await sendTransactions(signedTxns, 0); // Don't wait here
+      setStatus('Submitting transaction to mainnet...');
+      const { txId: id } = await submitRawTransactions(signedTxns);
       setTxId(id);
 
-      setStatus('Waiting for confirmation...');
-      const { confirmedRound } = await waitForConfirmationJson(id, 8);
+      setStatus('Waiting for on-chain confirmation...');
+      const { confirmedRound } = await waitForConfirmationJson(id, 4);
 
       setStatus('Saving to database...');
       const contractVoteIdHex = voteIdToHex(voteId);
