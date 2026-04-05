@@ -132,8 +132,15 @@ async function getRawBody(req: NextApiRequest): Promise<ArrayBuffer> {
 
 /**
  * Make HTTP request to ATLAS00 using http module (bypasses port blocking).
+ * When rawResponse is true, returns the raw buffer instead of JSON-parsed data.
  */
-function httpRequest(url: string, method: string, headers: Record<string, string>, body?: ArrayBuffer): Promise<{ status: number; data: any }> {
+function httpRequest(
+  url: string,
+  method: string,
+  headers: Record<string, string>,
+  body?: ArrayBuffer,
+  rawResponse?: boolean
+): Promise<{ status: number; data: any; buffer?: Buffer }> {
   return new Promise((resolve, reject) => {
     const urlObj = new URL(url);
     const options: http.RequestOptions = {
@@ -149,11 +156,16 @@ function httpRequest(url: string, method: string, headers: Record<string, string
       const chunks: Buffer[] = [];
       res.on('data', (chunk) => chunks.push(chunk));
       res.on('end', () => {
-        try {
-          const data = JSON.parse(Buffer.concat(chunks).toString());
-          resolve({ status: res.statusCode || 500, data });
-        } catch {
-          resolve({ status: res.statusCode || 500, data: {} });
+        const buffer = Buffer.concat(chunks);
+        if (rawResponse) {
+          resolve({ status: res.statusCode || 500, data: null, buffer });
+        } else {
+          try {
+            const data = JSON.parse(buffer.toString());
+            resolve({ status: res.statusCode || 500, data });
+          } catch {
+            resolve({ status: res.statusCode || 500, data: {} });
+          }
         }
       });
     });
@@ -174,8 +186,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const pathSegments = req.query.path;
   const path = '/' + (Array.isArray(pathSegments) ? pathSegments.join('/') : pathSegments || '');
+  
+  // Preserve format query param, reconstruct other query params
   const queryString = req.url?.includes('?') ? req.url.split('?')[1] : '';
   const fullPath = queryString ? `${path}?${queryString}` : path;
+
+  // Detect msgpack request via query param or Accept header
+  const wantsMsgpack = req.query.format === 'msgpack' ||
+    (req.headers.accept || '').includes('application/msgpack');
 
   if (req.method === 'GET') {
     if (!ALLOWED_GET_PATHS.some(pattern => pattern.test(path))) {
@@ -186,12 +204,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (useAtlas) {
       try {
+        // Build headers, forwarding Accept header for msgpack
+        const reqHeaders: Record<string, string> = {
+          'X-Algo-API-Token': process.env.ALGOD_TOKEN || ''
+        };
+        if (wantsMsgpack) {
+          reqHeaders['Accept'] = 'application/msgpack';
+        }
+
         const result = await httpRequest(
           `${ALGOD_PRIMARY}${fullPath}`,
           'GET',
-          { 'X-Algo-API-Token': process.env.ALGOD_TOKEN || '' }
+          reqHeaders,
+          undefined,
+          wantsMsgpack
         );
         if (result.status === 200) {
+          if (wantsMsgpack && result.buffer) {
+            res.setHeader('Content-Type', 'application/msgpack');
+            return res.status(200).send(result.buffer);
+          }
           return res.status(200).json(result.data);
         }
       } catch {
@@ -199,9 +231,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
+    // Nodely fallback
     try {
-      const response = await fetch(`${ALGOD_FALLBACK}${fullPath}`);
+      const fetchHeaders: Record<string, string> = {};
+      if (wantsMsgpack) {
+        fetchHeaders['Accept'] = 'application/msgpack';
+      }
+
+      const response = await fetch(`${ALGOD_FALLBACK}${fullPath}`, { headers: fetchHeaders });
       if (response.ok) {
+        if (wantsMsgpack) {
+          const buffer = Buffer.from(await response.arrayBuffer());
+          res.setHeader('Content-Type', 'application/msgpack');
+          return res.status(200).send(buffer);
+        }
         const data = await response.json();
         return res.status(200).json(data);
       }
