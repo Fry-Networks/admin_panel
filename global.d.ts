@@ -1,8 +1,10 @@
+import { MongoClient } from 'mongodb';
+
 declare module globalThis {
   var _mongoClientPromise: Promise<MongoClient>;
 }
-// types.d.ts
 
+// NextAuth type extensions
 import 'next-auth';
 
 declare module 'next-auth' {
@@ -11,9 +13,13 @@ declare module 'next-auth' {
       name: string;
       email: string;
       image: string;
-      admin: boolean; // Your custom session property
-      owner: boolean; // Your custom session property
+      // Legacy boolean flags (for backwards compatibility)
+      admin: boolean;
+      owner: boolean;
       mods: boolean;
+      // RBAC fields
+      roles: string[];
+      permissions: string[];
     };
   }
 }
