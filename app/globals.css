@@ -73,3 +73,19 @@ html, body {
         width: 50%;
     }
 }
+
+/* FIX 4b-3: re-enable native datetime-local picker. Some upstream CSS in the
+   cascade (Tailwind preflight, Tremor, HeadlessUI, or similar) sets
+   appearance:none on inputs, which suppresses the native browser date/time
+   picker on Chromium and Edge. This block restores it and adds dark color-scheme
+   so the popup matches the dark UI. Scoped strictly to type=datetime-local. */
+input[type="datetime-local"] {
+  -webkit-appearance: auto;
+  appearance: auto;
+  color-scheme: dark;
+}
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 1;
+  display: block;
+}
