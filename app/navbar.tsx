@@ -43,7 +43,13 @@ const navGroups: NavGroup[] = [
       { name: 'Income', href: '/fee' },
       { name: 'Reduction', href: '/reduction' }
     ]
-  }
+  },
+  {
+    name: 'Admin',
+    items: [
+      { name: 'Events', href: '/events' },
+    ],
+  },
 ];
 
 const disabledNavigation: NavItem[] = [
