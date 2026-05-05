@@ -49,7 +49,7 @@ const navGroups: NavGroup[] = [
     items: [
       { name: 'Events', href: '/events' },
       { name: 'WebUIs', href: '/webuis' },
-      { name: 'Allowlist', href: '/allowlist' },
+      { name: 'User Management', href: '/allowlist' },
     ],
   },
 ];

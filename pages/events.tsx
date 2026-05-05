@@ -18,6 +18,31 @@ const STATUS_COLORS: Record<EventStatus, string> = { draft: 'gray', active: 'gre
 const STATUS_OPTIONS: EventStatus[] = ['draft', 'active', 'ended', 'cancelled'];
 const METRIC_OPTIONS: MetricType[] = ['manual', 'aem_count', 'device_count'];
 
+
+const isoToLocalInput = (iso: string): string => {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  } catch {
+    return '';
+  }
+};
+
+const localInputToIso = (val: string): string => {
+  if (!val) return '';
+  try {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString();
+  } catch {
+    return '';
+  }
+};
+
+
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,8 +101,26 @@ export default function EventsPage() {
           <TextInput placeholder="Event name *" value={name} onValueChange={setName} />
           <Select value={status} onValueChange={(v: any) => setStatus(v as EventStatus)}>{STATUS_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</Select>
           <TextInput placeholder="Description" value={description} onValueChange={setDescription} className="md:col-span-2" />
-          <TextInput placeholder="Start date (ISO 8601) *" value={startDate} onValueChange={setStartDate} />
-          <TextInput placeholder="End date (ISO 8601) *" value={endDate} onValueChange={setEndDate} />
+          <div>
+            <Text className="text-gray-400 text-xs mb-1">Start date *</Text>
+            <input
+              type="datetime-local"
+              value={isoToLocalInput(startDate)}
+              onChange={(e) => setStartDate(localInputToIso(e.target.value))}
+              required
+              className="w-full bg-gray-950 border border-gray-700 rounded-md px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <Text className="text-gray-400 text-xs mb-1">End date *</Text>
+            <input
+              type="datetime-local"
+              value={isoToLocalInput(endDate)}
+              onChange={(e) => setEndDate(localInputToIso(e.target.value))}
+              required
+              className="w-full bg-gray-950 border border-gray-700 rounded-md px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
           <Select value={metricType} onValueChange={(v: any) => setMetricType(v as MetricType)}>{METRIC_OPTIONS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</Select>
           <TextInput placeholder="Audience" value={audience} onValueChange={setAudience} />
           <TextInput placeholder="Prize type (e.g. USDC)" value={prizeType} onValueChange={setPrizeType} />
