@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import algosdk from 'algosdk';
-import { SupportedWallet, WalletAccount, WalletId, WalletManager } from '@txnlab/use-wallet';
+import { NetworkId, SupportedWallet, WalletAccount, WalletId, WalletManager } from '@txnlab/use-wallet';
 
 // Pera only for admin panel
 export const PROVIDER_ID = {
@@ -113,8 +113,30 @@ export function WalletProvider({
 
   useEffect(() => {
     if (!managerRef.current) {
+      // Configure for MAINNET with algod routed through admin panel proxy
+      const algodBaseServer = typeof window !== 'undefined' 
+        ? `${window.location.origin}/api/algod` 
+        : 'http://localhost:3008/api/algod';
+
       const manager = new WalletManager({
-        wallets: value.providers.map((provider) => provider.id) as SupportedWallet[]
+        wallets: value.providers.map((provider) => provider.id) as SupportedWallet[],
+        networks: {
+          [NetworkId.MAINNET]: {
+            algod: {
+              baseServer: algodBaseServer,
+              token: '',
+              port: ''
+            }
+          },
+          [NetworkId.TESTNET]: {
+            algod: {
+              baseServer: 'https://testnet-api.4160.nodely.dev',
+              token: '',
+              port: ''
+            }
+          }
+        },
+        defaultNetwork: NetworkId.MAINNET
       });
       managerRef.current = manager;
       setIsReady(true);

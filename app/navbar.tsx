@@ -43,6 +43,13 @@ const navGroups: NavGroup[] = [
       { name: 'Income', href: '/fee' },
       { name: 'Reduction', href: '/reduction' }
     ]
+  },
+  {
+    name: 'Admin',
+    items: [
+      { name: 'WebUIs', href: '/webuis' },
+      { name: 'Allowlist', href: '/allowlist' }
+    ]
   }
 ];
 

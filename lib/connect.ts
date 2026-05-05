@@ -9,7 +9,7 @@ export async function connect() {
         throw new Error('MONGO_URI not set!');
     }
     // console.log('Connecting to MongoDB...');
-    await mongoose.connect(uri);
+    await mongoose.connect(uri, { dbName: 'main' });
     // console.log('Connected to MongoDB!');
     mongoose.connection.useDb('main');
 

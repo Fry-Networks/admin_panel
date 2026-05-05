@@ -226,6 +226,46 @@ export async function waitForConfirmationJson(
 }
 
 /**
+ * Submit signed transactions directly to mainnet via admin panel proxy.
+ * Bypasses use-wallet's algod client which may be cached to wrong network.
+ */
+export async function submitRawTransactions(
+  signedTxns: (Uint8Array | null)[]
+): Promise<{ txId: string }> {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3008';
+  
+  // Filter out null entries and concatenate
+  const txnsToSend = signedTxns.filter((txn): txn is Uint8Array => txn !== null);
+  if (txnsToSend.length === 0) {
+    throw new Error('No signed transactions to send');
+  }
+
+  // Concatenate all transactions into single blob
+  const totalLength = txnsToSend.reduce((sum, txn) => sum + txn.length, 0);
+  const blob = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const txn of txnsToSend) {
+    blob.set(txn, offset);
+    offset += txn.length;
+  }
+
+  const response = await fetch(`${baseUrl}/api/algod/v2/transactions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-binary' },
+    body: blob
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Transaction submission failed: ${response.status} - ${text}`);
+  }
+
+  const data = await response.json();
+  return { txId: data.txId };
+}
+
+
+/**
  * Convert vote ID Uint8Array to hex string for storage.
  */
 export function voteIdToHex(voteId: Uint8Array): string {

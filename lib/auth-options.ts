@@ -50,7 +50,7 @@ export const authOptions: NextAuthOptions = {
         const db = client.db('main');
 
         // Case-insensitive lookup for enabled allowlist entry
-        const allowed = await db.collection('github-allowlist').findOne({
+        const allowed = await db.collection('github-allowlists').findOne({
           githubUsername: { $regex: new RegExp(`^${githubUsername}$`, 'i') },
           enabled: true,
         });
