@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, Title, Text, Button, TextInput, NumberInput, Select, SelectItem, Badge } from '@tremor/react';
 
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 type EventStatus = 'draft' | 'active' | 'ended' | 'cancelled';
 type MetricType = 'manual' | 'aem_count' | 'device_count';
 type Prize = { type?: string; amount?: number; description?: string; paidTxId?: string };
@@ -19,28 +21,6 @@ const STATUS_OPTIONS: EventStatus[] = ['draft', 'active', 'ended', 'cancelled'];
 const METRIC_OPTIONS: MetricType[] = ['manual', 'aem_count', 'device_count'];
 
 
-const isoToLocalInput = (iso: string): string => {
-  if (!iso) return '';
-  try {
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return '';
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  } catch {
-    return '';
-  }
-};
-
-const localInputToIso = (val: string): string => {
-  if (!val) return '';
-  try {
-    const d = new Date(val);
-    if (isNaN(d.getTime())) return '';
-    return d.toISOString();
-  } catch {
-    return '';
-  }
-};
 
 
 export default function EventsPage() {
@@ -103,21 +83,31 @@ export default function EventsPage() {
           <TextInput placeholder="Description" value={description} onValueChange={setDescription} className="md:col-span-2" />
           <div>
             <Text className="text-gray-400 text-xs mb-1">Start date *</Text>
-            <input
-              type="datetime-local"
-              value={isoToLocalInput(startDate)}
-              onChange={(e) => setStartDate(localInputToIso(e.target.value))}
+            <DatePicker
+              selected={startDate ? new Date(startDate) : null}
+              onChange={(d: Date | null) => setStartDate(d ? d.toISOString() : '')}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="yyyy-MM-dd HH:mm"
+              placeholderText="Select start date and time"
               required
+              wrapperClassName="w-full"
               className="w-full bg-gray-950 border border-gray-700 rounded-md px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
             <Text className="text-gray-400 text-xs mb-1">End date *</Text>
-            <input
-              type="datetime-local"
-              value={isoToLocalInput(endDate)}
-              onChange={(e) => setEndDate(localInputToIso(e.target.value))}
+            <DatePicker
+              selected={endDate ? new Date(endDate) : null}
+              onChange={(d: Date | null) => setEndDate(d ? d.toISOString() : '')}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="yyyy-MM-dd HH:mm"
+              placeholderText="Select end date and time"
               required
+              wrapperClassName="w-full"
               className="w-full bg-gray-950 border border-gray-700 rounded-md px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
