@@ -21,6 +21,7 @@ const navGroups: NavGroup[] = [
     name: 'Network',
     items: [
       { name: 'Devices', href: '/devices' },
+      { name: 'Virtual Devices', href: '/virtual-devices' },
       { name: 'BYOD', href: '/byod' },
       { name: 'Users', href: '/users' },
       { name: 'Blacklist', href: '/blacklist' }
