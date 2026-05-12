@@ -119,6 +119,27 @@ export default function VirtualDevicesPage() {
         });
         if (!res.ok) { const e = await res.json(); throw new Error(e.message); }
         showToast('Device transitioned', 'success');
+      } else if (modalAction === 'cancel' && modalDevice) {
+        const res = await fetch('/api/virtual-devices/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ miner_key: modalDevice.miner_key }),
+        });
+        if (!res.ok) { const e = await res.json(); throw new Error(e.message); }
+        showToast('Device canceled', 'success');
+      } else if (modalAction === 'bulk-cancel') {
+        const res = await fetch('/api/virtual-devices/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'cancel',
+            miner_keys: Array.from(selectedKeys),
+          }),
+        });
+        if (!res.ok) { const e = await res.json(); throw new Error(e.message); }
+        const result = await res.json();
+        showToast(result.success + ' succeeded, ' + result.failed + ' failed', result.failed > 0 ? 'warning' : 'success');
+        setSelectedKeys(new Set());
       } else if (modalAction?.startsWith('bulk-')) {
         const action = modalAction.replace('bulk-', '');
         const res = await fetch('/api/virtual-devices/bulk', {
@@ -154,7 +175,7 @@ export default function VirtualDevicesPage() {
   ];
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
+    <main data-testid="virtual-devices-page" className="p-4 md:p-10 mx-auto max-w-8xl bg-gray-950">
       <Title className="text-white">Virtual Devices</Title>
       <Text className="text-gray-400 mt-1">
         Manage virtual mining devices from Wix orders
@@ -181,14 +202,14 @@ export default function VirtualDevicesPage() {
 
       {/* Search + Filters */}
       <div className="flex flex-wrap gap-3 mt-6">
-        <input
+        <input data-testid="virtual-devices-search"
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search email, miner key, order, wix order..."
           className="flex-1 min-w-[200px] h-10 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 px-3 text-sm focus:border-red-500 focus:ring-red-500"
         />
-        <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
+        <select data-testid="virtual-devices-status-filter" value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
           className="h-10 rounded-md border border-gray-600 bg-gray-800 text-gray-300 px-3 text-sm focus:border-red-500">
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
@@ -196,7 +217,7 @@ export default function VirtualDevicesPage() {
           <option value="transitioned">Transitioned</option>
           <option value="canceled">Canceled</option>
         </select>
-        <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
+        <select data-testid="virtual-devices-type-filter" value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
           className="h-10 rounded-md border border-gray-600 bg-gray-800 text-gray-300 px-3 text-sm focus:border-red-500">
           <option value="all">All Types</option>
           <option value="VRDN">VRDN</option>
@@ -207,7 +228,7 @@ export default function VirtualDevicesPage() {
 
       {/* Bulk Actions */}
       {selectedKeys.size > 0 && (
-        <div className="flex items-center gap-3 mt-4 p-3 bg-gray-800 rounded-lg border border-gray-700">
+        <div data-testid="bulk-actions-bar" className="flex items-center gap-3 mt-4 p-3 bg-gray-800 rounded-lg border border-gray-700">
           <span className="text-sm text-gray-300">{selectedKeys.size} selected</span>
           <button onClick={() => handleBulkAction('activate')}
             className="px-3 py-1.5 text-sm rounded bg-green-600 text-white hover:bg-green-700">
@@ -216,6 +237,10 @@ export default function VirtualDevicesPage() {
           <button onClick={() => handleBulkAction('deactivate')}
             className="px-3 py-1.5 text-sm rounded bg-yellow-600 text-white hover:bg-yellow-700">
             Deactivate All
+          </button>
+          <button onClick={() => handleBulkAction('cancel')}
+            className="px-3 py-1.5 text-sm rounded bg-red-600 text-white hover:bg-red-700">
+            Cancel All
           </button>
           <button onClick={() => setSelectedKeys(new Set())}
             className="px-3 py-1.5 text-sm rounded bg-gray-700 text-gray-300 hover:bg-gray-600 ml-auto">
@@ -251,7 +276,7 @@ export default function VirtualDevicesPage() {
 
       {/* Toast */}
       {toast && (
-        <div className={'fixed bottom-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm ' +
+        <div data-testid="toast-message" className={'fixed bottom-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm ' +
           (toast.type === 'error' ? 'bg-red-900 text-red-200 border border-red-700' :
            toast.type === 'warning' ? 'bg-yellow-900 text-yellow-200 border border-yellow-700' :
            'bg-green-900 text-green-200 border border-green-700')}>

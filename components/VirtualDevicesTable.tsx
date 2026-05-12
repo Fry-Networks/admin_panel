@@ -79,7 +79,7 @@ export default function VirtualDevicesTable({
 
   return (
     <div>
-      <div className="overflow-x-auto">
+      <div data-testid="virtual-devices-table" className="overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="text-xs text-gray-400 uppercase border-b border-gray-700">
             <tr>
@@ -103,7 +103,7 @@ export default function VirtualDevicesTable({
               return (
                 <tr key={d._id} className="hover:bg-gray-800/50">
                   <td className="px-3 py-3">
-                    <input type="checkbox" checked={selectedKeys.has(d.miner_key)}
+                    <input data-testid="virtual-device-checkbox" type="checkbox" checked={selectedKeys.has(d.miner_key)}
                       onChange={() => toggleOne(d.miner_key)}
                       className="rounded bg-gray-700 border-gray-600 text-red-500 focus:ring-red-500" />
                   </td>
@@ -165,12 +165,15 @@ function ActionMenu({ status, device, onAction }: {
     actions.push({ label: 'Deactivate', action: 'deactivate' });
     actions.push({ label: 'Transition', action: 'transition' });
   }
+  if (status === 'Pending' || status === 'Activated') {
+    actions.push({ label: 'Cancel', action: 'cancel' });
+  }
 
   if (actions.length === 0) return <span className="text-gray-600 text-xs">-</span>;
 
   return (
     <div className="relative">
-      <button onClick={() => setOpen(!open)}
+      <button data-testid="virtual-device-actions" onClick={() => setOpen(!open)}
         className="text-gray-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-gray-700">
         Actions
       </button>
@@ -179,7 +182,7 @@ function ActionMenu({ status, device, onAction }: {
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="absolute right-0 z-50 mt-1 w-36 rounded-md bg-gray-800 shadow-lg ring-1 ring-black/20">
             {actions.map(a => (
-              <button key={a.action} onClick={() => { setOpen(false); onAction(a.action, device); }}
+              <button key={a.action} data-testid={'action-' + a.action} onClick={() => { setOpen(false); onAction(a.action, device); }}
                 className="block w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
                 {a.label}
               </button>

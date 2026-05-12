@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import clientPromise from '@/lib/mongoclient';
+import { getVirtualDevicesCollection } from '@/lib/virtual-devices';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
@@ -17,13 +18,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const client = await clientPromise;
     const db = client.db('main');
-    const device = await db.collection('devices').findOne({ miner_key: virtual_miner_key, virtual: true });
+    const device = await getVirtualDevicesCollection(db).findOne({ miner_key: virtual_miner_key, virtual: true });
 
     if (!device) return res.status(404).json({ message: 'Virtual device not found' });
+    if (device.canceled_at) return res.status(409).json({ message: 'Device is canceled' });
     if (!device.activated) return res.status(409).json({ message: 'Device must be activated before transition' });
     if (device.transitioned_at) return res.status(409).json({ message: 'Device already transitioned' });
 
-    const result = await db.collection('devices').findOneAndUpdate(
+    const result = await getVirtualDevicesCollection(db).findOneAndUpdate(
       { miner_key: virtual_miner_key, virtual: true },
       { $set: { transitioned_at: new Date(), transitioned_to_device: physical_miner_key, activated: false } },
       { returnDocument: 'after' }

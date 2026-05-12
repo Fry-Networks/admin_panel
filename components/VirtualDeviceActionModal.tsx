@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 
 interface Props {
   isOpen: boolean;
-  action: 'activate' | 'deactivate' | 'transition' | 'bulk-activate' | 'bulk-deactivate' | null;
+  action: 'activate' | 'deactivate' | 'transition' | 'cancel' | 'bulk-activate' | 'bulk-deactivate' | 'bulk-cancel' | null;
   device?: { miner_key: string; email: string; order: string } | null;
   bulkCount?: number;
   onConfirm: (data: { reward_wallet?: string; physical_miner_key?: string }) => void;
@@ -15,8 +15,10 @@ const titles: Record<string, string> = {
   activate: 'Activate Virtual Device',
   deactivate: 'Deactivate Virtual Device',
   transition: 'Transition to Physical Device',
+  cancel: 'Cancel Virtual Device',
   'bulk-activate': 'Bulk Activate Devices',
   'bulk-deactivate': 'Bulk Deactivate Devices',
+  'bulk-cancel': 'Bulk Cancel Devices',
 };
 
 export default function VirtualDeviceActionModal({
@@ -59,7 +61,7 @@ export default function VirtualDeviceActionModal({
             <Transition.Child as={Fragment}
               enter="ease-out duration-200" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100"
               leave="ease-in duration-150" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
-              <Dialog.Panel className="w-full max-w-md rounded-xl bg-gray-900 border border-gray-700 p-6 shadow-xl">
+              <Dialog.Panel data-testid="virtual-device-modal" className="w-full max-w-md rounded-xl bg-gray-900 border border-gray-700 p-6 shadow-xl">
                 <Dialog.Title className="text-lg font-medium text-white">
                   {titles[action] || 'Confirm Action'}
                 </Dialog.Title>
@@ -111,14 +113,19 @@ export default function VirtualDeviceActionModal({
                       This will deactivate the device and clear its reward wallet. The device will stop earning rewards.
                     </p>
                   )}
+                  {(action === 'cancel' || action === 'bulk-cancel') && (
+                    <p className="text-sm text-red-400">
+                      This will cancel the virtual device and disable future reward accrual. Previously settled rewards in main.rewards are not affected.
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-6 flex justify-end gap-3">
-                  <button onClick={handleClose} disabled={loading}
+                  <button data-testid="modal-cancel" onClick={handleClose} disabled={loading}
                     className="px-4 py-2 text-sm rounded-md bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50">
                     Cancel
                   </button>
-                  <button onClick={handleConfirm} disabled={loading || (action === 'transition' && !physicalKey.trim())}
+                  <button data-testid="modal-confirm" onClick={handleConfirm} disabled={loading || (action === 'transition' && !physicalKey.trim())}
                     className="px-4 py-2 text-sm rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50">
                     {loading ? 'Processing...' : 'Confirm'}
                   </button>

@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import clientPromise from '@/lib/mongoclient';
+import { getVirtualDevicesCollection } from '@/lib/virtual-devices';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).json({ message: 'Method not allowed' });
@@ -11,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const client = await clientPromise;
   const db = client.db('main');
-  const collection = db.collection('devices');
+  const collection = getVirtualDevicesCollection(db);
 
   const page = Math.max(1, parseInt(req.query.page as string) || 1);
   const limit = Math.min(200, Math.max(1, parseInt(req.query.limit as string) || 50));
