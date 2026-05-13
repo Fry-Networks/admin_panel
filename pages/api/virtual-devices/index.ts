@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const status = (req.query.status as string) || 'all';
   const type = (req.query.type as string) || 'all';
 
-  const filter: any = { virtual: true };
+  const filter: any = { virtual: true, is_registered: { $ne: true } };
 
   if (status === 'pending') {
     filter.activated = false;
@@ -55,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       collection.find(filter).sort({ created_at: -1 }).skip((page - 1) * limit).limit(limit).toArray(),
       collection.countDocuments(filter),
       collection.aggregate([
-        { $match: { virtual: true } },
+        { $match: { virtual: true, is_registered: { $ne: true } } },
         { $facet: {
           total: [{ $count: 'count' }],
           pending: [{ $match: { activated: false, transitioned_at: null, canceled_at: null } }, { $count: 'count' }],
