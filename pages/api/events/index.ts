@@ -2,6 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import { getEventModel } from '@/lib/events/eventModel';
+import { startAutoRefresh } from '@/lib/events/autoRefreshScheduler';
+
+// Start auto-refresh on first API route hit (idempotent — only starts once)
+if (typeof window === 'undefined') {
+  startAutoRefresh();
+}
 
 type ApiResponse =
   | { success: true; events: unknown[] }
@@ -33,7 +39,7 @@ export default async function handler(
 
     if (req.method === 'POST') {
       const body = req.body ?? {};
-      const required = ['name', 'startDate', 'endDate', 'status', 'metric'];
+      const required = ['name', 'startDate', 'endDate', 'status'];
       for (const f of required) {
         if (body[f] === undefined || body[f] === null || body[f] === '') {
           return res
@@ -41,19 +47,53 @@ export default async function handler(
             .json({ success: false, error: `missing field: ${f}` });
         }
       }
-      const allowedMetrics = ['manual', 'aem_count', 'device_count'];
-      if (!allowedMetrics.includes(body.metric)) {
+
+      // Accept metric as string or object { type: string, config?: ... }
+      const metricInput = body.metric;
+      let metricType: string;
+      let metricConfig: Record<string, unknown> | undefined;
+      if (typeof metricInput === 'string') {
+        metricType = metricInput;
+      } else if (metricInput && typeof metricInput === 'object') {
+        metricType = metricInput.type;
+        metricConfig = metricInput.config;
+      } else {
         return res
           .status(400)
-          .json({ success: false, error: `metric must be one of ${allowedMetrics.join(', ')}` });
+          .json({ success: false, error: 'missing field: metric' });
+      }
+
+      const allowedMetrics = ['manual', 'aem_count', 'device_count'];
+      if (!allowedMetrics.includes(metricType)) {
+        return res.status(400).json({
+          success: false,
+          error: `metric must be one of ${allowedMetrics.join(', ')}`,
+        });
       }
       const allowedStatuses = ['draft', 'active', 'ended', 'cancelled'];
       if (!allowedStatuses.includes(body.status)) {
-        return res
-          .status(400)
-          .json({ success: false, error: `status must be one of ${allowedStatuses.join(', ')}` });
+        return res.status(400).json({
+          success: false,
+          error: `status must be one of ${allowedStatuses.join(', ')}`,
+        });
       }
-      const created_by = session.user?.email ?? session.user?.name ?? 'admin';
+
+      const created_by =
+        session.user?.email ?? session.user?.name ?? 'admin';
+
+      // Build metric object with optional refresh config
+      const refreshIntervalMinutes =
+        typeof body.refreshIntervalMinutes === 'number'
+          ? body.refreshIntervalMinutes
+          : 60;
+      const metric: Record<string, unknown> = {
+        type: metricType,
+        config: {
+          ...(metricConfig ?? {}),
+          refreshIntervalMinutes,
+        },
+      };
+
       const doc = await EventModel.create({
         name: body.name,
         description: body.description,
@@ -61,17 +101,21 @@ export default async function handler(
         startDate: new Date(body.startDate),
         endDate: new Date(body.endDate),
         prize: body.prize,
-        metric: body.metric,
+        metric,
         bannerImage: body.bannerImage,
         ctaLink: body.ctaLink,
         audience: body.audience,
+        prizeTiers: body.prizeTiers,
+        waivedRequirements: body.waivedRequirements,
         created_by,
       });
       return res.status(201).json({ success: true, event: doc.toObject() });
     }
 
     res.setHeader('Allow', 'GET, POST');
-    return res.status(405).json({ success: false, error: 'method not allowed' });
+    return res
+      .status(405)
+      .json({ success: false, error: 'method not allowed' });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'unknown error';
     return res.status(500).json({ success: false, error: msg });

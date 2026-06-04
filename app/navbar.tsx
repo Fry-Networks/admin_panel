@@ -21,6 +21,7 @@ const navGroups: NavGroup[] = [
     name: 'Network',
     items: [
       { name: 'Devices', href: '/devices' },
+      { name: 'Virtual Devices', href: '/virtual-devices' },
       { name: 'BYOD', href: '/byod' },
       { name: 'Users', href: '/users' },
       { name: 'Blacklist', href: '/blacklist' }
@@ -50,6 +51,7 @@ const navGroups: NavGroup[] = [
       { name: 'Events', href: '/events' },
       { name: 'WebUIs', href: '/webuis' },
       { name: 'User Management', href: '/allowlist' },
+      { name: 'Device Credentials', href: '/admin/credentials' },
     ],
   },
 ];
@@ -195,6 +197,19 @@ export default function Navbar() {
                     <NavDropdown key={group.name} group={group} pathname={pathname} />
                   ))}
 
+                  {/* Virtual Devices Quick Link */}
+                  <a
+                    href="/virtual-devices"
+                    className={classNames(
+                      pathname === '/virtual-devices'
+                        ? 'border-red-500 text-white'
+                        : 'border-transparent text-gray-400 hover:text-white hover:border-gray-500',
+                      'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium tracking-wide'
+                    )}
+                  >
+                    Virtual Devices
+                  </a>
+
                   {/* Disabled Section */}
                   <div className="flex items-center gap-2">
                     <span className="h-5 w-px bg-gray-700" />
@@ -335,6 +350,21 @@ export default function Navbar() {
                   })}
                 </div>
               ))}
+
+              {/* Virtual Devices Quick Link Mobile */}
+              <Disclosure.Button
+                as="a"
+                href="/virtual-devices"
+                className={classNames(
+                  pathname === '/virtual-devices'
+                    ? 'bg-gray-800 border-red-500 text-white'
+                    : 'border-transparent text-gray-400 hover:bg-gray-800 hover:border-gray-500 hover:text-white',
+                  'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+                )}
+                aria-current={pathname === '/virtual-devices' ? 'page' : undefined}
+              >
+                Virtual Devices
+              </Disclosure.Button>
 
               {/* Disabled Section for Mobile */}
               <div className="px-3 pt-4 pb-2">

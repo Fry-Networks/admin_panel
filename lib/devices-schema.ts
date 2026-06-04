@@ -7,7 +7,17 @@ export const devicesSchema = new mongoose.Schema({
   email: String,
   order: String,
   registered_at: Date,
-  created_at: { type: Date, default: Date.now }
+  created_at: { type: Date, default: Date.now },
+  // Virtual mining fields (Phase 4)
+  virtual: { type: Boolean, default: false },
+  activated: { type: Boolean, default: false },
+  activated_at: { type: Date, default: null },
+  reward_wallet: { type: String, default: null },
+  wix_order_id: { type: String, default: null },
+  wix_line_item_id: { type: String, default: null },
+  transitioned_at: { type: Date, default: null },
+  transitioned_to_device: { type: String, default: null },
+  canceled_at: { type: Date, default: null },
 });
 export interface Device extends mongoose.Document {
   user_id: mongoose.Schema.Types.ObjectId | string;
@@ -29,6 +39,16 @@ export interface Device extends mongoose.Document {
     asset_id: string;
     amount: number;
   };
+  // Virtual mining fields
+  virtual?: boolean;
+  activated?: boolean;
+  activated_at?: Date | null;
+  reward_wallet?: string | null;
+  wix_order_id?: string | null;
+  wix_line_item_id?: string | null;
+  transitioned_at?: Date | null;
+  transitioned_to_device?: string | null;
+  canceled_at?: Date | null;
 }
 
 const DeviceModel = (mongoose.models.device ||

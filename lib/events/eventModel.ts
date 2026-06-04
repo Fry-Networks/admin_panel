@@ -4,7 +4,29 @@ import { eventsConnect } from './connect';
 export type EventStatus = 'draft' | 'active' | 'ended' | 'cancelled';
 export type MetricType = 'manual' | 'aem_count' | 'device_count';
 export type RefreshStatus = 'ok' | 'skipped' | 'failed';
-export type LeaderboardSource = 'manual' | 'hardwareapi';
+export type LeaderboardSource = 'manual' | 'hardwareapi' | 'auto';
+
+export interface IPrizeTier {
+  tier: string;
+  description: string;
+  type: string;
+  amount: number;
+  maxRank: number;
+}
+
+export interface IWinner {
+  wallet: string;
+  rank: number;
+  tier: string;
+  prizeTxId?: string;
+  declaredAt: Date;
+  declaredBy: string;
+}
+
+export interface IWaivedRequirements {
+  registrationStake: boolean;
+  minerTypes: string[];
+}
 
 export interface IEvent extends Document {
   name: string;
@@ -24,6 +46,7 @@ export interface IEvent extends Document {
     lastRefreshAt?: Date;
     lastRefreshStatus?: RefreshStatus;
     lastRefreshError?: string;
+    nextRefreshAt?: Date;
   };
   leaderboard: Array<{
     wallet: string;
@@ -38,6 +61,9 @@ export interface IEvent extends Document {
     declaredBy?: string;
     prizeTxId?: string;
   };
+  prizeTiers?: IPrizeTier[];
+  winners?: IWinner[];
+  waivedRequirements?: IWaivedRequirements;
   bannerImage?: string;
   ctaLink?: string;
   audience?: string;
@@ -75,13 +101,14 @@ const EventSchema = new Schema<IEvent>(
       lastRefreshAt: { type: Date },
       lastRefreshStatus: { type: String, enum: ['ok', 'skipped', 'failed'] },
       lastRefreshError: { type: String },
+      nextRefreshAt: { type: Date },
     },
     leaderboard: [
       {
         wallet: { type: String, required: true },
         score: { type: Number, required: true, min: 0 },
         lastCalculated: { type: Date },
-        source: { type: String, enum: ['manual', 'hardwareapi'] },
+        source: { type: String, enum: ['manual', 'hardwareapi', 'auto'] },
       },
     ],
     winner: {
@@ -90,6 +117,29 @@ const EventSchema = new Schema<IEvent>(
       declaredAt: { type: Date },
       declaredBy: { type: String },
       prizeTxId: { type: String },
+    },
+    prizeTiers: [
+      {
+        tier: { type: String, required: true },
+        description: { type: String, required: true },
+        type: { type: String, required: true },
+        amount: { type: Number, required: true },
+        maxRank: { type: Number, required: true },
+      },
+    ],
+    winners: [
+      {
+        wallet: { type: String, required: true },
+        rank: { type: Number, required: true },
+        tier: { type: String, required: true },
+        prizeTxId: { type: String },
+        declaredAt: { type: Date },
+        declaredBy: { type: String },
+      },
+    ],
+    waivedRequirements: {
+      registrationStake: { type: Boolean, default: false },
+      minerTypes: [{ type: String }],
     },
     bannerImage: { type: String },
     ctaLink: { type: String },
@@ -107,6 +157,9 @@ EventSchema.index({ startDate: 1, endDate: 1 });
 EventSchema.index({ 'metric.type': 1 });
 EventSchema.index({ 'leaderboard.wallet': 1 });
 EventSchema.index({ 'winner.wallet': 1 });
+EventSchema.index({ 'winners.wallet': 1 });
+EventSchema.index({ 'waivedRequirements.registrationStake': 1, status: 1 });
+EventSchema.index({ 'metric.nextRefreshAt': 1, status: 1 });
 
 // Deferred async getter — uses isolated eventsConnect() instead of default mongoose connection.
 // This replaces dashb's: export default mongoose.models.Event || mongoose.model<IEvent>('Event', EventSchema);

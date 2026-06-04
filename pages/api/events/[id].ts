@@ -15,6 +15,9 @@ const ALLOWED_PATCH_FIELDS = [
   'bannerImage',
   'ctaLink',
   'audience',
+  'prizeTiers',
+  'winners',
+  'waivedRequirements',
 ];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

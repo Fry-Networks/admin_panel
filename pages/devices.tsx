@@ -15,6 +15,7 @@ import '../app/css/devices.css';
 import DeviceForm from '../components/form-device';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import ChangeDeviceForm from '../components/change-device';
+import AdminCredentialEdit from '../components/AdminCredentialEdit';
 import { FryToken } from '../lib/tokens-schema';
 
 export default function DevicesPage({
@@ -56,6 +57,7 @@ export default function DevicesPage({
           <Tab>List</Tab>
           <Tab>Add Device</Tab>
           <Tab>Update Device</Tab>
+          <Tab>Credentials</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -77,6 +79,9 @@ export default function DevicesPage({
           </TabPanel>
           <TabPanel>
             <ChangeDeviceForm products={products} />
+          </TabPanel>
+          <TabPanel>
+            <AdminCredentialEdit />
           </TabPanel>
         </TabPanels>
       </TabGroup>

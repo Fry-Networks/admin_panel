@@ -1,17 +1,12 @@
-
-
-export async function addDevice({ email, id, order, byod }: { email: string, id: string, order: string, byod?: string }): Promise<boolean> {
-    let device_name = "";
-
+export async function addDevice({ email, id, order, byod, api_type, credentials }: { email: string, id: string, order: string, byod?: string, api_type?: string, credentials?: Record<string, string> }): Promise<boolean> {
     const res = await fetch('/api/add-device', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email,   id, order, byod })
+        body: JSON.stringify({ email, id, order, byod, api_type, credentials })
     });
     return res.ok;
-
 };
 
 export async function addUser(data: { email: string, address: string, first_name: string, last_name: string }): Promise<boolean> {

@@ -8,3 +8,7 @@ node_modules
 .env.*
 Dockerfile
 docker-compose.yml
+
+# Exclude e2e test files from build
+e2e/
+playwright.config.ts

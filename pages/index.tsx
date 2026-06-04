@@ -11,6 +11,7 @@ import {
 } from '@tremor/react';
 import { getSession } from 'next-auth/react';
 import clientPromise from '../lib/mongoclient';
+import ReferralEscrowCard from '../components/ReferralEscrowCard';
 
 type DashboardStats = {
   network: { totalDevices: number; verifiedDevices: number; blacklisted: number };
@@ -46,7 +47,7 @@ export default function IndexPage({
   }
 
   const formatNumber = (num: number) => num.toLocaleString();
-  
+
   const truncateKey = (key: string) => {
     if (!key || key.length < 12) return key || 'Unknown';
     return `${key.slice(0, 4)}...${key.slice(-4)}`;
@@ -60,7 +61,7 @@ export default function IndexPage({
   return (
     <main className="p-4 md:p-10 mx-auto max-w-7xl bg-gray-950">
       <Title className="text-white">FRY Admin Panel Dashboard</Title>
-      
+
       <Grid numItemsSm={2} numItemsLg={4} className="gap-6 mt-6">
         {/* Network Stats */}
         <Card className="bg-gray-900 border-gray-700">
@@ -129,6 +130,11 @@ export default function IndexPage({
           <Text className="mt-4 text-gray-500">No recent activity</Text>
         )}
       </Card>
+
+      {/* Referral Escrow Card */}
+      <div className="mt-6">
+        <ReferralEscrowCard />
+      </div>
 
       {/* Quick Stats Row */}
       <Grid numItemsSm={2} numItemsLg={4} className="gap-6 mt-6">
