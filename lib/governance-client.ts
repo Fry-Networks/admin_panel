@@ -7,9 +7,9 @@ import algosdk from 'algosdk';
 import { sha512_256 } from 'js-sha512';
 
 // Contract constants
-export const GOVERNANCE_APP_ID = 3500693631;
+export const GOVERNANCE_APP_ID = 3594179146;
 export const FRY_ASA_ID = 2485314946;
-export const VOTE_BOX_MBR = BigInt(104100);  // ~0.1 ALGO for vote box creation
+export const VOTE_BOX_MBR = BigInt(61700);  // ~0.1 ALGO for vote box creation
 export const VOTE_BOX_PREFIX = new Uint8Array([0x76]);  // "v"
 export const GOVERNANCE_ADMIN_ADDRESS = 'E2F2LT2INE75DBOYHQXTCTOP2PAP5MHAXQRXTTCCXFKHQTVG36DJONBQZE';
 
@@ -228,6 +228,34 @@ export async function waitForConfirmationJson(
 /**
  * Convert vote ID Uint8Array to hex string for storage.
  */
+
+/**
+ * Submit signed transactions to the network via local algod proxy.
+ */
+export async function submitRawTransactions(signedTxns: (Uint8Array | null)[]): Promise<{ txId: string }> {
+  const validTxns = signedTxns.filter((txn): txn is Uint8Array => txn !== null);
+  if (validTxns.length === 0) throw new Error('No valid signed transactions to submit');
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3008';
+  const totalLength = validTxns.reduce((sum, txn) => sum + txn.length, 0);
+  const combined = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const txn of validTxns) {
+    combined.set(txn, offset);
+    offset += txn.length;
+  }
+
+  const response = await fetch(`${baseUrl}/api/algod/v2/transactions`, {
+    method: 'POST',
+    body: combined,
+    headers: { 'Content-Type': 'application/x-binary' }
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Transaction submission failed: ${response.status} ${text}`);
+  }
+  const data = await response.json();
+  return { txId: data.txId || data.txid || data.transactionId };
+}
 export function voteIdToHex(voteId: Uint8Array): string {
   return Array.from(voteId)
     .map(b => b.toString(16).padStart(2, '0'))

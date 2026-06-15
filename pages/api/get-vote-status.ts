@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import mongoose from 'mongoose';
 import { Vote } from '../../lib/vote-schema';
+import { fetchVoteBoxOnChain, fetchStakeBoxOnChain, fetchAllStakeBoxesForVote } from '../../lib/algod-server';
 
 export default async function handler(
   req: NextApiRequest,
@@ -44,23 +45,41 @@ export default async function handler(
 
       const voteTitle = vote.title;
       const votes = vote.votes;
-      const stakesInformation = [];
+      const stakesInformation: any[] = [];
 
-      for (let i = 0; i < votes.length; i++) {
-        const different_people = votes[i].different_people;
-        for (const one of different_people) {
-          const stakeForOne = await stakeCollection.findOne({
-            voteTitle: voteTitle,
-            voteOption: i.toString(),
-            address: one
-          });
-
-          if (!stakeForOne) {
-            res.status(404).json({ message: 'Error fetching vote status' });
-            return;
+      if ((vote as any).contractVoteId) {
+        // V2 path: enumerate on-chain stake boxes directly
+        try {
+          const onChainStakes = await fetchAllStakeBoxesForVote(
+            (vote as any).contractVoteId
+          );
+          for (const stake of onChainStakes) {
+            stakesInformation.push({
+              address: stake.address,
+              voteTitle: voteTitle,
+              voteOption: stake.optionIndex.toString(),
+              amount: stake.tokenAmount,
+              onChain: { source: 'V2', stake }
+            });
           }
-
-          stakesInformation.push(stakeForOne);
+        } catch (e) {
+          console.warn('[get-vote-status] V2 on-chain enumeration failed:', e);
+        }
+      } else {
+        // V1 path: read from MongoDB (tolerate missing records)
+        for (let i = 0; i < votes.length; i++) {
+          const different_people = votes[i].different_people;
+          for (const one of different_people) {
+            const stakeForOne = await stakeCollection.findOne({
+              voteTitle: voteTitle,
+              voteOption: i.toString(),
+              address: one
+            });
+            if (stakeForOne) {
+              stakesInformation.push(stakeForOne);
+            }
+            // Softened: skip missing records instead of hard-fail 404
+          }
         }
       }
 

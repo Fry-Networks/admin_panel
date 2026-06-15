@@ -32,6 +32,7 @@ import ModalVoteStatus from '../components/vote-status';
 import ModalEditVote from '../components/edit-vote';
 import CreateContractVoteModal from '../components/create-contract-vote';
 import { useWallet } from '../lib/use-wallet-compat';
+import { fetchVoteBoxOnChain } from '../lib/algod-server';
 
 type ActivationResult = {
   status: 'success' | 'error';
@@ -56,6 +57,7 @@ interface ExtendedVote extends Vote {
   sequence_number?: number;
   contractVoteId?: string;
   contractTxId?: string;
+  onChain?: { source: string; tallies: any };
 }
 
 interface CFIPReview {
@@ -539,10 +541,10 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
                     
                     {/* On-Chain Badge */}
                     {hasContractVote && (
-                      <Badge color="cyan">
+                      <Badge color={vote.onChain?.source === 'V2' ? 'emerald' : vote.onChain ? 'amber' : 'cyan'}>
                         <Flex alignItems="center" className="gap-1">
                           <Icon icon={RiLink} size="xs" />
-                          On-Chain
+                          {vote.onChain ? `${vote.onChain.source} | Tokens: ${vote.onChain.tallies.totalTokens.join(', ')}` : 'On-Chain'}
                         </Flex>
                       </Badge>
                     )}
@@ -589,15 +591,30 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
                   )}
                 </Flex>
 
-                {vote.votes.map((option, optIdx) => (
+                {vote.votes.map((option, optIdx) => {
+                  const isV2 = !!(vote as any).vote_version && (vote as any).vote_version === 'v2' && (vote as any).contractVoteId;
+                  const chainTokens = isV2 ? (vote as any).onChain?.tallies?.totalTokens?.[optIdx] : null;
+                  const chainVoters = isV2 ? (vote as any).onChain?.tallies?.totalVoters?.[optIdx] : null;
+                  return (
                   <div key={option.id || optIdx}>
                     <Title className="text-base text-gray-200">
-                      {optIdx + 1}.{option.title}
+                      {optIdx + 1}. {option.title}
                     </Title>
                     <Text className="text-gray-400">{option.description}</Text>
-                    <Text className="text-gray-400">Votes: {option.votes}</Text>
+                    {isV2 ? (
+                      (vote as any).onChain ? (
+                        <Text className="text-emerald-400">
+                          On-Chain: {Number(chainTokens || 0).toLocaleString()} FRY staked ({Number(chainVoters || 0)} voters)
+                        </Text>
+                      ) : (
+                        <Text className="text-amber-400">On-chain data unavailable</Text>
+                      )
+                    ) : (
+                      <Text className="text-gray-400">Votes: {option.votes}</Text>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
                 
                 <div className="mt-3 flex flex-row flex-wrap justify-center items-center">
                   {/* Create Contract Vote Button - only shown when no contractVoteId */}
@@ -810,6 +827,17 @@ export async function getServerSideProps(context: any) {
         deleted: { $ne: true }
       })
       .toArray();
+
+    // Enrich votes with live on-chain data for V2 votes
+    for (const vote of votes) {
+      if ((vote as any).contractVoteId) {
+        try {
+          (vote as any).onChain = await fetchVoteBoxOnChain((vote as any).contractVoteId);
+        } catch (e) {
+          console.warn('[dao] on-chain read failed:', e);
+        }
+      }
+    }
 
     return {
       props: { 

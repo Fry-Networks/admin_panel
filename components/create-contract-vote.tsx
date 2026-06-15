@@ -56,7 +56,7 @@ export default function CreateContractVoteModal({
   // Form state
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [lockDurationDays, setLockDurationDays] = useState<number>(7);
+  const [lockDurationDays, setLockDurationDays] = useState<number>(180);
   const [superMajority, setSuperMajority] = useState<number>(50);
   const [voteType, setVoteType] = useState<number>(VOTE_TYPE.FIP);
   
