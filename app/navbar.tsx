@@ -41,7 +41,8 @@ const navGroups: NavGroup[] = [
       { name: 'Fry Tokens', href: '/token' },
       { name: 'Rewards', href: '/rewards' },
       { name: 'Income', href: '/fee' },
-      { name: 'Reduction', href: '/reduction' }
+      { name: 'Reduction', href: '/reduction' },
+      { name: 'Pool Funding', href: '/pool-funding' }
     ]
   },
   {
