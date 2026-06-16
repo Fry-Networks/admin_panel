@@ -10,6 +10,7 @@ const ALLOWED_GET_PATHS = [
   /^\/v2\/status\/wait-for-block-after\//,
   /^\/v2\/applications\//,
   /^\/v2\/accounts\//,
+  /^\/v2\/assets\//,
   /^\/v2\/transactions\/params$/,
   /^\/v2\/status$/,
   /^\/health$/,
