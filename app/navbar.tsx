@@ -42,15 +42,9 @@ const navGroups: NavGroup[] = [
       { name: 'Rewards', href: '/rewards' },
       { name: 'Income', href: '/fee' },
       { name: 'Reduction', href: '/reduction' },
-      { name: 'Pool Funding', href: '/pool-funding' }
+      { name: 'Epoch Management', href: '/epoch-management' }
     ]
-  },
-  {
-    name: 'Admin',
-    items: [
-      { name: 'Events', href: '/events' },
-    ],
-  },
+  }
 ];
 
 const disabledNavigation: NavItem[] = [
