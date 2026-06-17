@@ -33,6 +33,9 @@ import ModalEditVote from '../components/edit-vote';
 import CreateContractVoteModal from '../components/create-contract-vote';
 import { useWallet } from '../lib/use-wallet-compat';
 import { fetchVoteBoxOnChain } from '../lib/algod-server';
+import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
+
 
 type ActivationResult = {
   status: 'success' | 'error';
@@ -89,6 +92,16 @@ function isDiscussionEnded(endDate: Date | string | undefined, now: Date | null)
   return new Date(endDate) <= now;
 }
 
+
+// Render Discord-style markdown to sanitized HTML
+function renderMd(text: string): string {
+  if (!text) return '';
+  const raw = marked.parse(text, { async: false }) as string;
+  return sanitizeHtml(raw, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['h1','h2','h3','h4','h5','h6','hr','del','s']),
+    allowedAttributes: { ...sanitizeHtml.defaults.allowedAttributes, '*': ['class'] },
+  });
+}
 export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote[], cfipsForReview: CFIPReview[] }) {
   const { providers, activeAddress } = useWallet();
   const peraProvider = providers.find(p => p.metadata.id === 'pera');
@@ -220,7 +233,7 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
     }
 
     const stakeInformation = result.data;
-    setStakeInfo(stakeInformation);
+    setStakeInfo(stakeInformation ?? []);
     setOpenStatusModalId(id);
   };
 
@@ -408,7 +421,7 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
                     )}
                     <Title className="text-white">{cfip.title}</Title>
                   </Flex>
-                  <Text className="text-gray-300 mb-4">{cfip.description}</Text>
+                  <div className="text-gray-300 mb-4 prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: renderMd(cfip.description || '') }} />
                   
                   <div className="w-full mb-4">
                     <label className="text-sm text-gray-400 mb-1 block">Decision Reason (optional)</label>
@@ -561,7 +574,7 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
                       {vote.title}
                     </Title>
                   </Flex>
-                  <Text className="mb-5 text-gray-300">{vote.description}</Text>
+                  <div className="mb-5 text-gray-300 prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: renderMd(vote.description || '') }} />
                   
                   {/* Discussion Period Display */}
                   {vote.discussion_thread_id && vote.status === 'discussion' && (
@@ -600,7 +613,7 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
                     <Title className="text-base text-gray-200">
                       {optIdx + 1}. {option.title}
                     </Title>
-                    <Text className="text-gray-400">{option.description}</Text>
+                    <div className="text-gray-400 prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: renderMd(option.description || '') }} />
                     {isV2 ? (
                       (vote as any).onChain ? (
                         <Text className="text-emerald-400">
@@ -773,6 +786,7 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
                   isOpen={openStatusModalId === vote._id.toString()}
                   setIsOpen={handleCloseStatusModal}
                   stakeInfo={stakeInfo}
+                  vote={vote}
                 />
                 <ModalEditVote
                   isOpen={voteSelected?._id === vote._id}

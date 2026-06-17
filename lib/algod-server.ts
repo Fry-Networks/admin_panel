@@ -3,7 +3,7 @@
  * Used by getServerSideProps and API routes.
  */
 
-const ALGOD_PRIMARY = 'http://192.168.9.2:4190';
+const ALGOD_PRIMARY = 'http://192.168.9.2:8080';
 const ALGOD_FALLBACK = 'https://mainnet-api.4160.nodely.dev';
 
 async function algodFetch(path: string): Promise<any> {

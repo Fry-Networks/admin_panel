@@ -30,7 +30,8 @@ const navGroups: NavGroup[] = [
     name: 'Governance',
     items: [
       { name: 'DAO', href: '/dao' },
-      { name: 'Announcements', href: '/announcements' }
+      { name: 'Announcements', href: '/announcements' },
+      { name: 'Events', href: '/events' }
     ]
   },
   {
@@ -42,7 +43,8 @@ const navGroups: NavGroup[] = [
       { name: 'Rewards', href: '/rewards' },
       { name: 'Income', href: '/fee' },
       { name: 'Reduction', href: '/reduction' },
-      { name: 'Epoch Management', href: '/epoch-management' }
+      { name: 'Epoch Management', href: '/epoch-management' },
+      { name: 'Pool Funding', href: '/pool-funding' }
     ]
   }
 ];

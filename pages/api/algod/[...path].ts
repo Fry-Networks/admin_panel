@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import http from 'http';
 
-const ALGOD_PRIMARY = 'http://192.168.9.2:4190';
+const ALGOD_PRIMARY = 'http://192.168.9.2:8190';
 const ALGOD_FALLBACK = 'https://mainnet-api.4160.nodely.dev';
 
 // Allowlist of safe paths

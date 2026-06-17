@@ -35,6 +35,7 @@ export default function EventsPage() {
   const [ctaLink, setCtaLink] = useState('');
   const [audience, setAudience] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showCreateConfirm, setShowCreateConfirm] = useState(false);
 
   const fetchEvents = async () => {
     setLoading(true); setError(null);
@@ -86,7 +87,17 @@ export default function EventsPage() {
           <TextInput placeholder="Banner image URL" value={bannerImage} onValueChange={setBannerImage} />
           <TextInput placeholder="CTA link" value={ctaLink} onValueChange={setCtaLink} />
         </div>
-        <div className="mt-4"><Button onClick={handleCreate} disabled={submitting || !name || !startDate || !endDate}>{submitting ? 'Creating...' : 'Create Event'}</Button></div>
+        <div className="mt-4"><Button onClick={() => setShowCreateConfirm(true)} disabled={submitting || !name || !startDate || !endDate}>{submitting ? "Creating..." : showCreateConfirm ? "Confirm below" : "Create Event"}</Button></div>
+        {showCreateConfirm && (
+          <div className="mt-4 p-4 bg-amber-900/30 border border-amber-700 rounded">
+            <p className="font-bold text-amber-300">Create event "{name}"?</p>
+            <p className="text-sm text-gray-300 mt-2">This will create a new event in production.</p>
+            <div className="flex gap-2 mt-4">
+              <Button onClick={() => { handleCreate(); setShowCreateConfirm(false); }} disabled={submitting || !name || !startDate || !endDate} color="amber">{submitting ? "Creating..." : "Confirm Create"}</Button>
+              <Button onClick={() => setShowCreateConfirm(false)} variant="secondary">Cancel</Button>
+            </div>
+          </div>
+        )}
         {error && <Text className="text-red-400 mt-3">{error}</Text>}
       </Card>
       <Card className="bg-gray-900 border-gray-700 mt-6">

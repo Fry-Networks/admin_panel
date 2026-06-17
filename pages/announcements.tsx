@@ -576,9 +576,9 @@ export default function AnnouncementsPage({
 
   return (
     <main className="p-4 md:p-10 mx-auto max-w-8xl">
-      <Flex justifyContent="between" alignItems="center" className="mb-4">
+      <Flex justifyContent="between" alignItems="center" className="mb-4 flex-col md:flex-row gap-4">
         <Title>Announcements</Title>
-        <Flex justifyContent="end" alignItems="center" className="space-x-2">
+        <Flex justifyContent="end" alignItems="center" className="flex-wrap gap-2">
           <Button
             variant="secondary"
             loading={isRefreshing}
@@ -602,7 +602,7 @@ export default function AnnouncementsPage({
       )}
 
       <Card className="mb-6">
-        <Flex className="gap-4" alignItems="end" justifyContent="start">
+        <Flex className="flex-wrap gap-4" alignItems="end" justifyContent="start">
           <div className="w-full md:w-1/3">
             <Text className="mb-2">Search</Text>
             <TextInput
@@ -692,7 +692,7 @@ export default function AnnouncementsPage({
                 <TableCell>{formatDateTime(announcement.expires_at)}</TableCell>
                 <TableCell>{formatDateTime(announcement.updated_at)}</TableCell>
                 <TableCell>
-                  <Flex className="gap-2" justifyContent="start">
+                  <Flex className="flex-wrap gap-2" justifyContent="start">
                     <Button
                       size="xs"
                       variant="secondary"
