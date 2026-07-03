@@ -1,6 +1,7 @@
 import { NextPage } from 'next';
 import { AppProps } from 'next/app';
 import '../app/globals.css';
+import '../app/css/dark-contrast-fixes.css';
 import { useSession, SessionProvider } from 'next-auth/react';
 import { WalletProvider, useInitializeProviders, PROVIDER_ID } from '../lib/use-wallet-compat';
 import Navbar from '../app/navbar';
