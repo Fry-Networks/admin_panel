@@ -73,3 +73,56 @@ html, body {
         width: 50%;
     }
 }
+
+/* ===== BEGIN dark-contrast-overrides (relocated from app/css/dark-contrast-fixes.css, QA 1783133875) ===== */
+/* dark-contrast-fixes.css — WCAG AA overrides for always-on dark mode.
+   Additive layer, imported after globals.css. Reversal: delete this file + its import line.
+   Generated 2026-07-03 from recon of 15 failing contrast pairs. */
+
+/* --- Text too dark on dark surfaces (pairs 1,5,8,15) --- */
+.dark .text-gray-500 { color: #9ca3af !important; }
+.dark .text-gray-600 { color: #9ca3af !important; }
+.dark .text-gray-700 { color: #d1d5db !important; }
+
+/* --- Saturated badge text on near-black (pairs 6,7,9,12) --- */
+.dark .text-indigo-600 { color: #818cf8 !important; }
+.dark .text-violet-600 { color: #a78bfa !important; }
+.dark .text-purple-600 { color: #c084fc !important; }
+.dark .text-blue-600   { color: #60a5fa !important; }
+
+/* --- White-text buttons: darken bg for contrast (pairs 2,3,4,10,11,14) --- */
+.dark .bg-amber-500  { background-color: #b45309 !important; }
+.dark .bg-green-500  { background-color: #15803d !important; }
+.dark .bg-cyan-500   { background-color: #0e7490 !important; }
+.dark .bg-blue-500   { background-color: #1d4ed8 !important; }
+.dark .bg-red-500    { background-color: #b91c1c !important; }
+.dark .bg-purple-500 { background-color: #7e22ce !important; }
+
+/* --- Custom accent #e74c3c (pair 13) — all classes resolving to this color --- */
+.dark .bg-accent { background-color: #a93226 !important; }
+.bg-dark-tremor-brand { background-color: #a93226 !important; }
+.dark\:bg-dark-tremor-brand { background-color: #a93226 !important; }
+
+/* badge-on-badge contrast corrections — verified >=4.5:1 per WCAG AA */
+/* Badge text on DARKENED backgrounds (from d30e0b1 bg overrides) */
+.dark .bg-green-500 .whitespace-nowrap { color: #dcfce7 !important; }
+.dark .bg-amber-500 .whitespace-nowrap { color: #fef3c7 !important; }
+.dark .bg-blue-500 .whitespace-nowrap { color: #dbeafe !important; }
+.dark .bg-cyan-500 .whitespace-nowrap { color: #cffafe !important; }
+.dark .bg-purple-500 .whitespace-nowrap { color: #e9d5ff !important; }
+.dark .bg-red-500 .whitespace-nowrap { color: #fee2e2 !important; }
+
+/* Badge text on ORIGINAL bright backgrounds (dark text for contrast) */
+.dark .bg-emerald-400 .whitespace-nowrap { color: #022c22 !important; }
+.dark .bg-green-400 .whitespace-nowrap { color: #022c22 !important; }
+.dark .bg-yellow-500 .whitespace-nowrap { color: #422006 !important; }
+.dark .bg-gray-500 .whitespace-nowrap { color: #f9fafb !important; }
+.dark .bg-rose-500 .whitespace-nowrap { color: #1c1917 !important; }
+.dark .bg-slate-500 .whitespace-nowrap { color: #ffffff !important; }
+
+/* Darken violet/indigo badge bgs to achieve sufficient contrast */
+.dark .bg-violet-500 { background-color: #6d28d9 !important; }
+.dark .bg-indigo-500 { background-color: #4338ca !important; }
+.dark .bg-violet-500 .whitespace-nowrap { color: #ffffff !important; }
+.dark .bg-indigo-500 .whitespace-nowrap { color: #ffffff !important; }
+/* ===== END dark-contrast-overrides ===== */
