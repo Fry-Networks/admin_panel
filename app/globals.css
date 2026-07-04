@@ -143,3 +143,14 @@ html, body {
 .bg-dark-tremor-brand.bg-dark-tremor-brand { background-color: #a93226 !important; }
 
 /* ===== END dark-contrast-overrides-v2 ===== */
+
+/* ===== BEGIN dark-contrast-overrides-v3 (FIX4: emerald/green badge same-element text color) ===== */
+@layer utilities {
+  .dark [class*="bg-emerald-500"] {
+    color: #ecfdf5 !important;
+  }
+  .dark [class*="bg-green-500"] {
+    color: #dcfce7 !important;
+  }
+}
+/* ===== END dark-contrast-overrides-v3 ===== */
