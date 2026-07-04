@@ -126,3 +126,20 @@ html, body {
 .dark .bg-violet-500 .whitespace-nowrap { color: #ffffff !important; }
 .dark .bg-indigo-500 .whitespace-nowrap { color: #ffffff !important; }
 /* ===== END dark-contrast-overrides ===== */
+
+/* ===== BEGIN dark-contrast-overrides-v2 (QA2 residuals: emerald badge opacity variants + /events cascade, QA2 run 1783138825) ===== */
+
+/* --- Emerald badge: bg-darken + light text (catches bg-emerald-500/5 via attribute selector) --- */
+.dark [class*="bg-emerald-500"] { background-color: #065f46 !important; }
+.dark [class*="bg-emerald-500"] .whitespace-nowrap { color: #ecfdf5 !important; }
+
+/* --- Green badge opacity variant: bg-darken (catches bg-green-500/5; bare bg-green-500 covered by v1) --- */
+.dark [class*="bg-green-500/"] { background-color: #15803d !important; }
+.dark [class*="bg-green-500/"] .whitespace-nowrap { color: #dcfce7 !important; }
+
+/* --- /events cascade escalation: doubled-class selectors to defeat source-order competition --- */
+.dark .text-gray-500.text-gray-500 { color: #9ca3af !important; }
+.dark .bg-accent.bg-accent { background-color: #a93226 !important; }
+.bg-dark-tremor-brand.bg-dark-tremor-brand { background-color: #a93226 !important; }
+
+/* ===== END dark-contrast-overrides-v2 ===== */
