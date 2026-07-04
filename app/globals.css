@@ -154,3 +154,16 @@ html, body {
   }
 }
 /* ===== END dark-contrast-overrides-v3 ===== */
+/* ===== BEGIN dark-contrast-overrides-v4 (FIX5: remaining badge families + placeholders) ===== */
+.dark [class*="bg-blue-500"] { color: #ffffff !important; }
+.dark [class*="bg-amber-500"] { color: #ffffff !important; }
+.dark [class*="bg-violet-500"] { color: #ffffff !important; }
+.dark [class*="bg-gray-500"] { color: #ffffff !important; }
+.dark [class*="bg-slate-500"] { color: #ffffff !important; }
+.dark [class*="bg-rose-500"] { color: #000000 !important; }
+.dark [class*="bg-yellow-500"] { color: #000000 !important; }
+.dark [class*="bg-cyan-500"] { color: #ffffff !important; }
+.dark [class*="bg-purple-500"] { color: #ffffff !important; }
+.dark [class*="bg-indigo-500"] { color: #ffffff !important; }
+.dark input::placeholder, .dark textarea::placeholder { color: #9ca3af !important; }
+/* ===== END dark-contrast-overrides-v4 ===== */
