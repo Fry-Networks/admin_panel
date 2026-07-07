@@ -7,8 +7,10 @@ import {
   TabPanels,
   TabGroup,
   TabList,
-  Tab
+  Tab,
+  Button
 } from '@tremor/react';
+import { useRouter } from 'next/router';
 import Search from '../components/search';
 import clientPromise from '../lib/mongoclient';
 import { User } from '../lib/users-schema';
@@ -19,28 +21,39 @@ import RemoveUserForm from '../components/remove-user';
 
 export default function UsersPage({
   users,
-  searchParams
+  removeUsers,
+  total,
+  page,
+  limit,
+  q,
+  error
 }: {
   users: User[];
-  searchParams: { q: string };
+  removeUsers: User[];
+  total: number;
+  page: number;
+  limit: number;
+  q: string;
+  error?: string;
 }) {
-  const searchTerm = searchParams.q || '';
+  const router = useRouter();
 
-  const filtered =
-    searchTerm.length > 0
-      ? users.filter((user) => {
-          const contains = (original: string) => {
-            if (!searchTerm) return true;
-            return original.toLowerCase().includes(searchTerm.toLowerCase());
-          };
-          return (
-            contains(user.name?.full ?? '') ||
-            contains(user.address) ||
-            contains(user.email) ||
-            contains(user._id.toString())
-          );
-        })
-      : users;
+  if (error) {
+    return (
+      <main className="p-4 md:p-10 mx-auto max-w-7xl bg-gray-950">
+        <Title className="text-white">Users</Title>
+        <Text className="mt-6 text-gray-300">{error}</Text>
+      </main>
+    );
+  }
+
+  const totalPages = Math.max(1, Math.ceil((total || 0) / (limit || 50)));
+  const goPage = (p: number) => {
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    params.set('page', String(p));
+    router.push(`/users?${params.toString()}`);
+  };
 
   return (
     <main className="p-4 md:p-10 mx-auto max-w-7xl bg-gray-950">
@@ -57,18 +70,42 @@ export default function UsersPage({
               <Search />
             </Flex>
             <div className="mt-5">
-              <Text className="text-gray-300">{filtered.length} users matching your search</Text>
+              <Text className="text-gray-300">
+                {total} users{q ? ` matching "${q}"` : ''} — page {page} of {totalPages}
+              </Text>
             </div>
 
             <Card className="mt-6 bg-gray-900 border-gray-700">
-              <UsersTable users={filtered} />
+              <UsersTable users={users} />
             </Card>
+
+            <Flex justifyContent="between" alignItems="center" className="mt-4">
+              <Button
+                size="xs"
+                variant="secondary"
+                disabled={page <= 1}
+                onClick={() => goPage(page - 1)}
+              >
+                Previous
+              </Button>
+              <Text className="text-gray-300">
+                Page {page} of {totalPages}
+              </Text>
+              <Button
+                size="xs"
+                variant="secondary"
+                disabled={page >= totalPages}
+                onClick={() => goPage(page + 1)}
+              >
+                Next
+              </Button>
+            </Flex>
           </TabPanel>
           <TabPanel>
             <UserForm />
           </TabPanel>
           <TabPanel>
-            <RemoveUserForm users={users} />
+            <RemoveUserForm users={removeUsers} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
@@ -87,13 +124,51 @@ export async function getServerSideProps(context: any) {
     const client = await clientPromise;
     const db = client.db('main');
 
-    const users = await db.collection('users').find({}).toArray();
-    const searchParams = context.query;
+    const q = (context.query.q || '').toString();
+    const limit = 50;
+    let page = parseInt((context.query.page || '1').toString(), 10);
+    if (!Number.isFinite(page) || page < 1) page = 1;
+
+    const query =
+      q.length > 0
+        ? {
+            $or: [
+              { 'name.full': { $regex: q, $options: 'i' } },
+              { address: { $regex: q, $options: 'i' } },
+              { email: { $regex: q, $options: 'i' } }
+            ]
+          }
+        : {};
+
+    const total = await db.collection('users').countDocuments(query);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    if (page > totalPages) page = totalPages;
+
+    const users = await db
+      .collection('users')
+      .find(query)
+      .sort({ 'name.full': 1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .toArray();
+
+    const removeUsers = await db
+      .collection('users')
+      .find({}, { projection: { _id: 1, 'name.full': 1, email: 1 } })
+      .toArray();
 
     return {
-      props: { users: JSON.parse(JSON.stringify(users)), searchParams }
+      props: {
+        users: JSON.parse(JSON.stringify(users)),
+        removeUsers: JSON.parse(JSON.stringify(removeUsers)),
+        total,
+        page,
+        limit,
+        q
+      }
     };
   } catch (e) {
     console.error(e);
+    return { props: { error: 'Failed to fetch users' } };
   }
 }

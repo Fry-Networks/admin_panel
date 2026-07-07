@@ -113,7 +113,7 @@ export async function getServerSideProps(context: any) {
   } catch (e) {
     console.error(e);
     return {
-      props: { error: 'Failed to fetch data' }
+      props: { accounts: [], searchParams: context.query || {} }
     };
   }
 }

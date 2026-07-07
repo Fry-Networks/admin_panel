@@ -100,5 +100,6 @@ export async function getServerSideProps(context: any) {
         };
     } catch (e) {
         console.error(e);
+        return { props: { accounts: [], searchParams: context.query || {} } };
     }
 }

@@ -73,3 +73,92 @@ html, body {
         width: 50%;
     }
 }
+
+
+/* === E2E QA fix: dark theme for react-datepicker calendar popover (portals to body; own light CSS wins on order, so !important) === */
+.react-datepicker {
+  background-color: #0a0a0f !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+  font-family: inherit;
+}
+.react-datepicker__header,
+.react-datepicker__header--time {
+  background-color: #131A2B !important;
+  border-bottom-color: #374151 !important;
+}
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  color: #f9fafb !important;
+}
+.react-datepicker__day:hover,
+.react-datepicker__month-text:hover,
+.react-datepicker__time-list-item:hover {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected,
+.react-datepicker__time-list-item--selected {
+  background-color: #e74c3c !important;
+  color: #ffffff !important;
+}
+.react-datepicker__day--outside-month,
+.react-datepicker__day--disabled,
+.react-datepicker__time-list-item--disabled {
+  color: #6b7280 !important;
+}
+.react-datepicker__time-container,
+.react-datepicker__time,
+.react-datepicker__time-box,
+.react-datepicker__time-list {
+  background-color: #0a0a0f !important;
+  color: #f9fafb !important;
+}
+.react-datepicker__time-container { border-left-color: #374151 !important; }
+.react-datepicker__navigation-icon::before,
+.react-datepicker__year-read-view--down-arrow,
+.react-datepicker__month-read-view--down-arrow { border-color: #9ca3af !important; }
+.react-datepicker__triangle { display: none !important; }
+/* === end E2E QA fix === */
+
+/* === E2E QA Run2: contrast fixes (D1 buttons, D2 brand, D3 muted text/badges) === */
+/* D1: darken solid colored action buttons in dark mode so white text reaches >=4.5:1 */
+.dark button.bg-green-500,.dark .tremor-Button-root.bg-green-500{background-color:#15803d!important;border-color:#15803d!important}
+.dark button.bg-green-500:hover,.dark .tremor-Button-root.bg-green-500:hover{background-color:#166534!important}
+.dark button.bg-yellow-500,.dark .tremor-Button-root.bg-yellow-500{background-color:#a16207!important;border-color:#a16207!important}
+.dark button.bg-yellow-500:hover,.dark .tremor-Button-root.bg-yellow-500:hover{background-color:#854d0e!important}
+.dark button.bg-red-500,.dark .tremor-Button-root.bg-red-500{background-color:#b91c1c!important;border-color:#b91c1c!important}
+.dark button.bg-red-500:hover,.dark .tremor-Button-root.bg-red-500:hover{background-color:#991b1b!important}
+.dark button.bg-amber-500,.dark .tremor-Button-root.bg-amber-500{background-color:#b45309!important;border-color:#b45309!important}
+.dark button.bg-amber-500:hover,.dark .tremor-Button-root.bg-amber-500:hover{background-color:#92400e!important}
+/* D2: darken brand primary buttons #e74c3c -> #c0392b (white text ~5.4:1); scoped to buttons only, not accents/rings */
+.dark .tremor-Button-root.dark\:bg-dark-tremor-brand{background-color:#c0392b!important;border-color:#c0392b!important}
+.dark .tremor-Button-root.dark\:bg-dark-tremor-brand:hover{background-color:#a93226!important;border-color:#a93226!important}
+/* D3: lighten muted secondary text gray-500/600 -> gray-400 (~7:1); disabled nav keeps opacity-70 so still reads muted */
+.dark .text-gray-600{color:#9ca3af!important}
+.dark .text-gray-500{color:#9ca3af!important}
+/* D3: Tremor status badges (gray/slate/blue) render dark text on transparent bg -> force readable light text */
+.dark .tremor-Badge-text{color:#e5e7eb!important}
+/* === end E2E QA Run2 contrast fixes === */
+
+/* === E2E QA Run2b: extend solid-button darkening to full Tremor palette (white text >=4.5:1) === */
+.dark button.bg-orange-500,.dark .tremor-Button-root.bg-orange-500{background-color:#c2410c!important;border-color:#c2410c!important}
+.dark button.bg-lime-500,.dark .tremor-Button-root.bg-lime-500{background-color:#4d7c0f!important;border-color:#4d7c0f!important}
+.dark button.bg-emerald-500,.dark .tremor-Button-root.bg-emerald-500{background-color:#047857!important;border-color:#047857!important}
+.dark button.bg-teal-500,.dark .tremor-Button-root.bg-teal-500{background-color:#0f766e!important;border-color:#0f766e!important}
+.dark button.bg-cyan-500,.dark .tremor-Button-root.bg-cyan-500{background-color:#0e7490!important;border-color:#0e7490!important}
+.dark button.bg-sky-500,.dark .tremor-Button-root.bg-sky-500{background-color:#0369a1!important;border-color:#0369a1!important}
+.dark button.bg-blue-500,.dark .tremor-Button-root.bg-blue-500{background-color:#1d4ed8!important;border-color:#1d4ed8!important}
+.dark button.bg-indigo-500,.dark .tremor-Button-root.bg-indigo-500{background-color:#4338ca!important;border-color:#4338ca!important}
+.dark button.bg-violet-500,.dark .tremor-Button-root.bg-violet-500{background-color:#6d28d9!important;border-color:#6d28d9!important}
+.dark button.bg-purple-500,.dark .tremor-Button-root.bg-purple-500{background-color:#7e22ce!important;border-color:#7e22ce!important}
+.dark button.bg-fuchsia-500,.dark .tremor-Button-root.bg-fuchsia-500{background-color:#a21caf!important;border-color:#a21caf!important}
+.dark button.bg-pink-500,.dark .tremor-Button-root.bg-pink-500{background-color:#be185d!important;border-color:#be185d!important}
+.dark button.bg-rose-500,.dark .tremor-Button-root.bg-rose-500{background-color:#be123c!important;border-color:#be123c!important}
+.dark button.bg-gray-500,.dark .tremor-Button-root.bg-gray-500{background-color:#374151!important;border-color:#374151!important}
+.dark button.bg-slate-500,.dark .tremor-Button-root.bg-slate-500{background-color:#334155!important;border-color:#334155!important}
+/* === end Run2b palette === */
