@@ -98,6 +98,7 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
   const [openStatusModalId, setOpenStatusModalId] = useState<string | null>(null);
   const [openContractVoteModalId, setOpenContractVoteModalId] = useState<string | null>(null);
   const [stakeInfo, setStakeInfo] = useState([]);
+  const [voteStateExtra, setVoteStateExtra] = useState<any>({ options: [], onChain: null });
   const [voteSelected, setVoteSelected] = useState<Vote | undefined>(undefined);
   const [activationToast, setActivationToast] = useState<ActivationResult | null>(null);
   const [implementationState, setImplementationState] = useState<{[key: string]: {status: string, notes: string}}>({});
@@ -219,6 +220,7 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
 
     const stakeInformation = result.data;
     setStakeInfo(stakeInformation);
+    setVoteStateExtra({ options: result.options ?? [], onChain: result.onChain ?? null });
     setOpenStatusModalId(id);
   };
 
@@ -756,13 +758,15 @@ export default function DaoPage({ votes, cfipsForReview }: { votes: ExtendedVote
                   isOpen={openStatusModalId === vote._id.toString()}
                   setIsOpen={handleCloseStatusModal}
                   stakeInfo={stakeInfo}
+                  options={voteStateExtra.options}
+                  onChain={voteStateExtra.onChain}
                 />
                 <ModalEditVote
                   isOpen={voteSelected?._id === vote._id}
                   setIsOpen={handleCloseEditModal}
                   vote={{ id: vote._id.toString(), vote: voteSelected }}
                   index={index}
-                  key={vote._id.toString()}
+                  key={`edit-${vote._id.toString()}`}
                 />
                 <CreateContractVoteModal
                   isOpen={openContractVoteModalId === vote._id.toString()}
