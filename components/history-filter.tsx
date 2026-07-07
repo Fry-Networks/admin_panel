@@ -7,7 +7,7 @@ import {
   TextInput,
   Title
 } from '@tremor/react';
-import { useEffect, useState, ReactNode } from 'react';
+import { useEffect, useRef, useState, ReactNode } from 'react';
 
 interface HistoryFilterProps<T> {
   apiEndpoint: string;
@@ -15,6 +15,10 @@ interface HistoryFilterProps<T> {
   responseDataKey: string;
   showTotalIncome?: boolean;
   onDataLoaded?: (result: any) => void;
+  initialData?: T[];
+  initialTotalCount?: number;
+  initialTotal?: number;
+  initialResult?: any;
   children: (data: T[]) => ReactNode;
 }
 
@@ -24,15 +28,20 @@ export default function HistoryFilter<T>({
   responseDataKey,
   showTotalIncome = false,
   onDataLoaded,
+  initialData,
+  initialTotalCount,
+  initialTotal,
+  initialResult,
   children
 }: HistoryFilterProps<T>) {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [filterString, setFilterString] = useState('');
-  const [data, setData] = useState<T[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [total, setTotal] = useState(0);
+  const [data, setData] = useState<T[]>(initialData ?? []);
+  const [totalCount, setTotalCount] = useState(initialTotalCount ?? 0);
+  const [total, setTotal] = useState(initialTotal ?? 0);
   const [currentPage, setCurrentPage] = useState(1);
+  const didMount = useRef(false);
 
   const onFilterClicked = () => {
     fetchData();
@@ -71,11 +80,22 @@ export default function HistoryFilter<T>({
     }
   };
 
+  // Mount: when SSR-seeded (initialData provided), skip the client fetch and just
+  // propagate the seeded result (e.g. fryPrice). Otherwise fetch once.
   useEffect(() => {
+    if (initialData !== undefined) {
+      if (onDataLoaded && initialResult) onDataLoaded(initialResult);
+      return;
+    }
     fetchData();
   }, []);
 
+  // Fetch on page change only (guard skips the mount run, avoiding the double-fetch).
   useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
     fetchData();
   }, [currentPage]);
 

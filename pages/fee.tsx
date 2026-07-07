@@ -29,13 +29,17 @@ export default function FeePage({
   totalFee,
   totalCount,
   currentPage,
-  tokens
+  tokens,
+  byodInit,
+  gasInit
 }: {
   fees: Fee[];
   totalFee: number;
   totalCount: number;
   currentPage: number;
   tokens: FryToken[];
+  byodInit?: any;
+  gasInit?: any;
 }) {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
@@ -134,10 +138,10 @@ export default function FeePage({
             </Flex>
           </TabPanel>
           <TabPanel>
-            <ByodHistory />
+            <ByodHistory init={byodInit} />
           </TabPanel>
           <TabPanel>
-            <FryWorldHistory />
+            <FryWorldHistory init={gasInit} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
@@ -159,7 +163,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         fees: [],
         totalCount: 0,
-        currentPage: 1
+        currentPage: 1,
+        byodInit: null,
+        gasInit: null
       }
     };
   }
@@ -240,13 +246,42 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const tokens = await db.collection('tokens').find({}).toArray();
 
+  // SSR-seed the Byod + fry.farm history tabs via server-to-server localhost calls
+  // (bypasses Bunny CDN, so the page load never triggers the edge 429). The client
+  // components fall back to their own fetch if these are null.
+  let byodInit: any = null;
+  let gasInit: any = null;
+  try {
+    const cookie = context.req.headers.cookie || '';
+    const base = process.env.NEXTAUTH_URL_INTERNAL || 'http://127.0.0.1:3008';
+    const headers = { 'Content-Type': 'application/json', cookie };
+    const [byodRes, gasRes] = await Promise.all([
+      fetch(`${base}/api/byod-history`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ page: 1 })
+      }),
+      fetch(`${base}/api/gasfee-history`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ page: 1 })
+      })
+    ]);
+    if (byodRes.ok) byodInit = await byodRes.json();
+    if (gasRes.ok) gasInit = await gasRes.json();
+  } catch (e) {
+    console.error('fee SSR history seed failed', e);
+  }
+
   return {
     props: {
       fees: JSON.parse(JSON.stringify(rewards)),
       totalFee,
       totalCount,
       currentPage: Number(page),
-      tokens: JSON.parse(JSON.stringify(tokens))
+      tokens: JSON.parse(JSON.stringify(tokens)),
+      byodInit,
+      gasInit
     }
   };
 };
