@@ -86,7 +86,7 @@ export default function EventsPage() {
       if (prizeAmount > 0 || prizeType.trim()) {
         body.prize = {
           type: prizeType.trim() || undefined,
-          amount: prizeAmount || undefined,
+          amount: prizeAmount,
           description: prizeDescription.trim() || undefined,
         };
       }

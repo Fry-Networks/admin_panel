@@ -78,6 +78,22 @@ export default async function handler(
         });
       }
 
+      // Prize is required by the Event schema; validate here so incomplete input returns 400 (not a mongoose 500).
+      const prizeInput = body.prize;
+      if (
+        !prizeInput ||
+        typeof prizeInput !== 'object' ||
+        typeof prizeInput.type !== 'string' ||
+        prizeInput.type.trim() === '' ||
+        typeof prizeInput.amount !== 'number' ||
+        Number.isNaN(prizeInput.amount)
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: 'prize.type (non-empty string) and prize.amount (number) are required',
+        });
+      }
+
       const created_by =
         session.user?.email ?? session.user?.name ?? 'admin';
 
