@@ -3,6 +3,9 @@ export const productsSchema = new mongoose.Schema({
   wix_id: String,
   name: String,
   key: String,
+  type: String,
+  display_name: String,
+  color: String,
   reward: {
     unverified: { type: Number, default: 0 },
     verified: { type: Number, default: 0 },
@@ -19,7 +22,13 @@ export const productsSchema = new mongoose.Schema({
       staked: { type: String },
       reward: { type: String },
       register: { type: String },
-      node: { type: String }
+      node: { type: String },
+      reward_amount: { type: Number },
+      rewards: [{
+        asa_id: { type: String },
+        amount: { type: Number },
+        name: { type: String }
+      }]
     }
   },
   created_at: { type: Date, default: Date.now }
@@ -28,6 +37,9 @@ export interface Product extends mongoose.Document {
   wix_id: string;
   name: string;
   key: string;
+  type?: string;
+  display_name?: string;
+  color?: string;
   reward: {
     unverified: number;
     verified: number;
@@ -45,6 +57,12 @@ export interface Product extends mongoose.Document {
       reward: string;
       register: string;
       node: string;
+      reward_amount?: number;
+      rewards?: Array<{
+        asa_id: string;
+        amount: number;
+        name: string;
+      }>;
     };
   };
   created_at: Date;
