@@ -52,7 +52,15 @@ const navGroups: NavGroup[] = [
       { name: 'WebUIs', href: '/webuis' },
       { name: 'User Management', href: '/allowlist' },
       { name: 'Device Credentials', href: '/admin/credentials' },
+      { name: 'x402 Analytics', href: '/x402' },
     ],
+  },
+  {
+    name: 'Infrastructure',
+    items: [
+      { name: 'Monitor', href: '/monitor' },
+      { name: 'Cluster', href: '/cluster' },
+    ]
   },
 ];
 
