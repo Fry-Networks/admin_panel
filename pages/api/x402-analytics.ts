@@ -34,64 +34,80 @@ let cache: CacheEntry | null = null;
 const CACHE_TTL_MS = 60000; // 60 seconds
 
 async function fetchNodelyData(): Promise<IndexerData> {
-  const payTo = process.env.X402_PAYTO || 'IQGTOUZJMRO6K54AHPLJYEUMTOVJTPMHZKABXFSRZ4PTPZPCSV37VPCLTA';
+  // Dual-address: genesis (historical payTo) + treasury (current payTo after the 2026-07-17 flip).
+  const payTos = (
+    process.env.X402_PAYTOS ||
+    'IQGTOUZJMRO6K54AHPLJYEUMTOVJTPMHZKABXFSRZ4PTPZPCSV37VPCLTA,E2F2LT2INE75DBOYHQXTCTOP2PAP5MHAXQRXTTCCXFKHQTVG36DJONBQZE'
+  )
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   const indexerBase = process.env.X402_INDEXER || 'https://mainnet-idx.4160.nodely.dev';
   const assetId = '31566704';
 
+  // Collect USDC receipts across every payTo address (currency-greater-than=0 drops opt-ins server-side).
   let allTransactions: any[] = [];
-  let nextToken: string | undefined;
+  for (const payTo of payTos) {
+    let nextToken: string | undefined;
+    do {
+      const url = `${indexerBase}/v2/assets/${assetId}/transactions?address=${payTo}&address-role=receiver&currency-greater-than=0&limit=100${
+        nextToken ? `&next=${encodeURIComponent(nextToken)}` : ''
+      }`;
 
-  // Paginate through all transactions
-  do {
-    const url = `${indexerBase}/v2/assets/${assetId}/transactions?address=${payTo}&address-role=receiver&limit=100${
-      nextToken ? `&next=${encodeURIComponent(nextToken)}` : ''
-    }`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Nodely fetch failed: ${response.statusText}`);
 
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`Nodely fetch failed: ${response.statusText}`);
+      const data = await response.json();
+      allTransactions = allTransactions.concat(data.transactions || []);
+      nextToken = data['next-token'];
+    } while (nextToken);
+  }
 
-    const data = await response.json();
-    allTransactions = allTransactions.concat(data.transactions || []);
-    nextToken = data['next-token'];
-  } while (nextToken);
-
-  // Process transactions
-  const byDayMap: { [key: string]: { volumeUSDC: number; count: number; payers: Set<string> } } = {};
+  // Isolate x402 'exact' settlements: an atomic group (has group id) whose USDC axfer carries
+  // fee===0 — fees are pooled onto the facilitator's fee-bump txn inside the group. This excludes
+  // solo axfers (sweeps / manual transfers, fee>0) and non-x402 grouped flows (swaps / dust, fee>0),
+  // and is verified equivalent to "facilitator fee-payer present in the group". Dedupe by tx id
+  // (a payTo self-pay appears once; ids never overlap across addresses).
+  const byDayMap: { [key: string]: { volumeUSDC: number; count: number } } = {};
   const payers = new Set<string>();
+  const seen = new Set<string>();
   let totalVolume = 0;
+  let settlementCount = 0;
 
   allTransactions.forEach((tx: any) => {
     const assetTx = tx['asset-transfer-transaction'];
-    if (!assetTx || assetTx.amount === 0) return; // Skip opt-ins
+    if (!assetTx || assetTx.amount === 0) return; // skip opt-ins / app-calls referencing USDC
+    if (!tx.group || tx.fee !== 0) return; // x402 settlements only (atomic group + pooled fee)
+    if (seen.has(tx.id)) return;
+    seen.add(tx.id);
 
-    const amount = assetTx.amount / 1e6; // Convert µUSDC to USDC
-    const sender = assetTx.sender;
+    const amount = assetTx.amount / 1e6; // µUSDC → USDC
+    const sender = tx.sender; // outer sender = the x402 payer
     const roundTime = tx['round-time'];
 
     totalVolume += amount;
+    settlementCount += 1;
     payers.add(sender);
 
-    // Bucket by day (UTC)
     const date = new Date(roundTime * 1000).toISOString().split('T')[0];
     if (!byDayMap[date]) {
-      byDayMap[date] = { volumeUSDC: 0, count: 0, payers: new Set() };
+      byDayMap[date] = { volumeUSDC: 0, count: 0 };
     }
     byDayMap[date].volumeUSDC += amount;
     byDayMap[date].count += 1;
-    byDayMap[date].payers.add(sender);
   });
 
   const byDay = Object.entries(byDayMap)
     .map(([date, data]) => ({
       date,
-      volumeUSDC: parseFloat(data.volumeUSDC.toFixed(2)),
+      volumeUSDC: parseFloat(data.volumeUSDC.toFixed(6)),
       count: data.count
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
   return {
-    totalVolumeUSDC: parseFloat(totalVolume.toFixed(2)),
-    settlementCount: allTransactions.length,
+    totalVolumeUSDC: parseFloat(totalVolume.toFixed(6)),
+    settlementCount,
     uniquePayers: payers.size,
     byDay
   };
