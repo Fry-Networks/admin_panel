@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 const ESCROW_WALLET = 'E2F2LT2INE75DBOYHQXTCTOP2PAP5MHAXQRXTTCCXFKHQTVG36DJONBQZE';
 const FRY_2_0_ASA_ID = 2485314946;
+const FRY_3_0_ASA_ID = 3612979527;
 const INDEXER_URL = 'http://mainnet-idx.algonode.cloud';
 
 interface TransactionInfo {

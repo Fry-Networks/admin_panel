@@ -12,10 +12,6 @@ services:
     extra_hosts:
       - "ares00-mongodb-rewardsdb.tail01e8c3.ts.net:100.107.174.29"
       - "host.docker.internal:192.168.1.169"
-    dns:
-      - 100.100.100.100
-      - 8.8.8.8
-      - 1.1.1.1
     environment:
       MONGO_CA_CERT_PATH: "/etc/ssl/mongo/mongo-ca.crt"
       NODE_ENV: production
@@ -24,6 +20,7 @@ services:
       # Use internal loopback for server-to-server NextAuth calls.
       NEXTAUTH_URL_INTERNAL: "http://127.0.0.1:3008"
       NEXT_PUBLIC_DAO_TEST: "${NEXT_PUBLIC_DAO_TEST:-false}"
+      X402_METRICS_TOKEN: "${X402_METRICS_TOKEN:-}"
       NEXTAUTH_SECRET: "op://AdminPanel/AdminPanel/NEXTAUTH_SECRET"
       GITHUB_ID: "op://AdminPanel/AdminPanel/GITHUB_ID"
       GITHUB_SECRET: "op://AdminPanel/AdminPanel/GITHUB_SECRET"
@@ -91,10 +88,6 @@ services:
     extra_hosts:
       - "ares00-mongodb-rewardsdb.tail01e8c3.ts.net:100.107.174.29"
       - "host.docker.internal:192.168.1.169"
-    dns:
-      - 100.100.100.100
-      - 8.8.8.8
-      - 1.1.1.1
     environment:
       TEST_MODE: "true"
       MONGO_CA_CERT_PATH: "/etc/ssl/mongo/mongo-ca.crt"

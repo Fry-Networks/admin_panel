@@ -5,9 +5,9 @@ import { authOptions } from '@/lib/auth-options';
 import { ObjectId } from 'mongodb';
 import http from 'http';
 
-const ALGOD_PRIMARY = 'http://192.168.9.2:4190';
+const ALGOD_PRIMARY = 'http://192.168.9.2:8190';
 const ALGOD_FALLBACK = 'https://mainnet-api.4160.nodely.dev';
-const GOVERNANCE_APP_ID = 3500693631;
+const GOVERNANCE_APP_ID = 3594179146;
 const VOTE_BOX_PREFIX = 0x76;
 
 /**

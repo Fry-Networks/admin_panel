@@ -63,7 +63,7 @@ export default async function handler(
           .json({ success: false, error: 'missing field: metric' });
       }
 
-      const allowedMetrics = ['manual', 'aem_count', 'device_count'];
+      const allowedMetrics = ['manual', 'device_count'];
       if (!allowedMetrics.includes(metricType)) {
         return res.status(400).json({
           success: false,

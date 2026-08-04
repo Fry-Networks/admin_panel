@@ -7,8 +7,9 @@ import algosdk from 'algosdk';
 import { sha512_256 } from 'js-sha512';
 
 // Contract constants
-export const GOVERNANCE_APP_ID = 3500693631;
+export const GOVERNANCE_APP_ID = 3594179146;
 export const FRY_ASA_ID = 2485314946;
+export const FRY3_ASA_ID = 3612979527;
 export const VOTE_BOX_MBR = BigInt(104100);  // ~0.1 ALGO for vote box creation
 export const VOTE_BOX_PREFIX = new Uint8Array([0x76]);  // "v"
 export const GOVERNANCE_ADMIN_ADDRESS = 'E2F2LT2INE75DBOYHQXTCTOP2PAP5MHAXQRXTTCCXFKHQTVG36DJONBQZE';

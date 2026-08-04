@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth-options';
 import clientPromise from '../../lib/mongoclient';
 
 const FRY_DECIMALS = 6;
+const FRY_2_0_ASA_ID = '2485314946';
+const FRY_3_0_ASA_ID = '3612979527';
 const MICRO_DIVISOR = Math.pow(10, FRY_DECIMALS); // 1,000,000
 
 export default async function handler(

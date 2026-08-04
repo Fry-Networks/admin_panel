@@ -5,7 +5,7 @@ import { Card, Title, Text, Button, TextInput, NumberInput, Select, SelectItem, 
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 type EventStatus = 'draft' | 'active' | 'ended' | 'cancelled';
-type MetricType = 'manual' | 'aem_count' | 'device_count';
+type MetricType = 'manual' | 'device_count';
 type PrizeTier = { tier: string; description: string; type: string; amount: number; maxRank: number };
 type Prize = { type?: string; amount?: number; description?: string; paidTxId?: string };
 type Metric = { type: MetricType; config?: Record<string, any> };
@@ -20,8 +20,8 @@ type Event = {
 
 const STATUS_COLORS: Record<EventStatus, string> = { draft: 'gray', active: 'green', ended: 'amber', cancelled: 'red' };
 const STATUS_OPTIONS: EventStatus[] = ['draft', 'active', 'ended', 'cancelled'];
-const METRIC_OPTIONS: MetricType[] = ['manual', 'aem_count', 'device_count'];
-const MINER_TYPE_OPTIONS = ['AEM', 'SDN', 'RDN', 'BM', 'EM', 'AOWSCM', 'OLWQM', 'OHWQM', 'IDM', 'ODM'];
+const METRIC_OPTIONS: MetricType[] = ['manual', 'device_count'];
+const MINER_TYPE_OPTIONS = ['FEM'];
 const PRIZE_TYPE_OPTIONS = ['USDC', 'NFT', 'key', 'token', 'other'];
 
 const emptyTier = (): PrizeTier => ({ tier: '', description: '', type: 'USDC', amount: 0, maxRank: 1 });

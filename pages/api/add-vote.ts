@@ -65,7 +65,7 @@ export default async function handler(
         discussion_days: discussion_days || 30,
         type: 'fip',
         status: 'draft',
-        vote_version: 'v1',
+        vote_version: 'v2',
         sequence_number: nextSequenceNumber
       });
 

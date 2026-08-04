@@ -186,6 +186,7 @@ export default function ModalEditVote({
                 size="xl"
                 onClick={(e) => {
                   e.preventDefault();
+                  handleSubmit(e);
                 }}
               >
                 Submit

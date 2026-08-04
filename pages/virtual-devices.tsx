@@ -193,7 +193,7 @@ export default function VirtualDevicesPage() {
 
       {/* Type Breakdown */}
       <div className="flex gap-4 mt-4">
-        {['VRDN', 'VSDN', 'VSVN'].map(t => (
+        {['FEM'].map(t => (
           <span key={t} className="text-xs text-gray-500">
             {t}: <span className="text-gray-300">{stats.byType[t] || 0}</span>
           </span>
@@ -220,9 +220,9 @@ export default function VirtualDevicesPage() {
         <select data-testid="virtual-devices-type-filter" value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
           className="h-10 rounded-md border border-gray-600 bg-gray-800 text-gray-300 px-3 text-sm focus:border-red-500">
           <option value="all">All Types</option>
-          <option value="VRDN">VRDN</option>
-          <option value="VSDN">VSDN</option>
-          <option value="VSVN">VSVN</option>
+          <option value="FEM">FEM</option>
+          
+          
         </select>
       </div>
 

@@ -10,11 +10,11 @@ import ReductionProductTable from '../app/tables/table-reduction-products';
 export default function ReductionPage({
   reductions,
   count,
-  products
+  productGroups
 }: {
   reductions: Reduction[];
   count: number;
-  products: Product[];
+  productGroups: any[];
 }) {
   const [showIndex, setShowIndex] = useState<number>(-1);
   const [localReductions, setLocalReductions] =
@@ -62,7 +62,7 @@ export default function ReductionPage({
           <TabPanel>
             <Card className="bg-gray-900 border-gray-700">
               <ReductionProductTable
-                products={products}
+                productGroups={productGroups}
                 index={showIndex}
                 reductions={localReductions}
               />
@@ -81,15 +81,33 @@ export async function getServerSideProps(context: any) {
     const db = client.db('main');
 
     const reductions = await db.collection('reductions').find({}).toArray();
-    const products = await db.collection('products').find({}).toArray();
+    const rawProducts = await db.collection('products').find({}).toArray();
     const registeredDevicesCount = await db
       .collection('devices')
       .countDocuments({ is_registered: true });
 
+    // Group products by key for display
+    const groupMap: Record<string, any> = {};
+    for (const p of rawProducts) {
+      if (!groupMap[p.key]) {
+        groupMap[p.key] = {
+          key: p.key,
+          name: p.display_name || p.name,
+          variantCount: 0,
+          reward: { unverified: 0, verified: 0 },
+        };
+      }
+      groupMap[p.key].variantCount++;
+      if (p.reward?.unverified > 0 && groupMap[p.key].reward.unverified === 0) {
+        groupMap[p.key].reward = p.reward;
+      }
+    }
+    const productGroups = Object.values(groupMap);
+
     return {
       props: {
         reductions: JSON.parse(JSON.stringify(reductions)),
-        products: JSON.parse(JSON.stringify(products)),
+        productGroups: JSON.parse(JSON.stringify(productGroups)),
         count: registeredDevicesCount
       }
     };

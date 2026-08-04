@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Card, Title, Text, Button, TextInput, NumberInput, Select, SelectItem, Badge, Divider } from '@tremor/react';
 
 type EventStatus = 'draft' | 'active' | 'ended' | 'cancelled';
-type MetricType = 'manual' | 'aem_count' | 'device_count';
+type MetricType = 'manual' | 'device_count';
 type LeaderboardEntry = { wallet: string; score: number; lastCalculated?: string; source?: string };
 type PrizeTier = { tier: string; description: string; type: string; amount: number; maxRank: number };
 type WinnerEntry = { wallet: string; rank: number; tier: string; prizeTxId?: string; declaredAt?: string; declaredBy?: string };
