@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import http from 'http';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-options';
 
 const PROM_URL = 'http://100.80.183.107:9090';
 
@@ -39,6 +41,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const session = await getServerSession(req, res, authOptions);
+  if (!session || !session.user?.admin) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   // Accept GET with base64 query param 'q', or POST with JSON body
   let query: string | undefined;
   let start: string | undefined;
