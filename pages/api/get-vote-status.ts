@@ -15,7 +15,7 @@ const CAST_VOTE_SELECTOR = 'b239e8c4';
 const MIGRATE_VOTE_SELECTOR = 'a55156d2';
 
 /**
- * Make HTTP request to ATLAS00 algod (same pattern as confirm-contract-vote).
+ * Make HTTP request to the primary algod node (same pattern as confirm-contract-vote).
  */
 function algodRequest(path: string): Promise<{ status: number; data: any } | null> {
   return new Promise((resolve) => {

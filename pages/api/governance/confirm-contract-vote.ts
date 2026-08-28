@@ -11,7 +11,7 @@ const GOVERNANCE_APP_ID = 3594179146;
 const VOTE_BOX_PREFIX = 0x76;
 
 /**
- * Make HTTP request to ATLAS00 algod.
+ * Make HTTP request to the primary algod node.
  */
 function algodRequest(path: string): Promise<{ status: number; data: any } | null> {
   return new Promise((resolve) => {
